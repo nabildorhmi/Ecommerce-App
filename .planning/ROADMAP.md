@@ -30,12 +30,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A product card renders in Arabic locale showing a MAD price in Latin digits (e.g., "1 500,00 MAD") with correct RTL padding
   4. The `product_translations` table exists in the database and the initial migration establishes the translation-ready schema pattern
   5. Every Axios request from the frontend carries the Authorization and Accept-Language headers; a request without a valid token to a protected route returns 401
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: Laravel project scaffold — Sanctum, RBAC (spatie/laravel-permission), CORS, Service class pattern, and base migrations
-- [ ] 01-02: React project scaffold — Vite + TypeScript + MUI 7, React Router, TanStack Query, Zustand, Axios client with auth/language headers
-- [ ] 01-03: RTL + i18n wiring — RTLProvider with Emotion CacheProvider + stylis-plugin-rtl, i18next with FR/AR/EN locale files, language switcher, formatCurrency utility
+- [ ] 01-01-PLAN.md — Laravel scaffold: Sanctum bearer-token auth, RBAC, CORS, Service pattern, migrations (products, product_translations, delivery_zones)
+- [ ] 01-02-PLAN.md — React scaffold: Vite + TS + MUI 7, React Router v7, TanStack Query, Zustand, Axios client with auth + Accept-Language headers
+- [ ] 01-03-PLAN.md — RTL + i18n: RTLProvider with Emotion CacheProvider + stylis-plugin-rtl, i18next FR/AR/EN, language switcher, formatCurrency utility, smoke test
 
 ### Phase 2: Product Catalog
 **Goal**: A customer can browse all products, search and filter the catalog, view full scooter specs and image galleries, see stock status and trust signals, and contact the shop via WhatsApp — and an admin can manage every aspect of the catalog
