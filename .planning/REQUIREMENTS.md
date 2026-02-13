@@ -142,6 +142,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-07 | Phase 1 | Pending |
 | INFRA-08 | Phase 1 | Pending |
 | INFRA-09 | Phase 1 | Pending |
+| I18N-01 | Phase 1 | Pending |
+| I18N-03 | Phase 1 | Pending |
+| I18N-04 | Phase 1 | Pending |
 | PROD-01 | Phase 2 | Pending |
 | PROD-02 | Phase 2 | Pending |
 | PROD-03 | Phase 2 | Pending |
@@ -180,16 +183,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DLVR-03 | Phase 4 | Pending |
 | WISH-01 | Phase 5 | Pending |
 | WISH-02 | Phase 5 | Pending |
-| I18N-01 | Phase 1 | Pending |
-| I18N-02 | Phase 6 | Pending |
-| I18N-03 | Phase 1 | Pending |
-| I18N-04 | Phase 1 | Pending |
+| I18N-02 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 50 total
-- Mapped to phases: 50
+- v1 requirements: 51 total
+- Mapped to phases: 51
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after initial definition*
+*Last updated: 2026-02-13 — Traceability updated after roadmap creation (I18N-02 moved from Phase 6 to Phase 5; count corrected to 51)*
