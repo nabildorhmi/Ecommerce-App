@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 1 of 5 (Foundation)
-Plan: 2 of 3 in current phase
+Plan: 2 of 3 in current phase (01-01 and 01-02 complete, 01-03 remaining)
 Status: In progress
-Last activity: 2026-02-14 — Plan 02 complete: React frontend scaffold with Axios interceptors, Zustand auth store, QueryClient, router skeleton
+Last activity: 2026-02-14 — Plan 01 complete: Laravel 12 API with Sanctum, RBAC, migrations, SetLocale middleware
 
 Progress: [██░░░░░░░░] 13%
 
@@ -30,8 +30,8 @@ Progress: [██░░░░░░░░] 13%
 | 01-foundation | 2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (research), 01-02 (frontend scaffold)
-- Trend: Fast — both plans completed in minutes
+- Last 5 plans: 01-02 (frontend scaffold), 01-01 (Laravel API backend scaffold)
+- Trend: Active — 01-01 took 24 min (included PHP/MySQL installation from scratch)
 
 *Updated after each plan completion*
 
@@ -51,6 +51,9 @@ Recent decisions affecting current work:
 - [01-02]: Accept-Language fallback to 'fr' (not 'en') — French is primary language for Morocco
 - [01-02]: vitest triple-slash reference in vite.config.ts — avoids separate vitest.config.ts file
 - [01-02]: RTLProvider and i18n import deferred to plan 03 — insertion points commented in main.tsx
+- [01-01]: guard_name=sanctum for roles + User.$guard_name=sanctum required for Spatie to resolve roles correctly in Sanctum bearer token auth (not web guard)
+- [01-01]: Sanctum must be installed via composer require, not php artisan install:api (fails silently in non-interactive mode)
+- [01-01]: PHP 8.3 via winget, MySQL 8.4 standalone (no service), Composer manual install — no admin rights required
 
 ### Pending Todos
 
@@ -59,10 +62,10 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 4]: Research needed before planning — COD fraud prevention strategy (phone OTP vs. duplicate detection) and order state machine library choice (spatie/laravel-model-states vs. hand-coded). See research/SUMMARY.md Phase 4 research flag.
-- [Pre-Phase 1]: Confirm hosting environment supports MySQL 8 (or PostgreSQL) before first migration is written.
+- [Pre-Phase 1]: MySQL must be running (mysqld process) before API can serve requests. MySQL runs standalone without Windows service.
 
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 01-02-PLAN.md — React frontend scaffold. Next: 01-03-PLAN.md (i18n + RTL).
+Stopped at: Completed 01-01-PLAN.md — Laravel 12 API backend scaffold. Next: 01-03-PLAN.md (i18n + RTL).
 Resume file: None
