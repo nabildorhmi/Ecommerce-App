@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 Phase: 1 of 5 (Foundation)
 Plan: 3 of 3 in current phase — ALL PLANS COMPLETE
 Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-02-14 — Plan 03 complete: i18n + RTL infrastructure, FR/EN/AR locale files, smoke test human-verified
+Last activity: 2026-02-14 — Phase 1 complete. Arabic/RTL removed per user decision — FR/EN only
 
 Progress: [███░░░░░░░] 20%
 
@@ -62,7 +62,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- RTL infrastructure simplification: remove Arabic from RTLProvider, LanguageSwitcher, i18n.ts, and locale files (user removed Arabic support after plan 03 verification). Should be done before Phase 2 feature work begins.
+None — RTL simplification completed (commit 5f7d38c).
 
 ### Blockers/Concerns
 
