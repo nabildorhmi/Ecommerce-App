@@ -5,15 +5,18 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { RouterProvider } from 'react-router';
 import { queryClient } from './app/queryClient';
 import { router } from './app/router';
+import { RTLProvider } from './shared/components/RTLProvider';
 
-// RTLProvider imported in plan 03 after i18n is wired
-// import { RTLProvider } from './shared/components/RTLProvider';
+// i18n MUST be imported before ReactDOM.createRoot to avoid FOUC.
+// With preloaded resources (no HTTP backend), init resolves synchronously.
+import './app/i18n';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      {/* RTLProvider wraps RouterProvider — added in plan 03 */}
-      <RouterProvider router={router} />
+      <RTLProvider>
+        <RouterProvider router={router} />
+      </RTLProvider>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   </React.StrictMode>

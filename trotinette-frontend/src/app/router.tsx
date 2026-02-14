@@ -1,14 +1,14 @@
 import { createBrowserRouter } from 'react-router';
+import { RtlSmokeTest } from '../shared/components/RtlSmokeTest';
 
 // Placeholder pages — replaced in Phase 2 and 3
-const HomePage = () => <div>Home (Phase 2)</div>;
 const AdminHomePage = () => <div>Admin (Phase 2)</div>;
 const LoginPage = () => <div>Login (Phase 3)</div>;
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <HomePage />,
+    element: <RtlSmokeTest />,
   },
   {
     path: '/login',
