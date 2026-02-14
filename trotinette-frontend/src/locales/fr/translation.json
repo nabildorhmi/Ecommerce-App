@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "catalog": "Catalogue",
+    "cart": "Panier",
+    "account": "Mon compte",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "admin": "Administration"
+  },
+  "language": {
+    "switch": "Changer de langue",
+    "fr": "Français",
+    "ar": "العربية",
+    "en": "English"
+  },
+  "product": {
+    "addToCart": "Ajouter au panier",
+    "outOfStock": "Rupture de stock",
+    "price": "Prix"
+  },
+  "smoke_test": {
+    "title": "Test d'infrastructure RTL",
+    "price_label": "Prix en centimes (150000)",
+    "open_dialog": "Ouvrir Dialog",
+    "open_drawer": "Ouvrir Drawer",
+    "dialog_title": "Dialog MUI (test portail)",
+    "dialog_content": "Si ce dialog est en RTL en arabe, le portail fonctionne correctement.",
+    "close": "Fermer",
+    "drawer_content": "Drawer MUI ouvert depuis le bon côté."
+  }
+}
