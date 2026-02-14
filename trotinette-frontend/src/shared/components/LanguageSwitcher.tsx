@@ -4,7 +4,6 @@ import type { SupportedLocale } from '../hooks/useLanguage';
 
 const LANGUAGES: { code: SupportedLocale; label: string }[] = [
   { code: 'fr', label: 'FR' },
-  { code: 'ar', label: 'AR' },
   { code: 'en', label: 'EN' },
 ];
 

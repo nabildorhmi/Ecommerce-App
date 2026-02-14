@@ -11,7 +11,6 @@
   "language": {
     "switch": "Changer de langue",
     "fr": "Français",
-    "ar": "العربية",
     "en": "English"
   },
   "product": {
@@ -20,13 +19,7 @@
     "price": "Prix"
   },
   "smoke_test": {
-    "title": "Test d'infrastructure RTL",
-    "price_label": "Prix en centimes (150000)",
-    "open_dialog": "Ouvrir Dialog",
-    "open_drawer": "Ouvrir Drawer",
-    "dialog_title": "Dialog MUI (test portail)",
-    "dialog_content": "Si ce dialog est en RTL en arabe, le portail fonctionne correctement.",
-    "close": "Fermer",
-    "drawer_content": "Drawer MUI ouvert depuis le bon côté."
+    "title": "Test d'infrastructure i18n",
+    "price_label": "Prix en centimes (150000)"
   }
 }

@@ -11,7 +11,6 @@
   "language": {
     "switch": "Switch language",
     "fr": "Français",
-    "ar": "العربية",
     "en": "English"
   },
   "product": {
@@ -20,13 +19,7 @@
     "price": "Price"
   },
   "smoke_test": {
-    "title": "RTL Infrastructure Smoke Test",
-    "price_label": "Price in centimes (150000)",
-    "open_dialog": "Open Dialog",
-    "open_drawer": "Open Drawer",
-    "dialog_title": "MUI Dialog (portal test)",
-    "dialog_content": "If this dialog is RTL in Arabic, the portal is working correctly.",
-    "close": "Close",
-    "drawer_content": "MUI Drawer opened from the correct side."
+    "title": "i18n Infrastructure Test",
+    "price_label": "Price in centimes (150000)"
   }
 }
