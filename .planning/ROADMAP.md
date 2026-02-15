@@ -47,12 +47,12 @@ Plans:
   3. A customer searching for a product name or description keyword sees relevant results in the current locale
   4. An admin can create a product with translatable name/description, upload multiple images, set spec attributes, assign a category, and toggle visibility — and those changes appear immediately on the storefront
   5. An out-of-stock product displays an "out of stock" indicator and the add-to-cart button is disabled
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: Product and Category backend — models, migrations (product_translations, media), API Resources, spatie/laravel-medialibrary conversions, spatie/laravel-query-builder filtering, full-text search, DLVR-02 seeder
-- [ ] 02-02: Product storefront — catalog listing page with filter bar, product detail page with spec table, image gallery, WhatsApp button, trust signals, stock indicator, category breadcrumbs
-- [ ] 02-03: Admin product management — product CRUD with image upload, category management, stock quantity editing, visibility toggle
+- [ ] 02-01-PLAN.md — Product catalog backend: models (Product, Category with translations), migrations (category_translations, fulltext index, media), Spatie medialibrary + query-builder, API controllers (customer listing/detail + admin CRUD), services, resources, seeders (delivery zones, categories, products)
+- [ ] 02-02-PLAN.md — Product storefront: catalog listing page with filter bar (category, price, stock, search), product grid with pagination, product detail page with image gallery, specs table, WhatsApp button, trust signals, stock indicator, category breadcrumb
+- [ ] 02-03-PLAN.md — Admin product management: product CRUD with image upload and translatable fields, category CRUD with FR/EN names, inline stock editing, visibility toggle
 
 ### Phase 3: User Accounts
 **Goal**: A customer can create an account, log in and stay logged in, manage their profile and saved delivery address, and view their order history placeholder — and an admin can view, manage, and deactivate any user account
@@ -108,8 +108,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
-| 2. Product Catalog | 0/3 | Not started | - |
+| 1. Foundation | 3/3 | Complete | 2026-02-14 |
+| 2. Product Catalog | 0/3 | Planned | - |
 | 3. User Accounts | 0/2 | Not started | - |
 | 4. Cart, Checkout, and Orders | 0/4 | Not started | - |
 | 5. Wishlist and Translation Completion | 0/2 | Not started | - |
