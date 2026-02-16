@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Customers can browse electric scooters, place orders, and pay cash on delivery — with an admin who controls the entire catalog, orders, and delivery zones.
-**Current focus:** Phase 1 — Foundation (complete)
+**Current focus:** Phase 2 — Product Catalog (in progress)
 
 ## Current Position
 
-Phase: 1 of 5 (Foundation)
-Plan: 3 of 3 in current phase — ALL PLANS COMPLETE
-Status: Phase 1 complete — ready for Phase 2
-Last activity: 2026-02-14 — Phase 1 complete. Arabic/RTL removed per user decision — FR/EN only
+Phase: 2 of 5 (Product Catalog)
+Plan: 1 of 3 in current phase — 02-01 COMPLETE
+Status: Phase 2 in progress — 02-01 (backend API) done. Next: 02-02 (storefront UI) or 02-03 (admin UI)
+Last activity: 2026-02-16 — 02-01 complete. Product catalog backend API with spatie medialibrary + query-builder
 
-Progress: [███░░░░░░░] 20%
+Progress: [████░░░░░░] 27%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~5min
-- Total execution time: ~0.2 hours
+- Total plans completed: 4
+- Average duration: ~8min
+- Total execution time: ~0.5 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | ~13 min | ~4 min |
+| 02-product-catalog | 1 | ~17 min | ~17 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (i18n + RTL), 01-02 (frontend scaffold), 01-01 (Laravel API backend scaffold)
-- Trend: Active — 01-01 took 24 min (included PHP/MySQL installation from scratch)
+- Last 5 plans: 02-01 (catalog backend API), 01-03 (i18n + RTL), 01-02 (frontend scaffold), 01-01 (Laravel API backend scaffold)
+- Trend: Active — 02-01 took 17 min (included MySQL startup debugging and composer path discovery)
 
 *Updated after each plan completion*
 
@@ -42,6 +43,12 @@ Progress: [███░░░░░░░] 20%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [02-01]: nonQueued() on all media conversions + QUEUE_CONVERSIONS_BY_DEFAULT=false in .env — sync conversions in dev, no queue worker needed
+- [02-01]: LIKE fallback for search terms < 4 chars — MySQL FULLTEXT ignores words below ft_min_word_len (default 4 InnoDB)
+- [02-01]: CategoryService.deleteCategory throws ValidationException if products exist — prevents orphaned product data
+- [02-01]: UpdateProductRequest uses PATCH semantics — all fields optional; sku unique rule ignores current product ID via Rule::unique()->ignore()
+- [02-01]: MySQL data directory at C:/Users/User/mysql-data — must start mysqld with --datadir=C:/Users/User/mysql-data
+- [02-01]: Composer at /c/Users/User/AppData/Local/Programs/composer (phar) — use full path in scripts
 - [Phase 1]: USER DECISION: Arabic language removed — only FR and EN supported going forward. RTL infrastructure (RTLProvider, rtlCache, ar locale) to be simplified before Phase 2 begins.
 - [01-03]: Module-level Emotion caches (rtlCache/ltrCache) created outside component — prevents CSS re-injection on every render (MUI issue #33892)
 - [01-03]: i18n.ts imported before ReactDOM.createRoot in main.tsx — prevents flash of untranslated content
@@ -62,15 +69,15 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None — RTL simplification completed (commit 5f7d38c).
+None.
 
 ### Blockers/Concerns
 
+- [Pre-Phase 2]: MySQL must be started manually before API: `"C:/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe" --datadir="C:/Users/User/mysql-data" --console &`
 - [Phase 4]: Research needed before planning — COD fraud prevention strategy (phone OTP vs. duplicate detection) and order state machine library choice (spatie/laravel-model-states vs. hand-coded). See research/SUMMARY.md Phase 4 research flag.
-- [Pre-Phase 1]: MySQL must be running (mysqld process) before API can serve requests. MySQL runs standalone without Windows service.
 
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Completed 01-03-PLAN.md — i18n + RTL infrastructure. Phase 1 complete. Next: Phase 2 (catalog).
+Last session: 2026-02-16
+Stopped at: Completed 02-01-PLAN.md — product catalog backend API. Phase 2 plan 1 of 3 done.
 Resume file: None
