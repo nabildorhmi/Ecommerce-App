@@ -47,6 +47,11 @@ Recent decisions affecting current work:
 - [02-03]: Dual query invalidation on admin mutations (['admin','products'] AND ['products']) — storefront reflects admin changes immediately
 - [02-03]: Dialog-based CRUD for categories, separate edit page for products — categories are simple (3 fields), products are complex (20+ fields)
 - [02-03]: Zod v4 uses { error: '...' } not { invalid_type_error: '...' } — breaking API change from v3; linter auto-corrected
+- [02-02]: Price MAD/centimes conversion: FilterBar shows MAD, URL stores centimes (multiply by 100 for API); keeps API integer contract intact
+- [02-02]: ProductGallery uses full-res image for main view (not card) — detail page justifies higher resolution
+- [02-02]: WhatsApp message hardcoded in French — Moroccan French is primary market language
+- [02-02]: VITE_WHATSAPP_NUMBER placeholder in .env — user must replace with real number before production
+- [02-02]: Add to Cart disabled (not hidden) for out-of-stock — consistent layout, wired in Phase 4
 - [02-01]: nonQueued() on all media conversions + QUEUE_CONVERSIONS_BY_DEFAULT=false in .env — sync conversions in dev, no queue worker needed
 - [02-01]: LIKE fallback for search terms < 4 chars — MySQL FULLTEXT ignores words below ft_min_word_len (default 4 InnoDB)
 - [02-01]: CategoryService.deleteCategory throws ValidationException if products exist — prevents orphaned product data
@@ -83,5 +88,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-03-PLAN.md — admin product/category management UI. Phase 2 complete (3 of 3 plans done).
+Stopped at: Completed 02-02-PLAN.md — storefront UI (catalog listing + product detail). Phase 2 plan 2 of 3 done.
 Resume file: None
