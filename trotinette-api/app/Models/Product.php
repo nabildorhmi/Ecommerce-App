@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+class Product extends Model implements HasMedia
+{
+    use InteractsWithMedia;
+
+    protected $fillable = [
+        'sku',
+        'price',
+        'stock_quantity',
+        'attributes',
+        'category_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'attributes'     => 'array',
+        'is_active'      => 'boolean',
+        'stock_quantity' => 'integer',
+        'price'          => 'integer',
+    ];
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumbnail')
+            ->fit(Fit::Contain, 200, 200)
+            ->nonQueued();
+
+        $this->addMediaConversion('card')
+            ->fit(Fit::Contain, 600, 400)
+            ->nonQueued();
+
+        $this->addMediaConversion('full')
+            ->fit(Fit::Contain, 1200, 900)
+            ->nonQueued();
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProductTranslation::class);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+}
