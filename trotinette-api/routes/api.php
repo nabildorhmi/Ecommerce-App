@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Customer\AuthController;
+use App\Http\Controllers\Customer\CategoryController;
+use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // Health check — unauthenticated
@@ -10,13 +14,35 @@ Route::get('/ping', fn() => response()->json(['status' => 'ok', 'locale' => app(
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login',    [AuthController::class, 'login']);
 
+// Public catalog routes — unauthenticated
+Route::get('/products',        [ProductController::class, 'index']);
+Route::get('/products/{slug}', [ProductController::class, 'show']);
+Route::get('/categories',      [CategoryController::class, 'index']);
+
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user',         [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
-    // Admin-only routes (placeholder for future phases)
+    // Admin-only routes
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         Route::get('/ping', fn() => response()->json(['status' => 'admin ok']));
+
+        // Product CRUD
+        Route::get('/products',                                   [AdminProductController::class, 'index']);
+        Route::post('/products',                                  [AdminProductController::class, 'store']);
+        Route::get('/products/{product}',                         [AdminProductController::class, 'show']);
+        Route::put('/products/{product}',                         [AdminProductController::class, 'update']);
+        Route::patch('/products/{product}',                       [AdminProductController::class, 'update']);
+        Route::delete('/products/{product}',                      [AdminProductController::class, 'destroy']);
+        Route::delete('/products/{product}/media/{mediaId}',      [AdminProductController::class, 'deleteMedia']);
+
+        // Category CRUD
+        Route::get('/categories',                   [AdminCategoryController::class, 'index']);
+        Route::post('/categories',                  [AdminCategoryController::class, 'store']);
+        Route::get('/categories/{category}',        [AdminCategoryController::class, 'show']);
+        Route::put('/categories/{category}',        [AdminCategoryController::class, 'update']);
+        Route::patch('/categories/{category}',      [AdminCategoryController::class, 'update']);
+        Route::delete('/categories/{category}',     [AdminCategoryController::class, 'destroy']);
     });
 });
