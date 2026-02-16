@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 2 of 5 (Product Catalog)
-Plan: 1 of 3 in current phase — 02-01 COMPLETE
-Status: Phase 2 in progress — 02-01 (backend API) done. Next: 02-02 (storefront UI) or 02-03 (admin UI)
-Last activity: 2026-02-16 — 02-01 complete. Product catalog backend API with spatie medialibrary + query-builder
+Plan: 3 of 3 in current phase — 02-01 COMPLETE, 02-02 COMPLETE, 02-03 COMPLETE
+Status: Phase 2 COMPLETE — all 3 plans done. Ready for Phase 3 (Authentication).
+Last activity: 2026-02-16 — 02-03 complete. Admin product and category management UI.
 
-Progress: [████░░░░░░] 27%
+Progress: [██████░░░░] 47%
 
 ## Performance Metrics
 
@@ -28,11 +28,11 @@ Progress: [████░░░░░░] 27%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3 | ~13 min | ~4 min |
-| 02-product-catalog | 1 | ~17 min | ~17 min |
+| 02-product-catalog | 3 | ~25 min | ~8 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (catalog backend API), 01-03 (i18n + RTL), 01-02 (frontend scaffold), 01-01 (Laravel API backend scaffold)
-- Trend: Active — 02-01 took 17 min (included MySQL startup debugging and composer path discovery)
+- Last 5 plans: 02-03 (admin UI), 02-02 (storefront UI), 02-01 (catalog backend API), 01-03 (i18n + RTL), 01-02 (frontend scaffold)
+- Trend: Active — 02-03 took 4 min (clean execution, parallel agent coordination)
 
 *Updated after each plan completion*
 
@@ -43,6 +43,10 @@ Progress: [████░░░░░░] 27%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [02-03]: FormData with Content-Type undefined override on apiClient — browser sets multipart/form-data boundary correctly; POST + _method=PATCH for Laravel multipart PATCH workaround
+- [02-03]: Dual query invalidation on admin mutations (['admin','products'] AND ['products']) — storefront reflects admin changes immediately
+- [02-03]: Dialog-based CRUD for categories, separate edit page for products — categories are simple (3 fields), products are complex (20+ fields)
+- [02-03]: Zod v4 uses { error: '...' } not { invalid_type_error: '...' } — breaking API change from v3; linter auto-corrected
 - [02-01]: nonQueued() on all media conversions + QUEUE_CONVERSIONS_BY_DEFAULT=false in .env — sync conversions in dev, no queue worker needed
 - [02-01]: LIKE fallback for search terms < 4 chars — MySQL FULLTEXT ignores words below ft_min_word_len (default 4 InnoDB)
 - [02-01]: CategoryService.deleteCategory throws ValidationException if products exist — prevents orphaned product data
@@ -79,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-01-PLAN.md — product catalog backend API. Phase 2 plan 1 of 3 done.
+Stopped at: Completed 02-03-PLAN.md — admin product/category management UI. Phase 2 complete (3 of 3 plans done).
 Resume file: None
