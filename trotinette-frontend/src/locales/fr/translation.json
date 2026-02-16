@@ -16,10 +16,69 @@
   "product": {
     "addToCart": "Ajouter au panier",
     "outOfStock": "Rupture de stock",
-    "price": "Prix"
+    "price": "Prix",
+    "specifications": "Caractéristiques",
+    "notFound": "Produit introuvable",
+    "backToCatalog": "Retour au catalogue",
+    "askWhatsApp": "Demander sur WhatsApp"
+  },
+  "catalog": {
+    "title": "Catalogue",
+    "search": "Rechercher...",
+    "category": "Catégorie",
+    "allCategories": "Toutes les catégories",
+    "priceRange": "Gamme de prix",
+    "minPrice": "Prix min (MAD)",
+    "maxPrice": "Prix max (MAD)",
+    "inStockOnly": "En stock uniquement",
+    "inStock": "En stock",
+    "outOfStock": "Rupture de stock",
+    "clearFilters": "Effacer les filtres",
+    "noProducts": "Aucun produit trouvé",
+    "showing": "{{count}} produit(s) trouvé(s)"
+  },
+  "trust": {
+    "returnPolicy": "Retour sous 7 jours",
+    "officialStore": "Boutique officielle",
+    "contact": "Contactez-nous"
   },
   "smoke_test": {
     "title": "Test d'infrastructure i18n",
     "price_label": "Prix en centimes (150000)"
+  },
+  "admin": {
+    "products": {
+      "title": "Produits",
+      "create": "Ajouter un produit",
+      "edit": "Modifier le produit",
+      "delete": "Supprimer le produit",
+      "confirmDelete": "Etes-vous sur de vouloir supprimer ce produit ?",
+      "sku": "Reference (SKU)",
+      "price": "Prix (MAD)",
+      "stock": "Stock",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "frenchName": "Nom en francais",
+      "englishName": "Nom en anglais",
+      "description": "Description",
+      "slug": "Slug",
+      "specifications": "Specifications",
+      "images": "Images",
+      "uploadImages": "Telecharger des images",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "categories": {
+      "title": "Categories",
+      "create": "Ajouter une categorie",
+      "edit": "Modifier la categorie",
+      "delete": "Supprimer la categorie",
+      "confirmDelete": "Etes-vous sur de vouloir supprimer cette categorie ?",
+      "hasProducts": "Cette categorie contient des produits",
+      "slug": "Slug",
+      "frName": "Nom en francais",
+      "enName": "Nom en anglais",
+      "active": "Actif"
+    }
   }
 }

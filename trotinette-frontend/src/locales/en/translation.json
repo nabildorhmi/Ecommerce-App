@@ -16,10 +16,69 @@
   "product": {
     "addToCart": "Add to cart",
     "outOfStock": "Out of stock",
-    "price": "Price"
+    "price": "Price",
+    "specifications": "Specifications",
+    "notFound": "Product not found",
+    "backToCatalog": "Back to catalog",
+    "askWhatsApp": "Ask on WhatsApp"
+  },
+  "catalog": {
+    "title": "Catalog",
+    "search": "Search...",
+    "category": "Category",
+    "allCategories": "All categories",
+    "priceRange": "Price range",
+    "minPrice": "Min price (MAD)",
+    "maxPrice": "Max price (MAD)",
+    "inStockOnly": "In stock only",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "clearFilters": "Clear filters",
+    "noProducts": "No products found",
+    "showing": "{{count}} product(s) found"
+  },
+  "trust": {
+    "returnPolicy": "7-day return policy",
+    "officialStore": "Official store",
+    "contact": "Contact us"
   },
   "smoke_test": {
     "title": "i18n Infrastructure Test",
     "price_label": "Price in centimes (150000)"
+  },
+  "admin": {
+    "products": {
+      "title": "Products",
+      "create": "Add product",
+      "edit": "Edit product",
+      "delete": "Delete product",
+      "confirmDelete": "Are you sure you want to delete this product?",
+      "sku": "SKU",
+      "price": "Price (MAD)",
+      "stock": "Stock",
+      "active": "Active",
+      "inactive": "Inactive",
+      "frenchName": "French name",
+      "englishName": "English name",
+      "description": "Description",
+      "slug": "Slug",
+      "specifications": "Specifications",
+      "images": "Images",
+      "uploadImages": "Upload images",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "categories": {
+      "title": "Categories",
+      "create": "Add category",
+      "edit": "Edit category",
+      "delete": "Delete category",
+      "confirmDelete": "Are you sure you want to delete this category?",
+      "hasProducts": "This category has products",
+      "slug": "Slug",
+      "frName": "French name",
+      "enName": "English name",
+      "active": "Active"
+    }
   }
 }
