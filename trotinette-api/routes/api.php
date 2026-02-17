@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\ProductController;
@@ -22,6 +23,7 @@ Route::get('/categories',      [CategoryController::class, 'index']);
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user',         [AuthController::class, 'me']);
+    Route::put('/user',         [AuthController::class, 'updateProfile']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // Admin-only routes
@@ -38,11 +40,16 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/products/{product}/media/{mediaId}',      [AdminProductController::class, 'deleteMedia']);
 
         // Category CRUD
-        Route::get('/categories',                   [AdminCategoryController::class, 'index']);
-        Route::post('/categories',                  [AdminCategoryController::class, 'store']);
-        Route::get('/categories/{category}',        [AdminCategoryController::class, 'show']);
-        Route::put('/categories/{category}',        [AdminCategoryController::class, 'update']);
-        Route::patch('/categories/{category}',      [AdminCategoryController::class, 'update']);
-        Route::delete('/categories/{category}',     [AdminCategoryController::class, 'destroy']);
+        Route::get('/categories',               [AdminCategoryController::class, 'index']);
+        Route::post('/categories',              [AdminCategoryController::class, 'store']);
+        Route::get('/categories/{category}',    [AdminCategoryController::class, 'show']);
+        Route::put('/categories/{category}',    [AdminCategoryController::class, 'update']);
+        Route::patch('/categories/{category}',  [AdminCategoryController::class, 'update']);
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+
+        // User management
+        Route::get('/users',                          [AdminUserController::class, 'index']);
+        Route::get('/users/{user}',                   [AdminUserController::class, 'show']);
+        Route::patch('/users/{user}/deactivate',      [AdminUserController::class, 'deactivate']);
     });
 });

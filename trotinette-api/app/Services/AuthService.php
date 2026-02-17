@@ -18,6 +18,7 @@ class AuthService
             'phone'    => $phone,
         ]);
         $user->assignRole('customer');
+        $user->refresh();
 
         return (object) [
             'plainTextToken' => $user->createToken('api')->plainTextToken,
@@ -28,6 +29,10 @@ class AuthService
     public function login(string $email, string $password): object
     {
         $user = User::where('email', $email)->firstOrFail();
+
+        if (! $user->is_active) {
+            throw new AuthenticationException('Account deactivated.');
+        }
 
         if (! Hash::check($password, $user->password)) {
             throw new AuthenticationException();
