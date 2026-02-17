@@ -63,11 +63,11 @@ Plans:
   2. A logged-in customer can update their name, email, phone, and delivery address (city and street) from their profile page
   3. A customer attempting to access an admin route is redirected to the storefront; an unauthenticated user is redirected to the login page
   4. An admin can view the registered user list, open a user's profile with their order history, and deactivate their account
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 03-01: Auth backend — registration, login, logout, profile update endpoints with Sanctum bearer token; role-based middleware on all /api/admin/* routes
-- [ ] 03-02: Auth frontend — register/login/logout UI, profile edit page, Zustand auth store with localStorage persistence, admin route guards, admin user management page
+- [ ] 03-01-PLAN.md — Auth backend: migration (is_active, address columns), phone required fix, profile update endpoint, admin user controller (list, detail, deactivate), login deactivation check
+- [ ] 03-02-PLAN.md — Auth frontend: login/register pages, profile edit page, ProtectedRoute + AdminRoute guards, admin user management page + detail page, router rewiring
 
 ### Phase 4: Cart, Checkout, and Orders
 **Goal**: A customer can add products to a persistent cart, proceed through checkout with a city-selected delivery fee, place a cash-on-delivery order, and track its status — while the backend enforces a tamper-proof order state machine with full audit logging, and an admin can manage every order
@@ -110,6 +110,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-14 |
 | 2. Product Catalog | 0/3 | Planned | - |
-| 3. User Accounts | 0/2 | Not started | - |
+| 3. User Accounts | 0/2 | Planned | - |
 | 4. Cart, Checkout, and Orders | 0/4 | Not started | - |
 | 5. Wishlist and Translation Completion | 0/2 | Not started | - |
