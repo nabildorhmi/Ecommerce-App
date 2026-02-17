@@ -89,3 +89,27 @@ export interface PaginatedProducts {
     total: number;
   };
 }
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  role: 'admin' | 'customer';
+  is_active: boolean;
+  address_city: string | null;
+  address_street: string | null;
+  order_history: unknown[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaginatedUsers {
+  data: AdminUser[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
+}

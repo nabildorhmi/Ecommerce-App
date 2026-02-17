@@ -4,10 +4,15 @@ import { ProductDetailPage } from '../features/catalog/pages/ProductDetailPage';
 import { AdminProductsPage } from '../features/admin/pages/AdminProductsPage';
 import { AdminProductEditPage } from '../features/admin/pages/AdminProductEditPage';
 import { AdminCategoriesPage } from '../features/admin/pages/AdminCategoriesPage';
+import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage';
+import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage';
+import { ProtectedRoute } from '../shared/components/ProtectedRoute';
+import { AdminRoute } from '../shared/components/AdminRoute';
+import { LoginPage } from '../features/auth/pages/LoginPage';
+import { ProfilePage } from '../features/auth/pages/ProfilePage';
 
-// Placeholder pages — replaced in Phase 3
-const AdminHomePage = () => <div>Admin (Phase 3)</div>;
-const LoginPage = () => <div>Login (Phase 3)</div>;
+// Admin home — redirect to product list (primary admin landing)
+const AdminHomePage = () => <Navigate to="/admin/products" replace />;
 
 export const router = createBrowserRouter([
   {
@@ -27,25 +32,48 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <LoginPage />,
   },
+  // Protected routes — require authentication
   {
-    path: '/admin',
-    element: <AdminHomePage />,
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/profile',
+        element: <ProfilePage />,
+      },
+    ],
   },
-  // Admin product management (02-03)
+  // Admin routes — require admin role
   {
-    path: '/admin/products',
-    element: <AdminProductsPage />,
-  },
-  {
-    path: '/admin/products/create',
-    element: <AdminProductEditPage />,
-  },
-  {
-    path: '/admin/products/:id/edit',
-    element: <AdminProductEditPage />,
-  },
-  {
-    path: '/admin/categories',
-    element: <AdminCategoriesPage />,
+    element: <AdminRoute />,
+    children: [
+      {
+        path: '/admin',
+        element: <AdminHomePage />,
+      },
+      {
+        path: '/admin/products',
+        element: <AdminProductsPage />,
+      },
+      {
+        path: '/admin/products/create',
+        element: <AdminProductEditPage />,
+      },
+      {
+        path: '/admin/products/:id/edit',
+        element: <AdminProductEditPage />,
+      },
+      {
+        path: '/admin/categories',
+        element: <AdminCategoriesPage />,
+      },
+      {
+        path: '/admin/users',
+        element: <AdminUsersPage />,
+      },
+      {
+        path: '/admin/users/:id',
+        element: <AdminUserDetailPage />,
+      },
+    ],
   },
 ]);
