@@ -46,6 +46,49 @@
     "title": "Test d'infrastructure i18n",
     "price_label": "Prix en centimes (150000)"
   },
+  "auth": {
+    "login": "Connexion",
+    "register": "Inscription",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "phone": "Telephone",
+    "name": "Nom complet",
+    "confirmPassword": "Confirmer le mot de passe",
+    "loginButton": "Se connecter",
+    "registerButton": "S'inscrire",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Deja un compte ?",
+    "loginError": "Identifiants incorrects",
+    "registerError": "Erreur lors de l'inscription"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "name": "Nom complet",
+    "email": "Adresse e-mail",
+    "phone": "Telephone",
+    "addressCity": "Ville",
+    "addressStreet": "Adresse",
+    "save": "Enregistrer",
+    "saved": "Profil enregistre avec succes"
+  },
+  "adminUsers": {
+    "title": "Utilisateurs",
+    "name": "Nom",
+    "email": "E-mail",
+    "phone": "Telephone",
+    "role": "Role",
+    "status": "Statut",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "deactivate": "Desactiver",
+    "confirmDeactivate": "Etes-vous sur de vouloir desactiver cet utilisateur ?"
+  },
+  "adminUserDetail": {
+    "title": "Detail utilisateur",
+    "orderHistory": "Historique des commandes",
+    "noOrders": "Aucune commande pour le moment",
+    "back": "Retour aux utilisateurs"
+  },
   "admin": {
     "products": {
       "title": "Produits",

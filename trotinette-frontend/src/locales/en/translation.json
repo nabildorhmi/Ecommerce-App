@@ -46,6 +46,49 @@
     "title": "i18n Infrastructure Test",
     "price_label": "Price in centimes (150000)"
   },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email address",
+    "password": "Password",
+    "phone": "Phone number",
+    "name": "Full name",
+    "confirmPassword": "Confirm password",
+    "loginButton": "Log in",
+    "registerButton": "Create account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginError": "Invalid credentials",
+    "registerError": "Registration failed"
+  },
+  "profile": {
+    "title": "My profile",
+    "name": "Full name",
+    "email": "Email address",
+    "phone": "Phone number",
+    "addressCity": "City",
+    "addressStreet": "Street address",
+    "save": "Save",
+    "saved": "Profile saved successfully"
+  },
+  "adminUsers": {
+    "title": "Users",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "deactivate": "Deactivate",
+    "confirmDeactivate": "Are you sure you want to deactivate this user?"
+  },
+  "adminUserDetail": {
+    "title": "User detail",
+    "orderHistory": "Order history",
+    "noOrders": "No orders yet",
+    "back": "Back to users"
+  },
   "admin": {
     "products": {
       "title": "Products",
