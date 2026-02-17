@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 3 of 5 (User Accounts)
-Plan: 1 of 2 in current phase — 03-01 COMPLETE
-Status: Phase 3 in progress — 03-01 done (auth backend). Next: 03-02 (frontend UI).
-Last activity: 2026-02-17 — 03-01 complete. Auth backend: account fields, profile update, admin user management.
+Plan: 2 of 2 in current phase — 03-02 COMPLETE
+Status: Phase 3 COMPLETE — all plans done. Next: Phase 4 (Orders/Checkout).
+Last activity: 2026-02-17 — 03-02 complete. Auth frontend: login/register, profile page, route guards, admin user management UI.
 
-Progress: [███████░░░] 55%
+Progress: [████████░░] 70%
 
 ## Performance Metrics
 
@@ -29,11 +29,11 @@ Progress: [███████░░░] 55%
 |-------|-------|-------|----------|
 | 01-foundation | 3 | ~13 min | ~4 min |
 | 02-product-catalog | 3 | ~25 min | ~8 min |
-| 03-user-accounts | 1 (so far) | ~5 min | ~5 min |
+| 03-user-accounts | 2 | ~10 min | ~5 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (auth backend), 02-03 (admin UI), 02-02 (storefront UI), 02-01 (catalog backend API), 01-03 (i18n + RTL)
-- Trend: Active — 03-01 took 5 min (clean execution, 1 auto-fix bug)
+- Last 5 plans: 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI), 02-02 (storefront UI), 02-01 (catalog backend API)
+- Trend: Active — 03-02 took 5 min (clean execution, 0 deviations)
 
 *Updated after each plan completion*
 
@@ -44,6 +44,10 @@ Progress: [███████░░░] 55%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [03-02]: layout route pattern for guards ({ element: <Guard />, children: [...] }) — React Router v7 recommended; avoids HOC wrapping
+- [03-02]: password_confirmation field name kept exact (not confirm_password) — Laravel confirmed rule requires base_field + _confirmation naming
+- [03-02]: useAuthStore.getState() inside useMutation onSuccess — mutations run outside React render tree, cannot use hook
+- [03-02]: AdminHomePage simplified to Navigate redirect to /admin/products — products page is primary admin entry, no dashboard needed
 - [03-01]: $user->refresh() after User::create() — surfaces DB column defaults (is_active=true) on new user registration response
 - [03-01]: Deactivation check before password check in AuthService::login() — prevents timing attack leaking valid emails
 - [03-01]: Admin cannot deactivate admin users (422) — prevents admin lockout
@@ -95,5 +99,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 03-01-PLAN.md — auth backend (migration, profile update endpoint, admin user management, deactivation guard). Phase 3 plan 1 of 2 done.
+Stopped at: Completed 03-02-PLAN.md — auth frontend (login/register, profile page, ProtectedRoute, AdminRoute, admin user list + detail). Phase 3 COMPLETE.
 Resume file: None
