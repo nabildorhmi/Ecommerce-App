@@ -79,13 +79,13 @@ Plans:
   3. A duplicate order (same phone number + same product within 10 minutes) is rejected with a clear error message; an order for an out-of-stock product cannot be placed
   4. An admin can view the order list filtered by status, city, or date; transition an order through valid states only (invalid buttons are not shown); add a note to an order; and all status changes are recorded in the audit log with actor and timestamp
   5. Order totals and delivery fees stored in the database always match what the backend calculated — no frontend-submitted amounts are trusted
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 04-01: Delivery zones backend — DeliveryZone model and migration, admin CRUD endpoints, seeder with major Moroccan cities, GET /api/delivery-zones public endpoint
-- [ ] 04-02: Order backend — OrderService with state machine (pending → confirmed → dispatched → delivered; cancellation paths), pessimistic locking, order_status_logs audit table, COD validation (phone required, duplicate detection, city validation, server-side pricing), stock decrement in transaction
-- [ ] 04-03: Cart and checkout frontend — Zustand cart store with localStorage persistence, cart drawer/page, checkout flow (city selector with live delivery fee, order review, COD confirmation, confirmation screen)
-- [ ] 04-04: Order history and admin order management — customer order history with trilingual status badges, admin order list with filters, order detail view, valid-state-only transition buttons, order notes
+- [ ] 04-01-PLAN.md — Delivery zones backend: admin CRUD endpoints, public GET /api/delivery-zones, DeliveryZoneResource (model/migration/seeder already exist from Phase 2)
+- [ ] 04-02-PLAN.md — Order backend: OrderStatus enum with state machine, 3 migrations (orders, order_items, order_status_logs), 3 models, OrderService (atomic creation with lockForUpdate, duplicate detection, server-side pricing), customer + admin controllers, form requests, resources
+- [ ] 04-03-PLAN.md — Cart and checkout frontend: Zustand cart store with localStorage persist, CartDrawer + CartBadge, checkout page (city selector with live delivery fee, order review, COD confirmation), order confirmation screen, Add to Cart wiring on ProductDetailPage
+- [ ] 04-04-PLAN.md — Order history and admin order management: customer order history with status badges, admin order list with filters, admin order detail with valid-only status transitions + notes + audit log, admin delivery zone CRUD page
 
 ### Phase 5: Wishlist and Translation Completion
 **Goal**: Logged-in customers can save products to a wishlist for later purchase, and every UI string across the entire application is fully translated in French, Arabic, and English
@@ -111,5 +111,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation | 3/3 | Complete | 2026-02-14 |
 | 2. Product Catalog | 0/3 | Planned | - |
 | 3. User Accounts | 0/2 | Planned | - |
-| 4. Cart, Checkout, and Orders | 0/4 | Not started | - |
+| 4. Cart, Checkout, and Orders | 0/4 | Planned | - |
 | 5. Wishlist and Translation Completion | 0/2 | Not started | - |
