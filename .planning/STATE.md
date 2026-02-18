@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 4 of 5 (Cart, Checkout & Orders)
-Plan: 1 of N in current phase — 04-01 COMPLETE
-Status: Phase 4 in progress — delivery zones backend done. Next: 04-02 (cart/order backend).
-Last activity: 2026-02-18 — 04-01 complete. Delivery zones: public GET /api/delivery-zones, admin CRUD, DeliveryZoneResource, 7 routes registered.
+Plan: 2 of N in current phase — 04-02 COMPLETE
+Status: Phase 4 in progress — delivery zones + order backend done. Next: 04-03 (customer order frontend).
+Last activity: 2026-02-18 — 04-02 complete. Order backend: OrderStatus enum with state machine, 3 migrations, 3 models, OrderService (atomic creation, lockForUpdate, duplicate detection, state machine transitions), 7 routes (3 customer + 4 admin), all live-tested.
 
-Progress: [████████░░] 72%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: ~6min
-- Total execution time: ~0.7 hours
+- Total execution time: ~0.8 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 72%
 | 01-foundation | 3 | ~13 min | ~4 min |
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
-| 04-cart-checkout-orders | 1 (so far) | ~1 min | ~1 min |
+| 04-cart-checkout-orders | 2 (so far) | ~7 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (delivery zones backend), 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI), 02-02 (storefront UI)
-- Trend: Active — 04-01 took 1 min (clean execution, 0 deviations)
+- Last 5 plans: 04-02 (order backend), 04-01 (delivery zones), 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI)
+- Trend: Active — 04-02 took 6 min (clean execution, 0 deviations)
 
 *Updated after each plan completion*
 
@@ -45,6 +45,13 @@ Progress: [████████░░] 72%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [04-02]: OrderStatus::from() in Admin controller validates status string against enum before passing to transitionStatus()
+- [04-02]: abort(422, msg) for invalid state machine transitions — returns HTTP 422 with clear message
+- [04-02]: from_status=null in first OrderStatusLog entry — documents initial pending state without fabricating a from_status
+- [04-02]: lockForUpdate on duplicate check query — prevents race condition between concurrent identical orders
+- [04-02]: Order number format ORD-{Ymd}-{5-char-uniqid} — human-readable for COD delivery operations
+- [04-02]: DeliveryZone::where('is_active', true)->firstOrFail() in createOrder — rejects inactive delivery zones at creation time
+- [04-02]: allowed_transitions in OrderResource — frontend knows which action buttons to render without hardcoding the state machine
 - [04-01]: Admin DeliveryZoneController aliased as AdminDeliveryZoneController in routes/api.php — avoids PHP class name collision with Customer\DeliveryZoneController
 - [04-01]: Admin index() uses paginate(50), customer index() uses get() — admin sees all zones (including inactive), customer gets only active (small list, no pagination needed)
 - [04-01]: destroy() lets DB FK constraint bubble as 500 for now — orders table not yet created; constraint enforcement deferred to 04-02
@@ -98,10 +105,8 @@ None.
 ### Blockers/Concerns
 
 - [Pre-Phase 2]: MySQL must be started manually before API: `"C:/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe" --datadir="C:/Users/User/mysql-data" --console &`
-- [Phase 4]: Research needed before planning — COD fraud prevention strategy (phone OTP vs. duplicate detection) and order state machine library choice (spatie/laravel-model-states vs. hand-coded). See research/SUMMARY.md Phase 4 research flag.
-
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 04-01-PLAN.md — delivery zones backend (public GET /api/delivery-zones, admin CRUD, DeliveryZoneResource, 7 routes). Phase 4 plan 1 COMPLETE.
+Stopped at: Completed 04-02-PLAN.md — order backend (OrderStatus enum state machine, 3 migrations, 3 models, OrderService with atomic creation/lockForUpdate/duplicate detection, 7 order routes, all live-tested).
 Resume file: None
