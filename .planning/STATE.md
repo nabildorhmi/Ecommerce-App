@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 4 of 5 (Cart, Checkout & Orders)
-Plan: 2 of N in current phase — 04-02 COMPLETE
-Status: Phase 4 in progress — delivery zones + order backend done. Next: 04-03 (customer order frontend).
-Last activity: 2026-02-18 — 04-02 complete. Order backend: OrderStatus enum with state machine, 3 migrations, 3 models, OrderService (atomic creation, lockForUpdate, duplicate detection, state machine transitions), 7 routes (3 customer + 4 admin), all live-tested.
+Plan: 3 of N in current phase — 04-03 COMPLETE
+Status: Phase 4 in progress — cart + checkout frontend done. Next: 04-04 (customer order history page).
+Last activity: 2026-02-18 — 04-03 complete. Cart: Zustand store with localStorage, CartDrawer/Badge/Item components, Navbar. Checkout: delivery zone selector with live fee, COD order placement, order confirmation page. All wired into router.
 
-Progress: [████████░░] 75%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: ~6min
-- Total execution time: ~0.8 hours
+- Total execution time: ~0.9 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 75%
 | 01-foundation | 3 | ~13 min | ~4 min |
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
-| 04-cart-checkout-orders | 2 (so far) | ~7 min | ~4 min |
+| 04-cart-checkout-orders | 3 (so far) | ~12 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (order backend), 04-01 (delivery zones), 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI)
-- Trend: Active — 04-02 took 6 min (clean execution, 0 deviations)
+- Last 5 plans: 04-03 (cart+checkout frontend), 04-02 (order backend), 04-01 (delivery zones), 03-02 (auth frontend), 03-01 (auth backend)
+- Trend: Active — 04-03 took 5 min (2 minor deviations auto-fixed: Navbar created, RootLayout added)
 
 *Updated after each plan completion*
 
@@ -45,6 +45,13 @@ Progress: [████████░░] 75%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [04-03]: Product name snapshotted at add-time using API-localized product.name (Accept-Language header already set by apiClient interceptor)
+- [04-03]: useCartStore.getState().clearCart() inside usePlaceOrder onSuccess — same outside-render-tree pattern as useAuthStore.getState()
+- [04-03]: location.state carries OrderConfirmation to confirmation page — avoids extra GET /orders/:number API call on confirmation
+- [04-03]: OrderConfirmationPage redirects to /orders if accessed without location.state (direct URL or page refresh)
+- [04-03]: RootLayout as root React Router v7 layout route — global Navbar without repeating import in every page
+- [04-03]: CheckoutPage redirects to /products via useEffect when cart is empty
+- [04-03]: isAtMaxStock check on Add to Cart button — prevents adding beyond snapshotted stockQuantity
 - [04-02]: OrderStatus::from() in Admin controller validates status string against enum before passing to transitionStatus()
 - [04-02]: abort(422, msg) for invalid state machine transitions — returns HTTP 422 with clear message
 - [04-02]: from_status=null in first OrderStatusLog entry — documents initial pending state without fabricating a from_status
@@ -105,8 +112,9 @@ None.
 ### Blockers/Concerns
 
 - [Pre-Phase 2]: MySQL must be started manually before API: `"C:/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe" --datadir="C:/Users/User/mysql-data" --console &`
+
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 04-02-PLAN.md — order backend (OrderStatus enum state machine, 3 migrations, 3 models, OrderService with atomic creation/lockForUpdate/duplicate detection, 7 order routes, all live-tested).
+Stopped at: Completed 04-03-PLAN.md — cart + checkout frontend (Zustand store, CartDrawer/Badge/Item, Navbar, RootLayout, CheckoutPage, OrderConfirmationPage, wired into router with protected routes, FR/EN translations).
 Resume file: None
