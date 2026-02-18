@@ -163,5 +163,54 @@
   "common": {
     "close": "Close",
     "loading": "Loading..."
+  },
+  "orders": {
+    "myOrders": "My Orders",
+    "ordersNav": "Orders",
+    "adminOrders": "Order Management",
+    "orderNumber": "Order #",
+    "date": "Date",
+    "customer": "Customer",
+    "city": "City",
+    "total": "Total",
+    "items": "Items",
+    "noOrders": "You have no orders yet",
+    "browseProducts": "Browse Products",
+    "orderDetail": "Order Detail",
+    "auditLog": "Status History",
+    "addNote": "Add Note",
+    "notePlaceholder": "Enter a note...",
+    "submitNote": "Save",
+    "transitionOrder": "Change Status",
+    "transitionNote": "Note (optional)",
+    "orderNotes": "Notes",
+    "noteLabel": "Note",
+    "actor": "Actor",
+    "transition": "Transition",
+    "backToOrders": "Back to Orders",
+    "allStatuses": "All Statuses",
+    "allCities": "All Cities",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "status": {
+      "label": "Status",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "dispatched": "Dispatched",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    }
+  },
+  "deliveryZones": {
+    "title": "Delivery Zones",
+    "city": "City",
+    "cityAr": "City (Arabic)",
+    "fee": "Delivery fee (MAD)",
+    "active": "Active",
+    "inactive": "Inactive",
+    "create": "Add zone",
+    "edit": "Edit zone",
+    "delete": "Delete zone",
+    "confirmDelete": "Are you sure you want to delete the zone"
   }
 }

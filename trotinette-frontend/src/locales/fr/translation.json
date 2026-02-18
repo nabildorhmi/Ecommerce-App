@@ -163,5 +163,54 @@
   "common": {
     "close": "Fermer",
     "loading": "Chargement..."
+  },
+  "orders": {
+    "myOrders": "Mes commandes",
+    "ordersNav": "Commandes",
+    "adminOrders": "Gestion des commandes",
+    "orderNumber": "N° de commande",
+    "date": "Date",
+    "customer": "Client",
+    "city": "Ville",
+    "total": "Total",
+    "items": "Articles",
+    "noOrders": "Vous n'avez pas encore de commande",
+    "browseProducts": "Parcourir les produits",
+    "orderDetail": "Détail de la commande",
+    "auditLog": "Historique des statuts",
+    "addNote": "Ajouter une note",
+    "notePlaceholder": "Saisir une note...",
+    "submitNote": "Enregistrer",
+    "transitionOrder": "Changer le statut",
+    "transitionNote": "Note (optionnel)",
+    "orderNotes": "Notes",
+    "noteLabel": "Note",
+    "actor": "Acteur",
+    "transition": "Transition",
+    "backToOrders": "Retour aux commandes",
+    "allStatuses": "Tous les statuts",
+    "allCities": "Toutes les villes",
+    "dateFrom": "Date de début",
+    "dateTo": "Date de fin",
+    "status": {
+      "label": "Statut",
+      "pending": "En attente",
+      "confirmed": "Confirmée",
+      "dispatched": "Expédiée",
+      "delivered": "Livrée",
+      "cancelled": "Annulée"
+    }
+  },
+  "deliveryZones": {
+    "title": "Zones de livraison",
+    "city": "Ville",
+    "cityAr": "Ville (arabe)",
+    "fee": "Frais de livraison (MAD)",
+    "active": "Active",
+    "inactive": "Inactive",
+    "create": "Ajouter une zone",
+    "edit": "Modifier la zone",
+    "delete": "Supprimer la zone",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer la zone"
   }
 }

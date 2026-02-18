@@ -6,12 +6,16 @@ import { AdminProductEditPage } from '../features/admin/pages/AdminProductEditPa
 import { AdminCategoriesPage } from '../features/admin/pages/AdminCategoriesPage';
 import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage';
 import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage';
+import { AdminDeliveryZonesPage } from '../features/admin/pages/AdminDeliveryZonesPage';
 import { ProtectedRoute } from '../shared/components/ProtectedRoute';
 import { AdminRoute } from '../shared/components/AdminRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { ProfilePage } from '../features/auth/pages/ProfilePage';
 import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
 import { OrderConfirmationPage } from '../features/checkout/pages/OrderConfirmationPage';
+import { MyOrdersPage } from '../features/orders/pages/MyOrdersPage';
+import { AdminOrdersPage } from '../features/orders/pages/AdminOrdersPage';
+import { AdminOrderDetailPage } from '../features/orders/pages/AdminOrderDetailPage';
 import { RootLayout } from '../shared/components/RootLayout';
 
 // Admin home — redirect to product list (primary admin landing)
@@ -55,6 +59,10 @@ export const router = createBrowserRouter([
             path: '/orders/:orderNumber/confirmation',
             element: <OrderConfirmationPage />,
           },
+          {
+            path: '/orders',
+            element: <MyOrdersPage />,
+          },
         ],
       },
       // Admin routes — require admin role
@@ -88,6 +96,18 @@ export const router = createBrowserRouter([
           {
             path: '/admin/users/:id',
             element: <AdminUserDetailPage />,
+          },
+          {
+            path: '/admin/orders',
+            element: <AdminOrdersPage />,
+          },
+          {
+            path: '/admin/orders/:id',
+            element: <AdminOrderDetailPage />,
+          },
+          {
+            path: '/admin/delivery-zones',
+            element: <AdminDeliveryZonesPage />,
           },
         ],
       },
