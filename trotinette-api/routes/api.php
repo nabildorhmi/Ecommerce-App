@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\DeliveryZoneController as AdminDeliveryZoneController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
+use App\Http\Controllers\Customer\DeliveryZoneController;
 use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +21,7 @@ Route::post('/auth/login',    [AuthController::class, 'login']);
 Route::get('/products',        [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories',      [CategoryController::class, 'index']);
+Route::get('/delivery-zones',  [DeliveryZoneController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -51,5 +54,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users',                          [AdminUserController::class, 'index']);
         Route::get('/users/{user}',                   [AdminUserController::class, 'show']);
         Route::patch('/users/{user}/deactivate',      [AdminUserController::class, 'deactivate']);
+
+        // Delivery zone CRUD
+        Route::get('/delivery-zones',                           [AdminDeliveryZoneController::class, 'index']);
+        Route::post('/delivery-zones',                          [AdminDeliveryZoneController::class, 'store']);
+        Route::get('/delivery-zones/{delivery_zone}',           [AdminDeliveryZoneController::class, 'show']);
+        Route::put('/delivery-zones/{delivery_zone}',           [AdminDeliveryZoneController::class, 'update']);
+        Route::patch('/delivery-zones/{delivery_zone}',         [AdminDeliveryZoneController::class, 'update']);
+        Route::delete('/delivery-zones/{delivery_zone}',        [AdminDeliveryZoneController::class, 'destroy']);
     });
 });
