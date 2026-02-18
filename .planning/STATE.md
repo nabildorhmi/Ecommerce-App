@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Customers can browse electric scooters, place orders, and pay cash on delivery — with an admin who controls the entire catalog, orders, and delivery zones.
-**Current focus:** Phase 4 — Cart, Checkout & Orders (in progress)
+**Current focus:** Phase 4 — Cart, Checkout & Orders (COMPLETE) — Phase 5 next
 
 ## Current Position
 
 Phase: 4 of 5 (Cart, Checkout & Orders)
-Plan: 3 of N in current phase — 04-03 COMPLETE
-Status: Phase 4 in progress — cart + checkout frontend done. Next: 04-04 (customer order history page).
-Last activity: 2026-02-18 — 04-03 complete. Cart: Zustand store with localStorage, CartDrawer/Badge/Item components, Navbar. Checkout: delivery zone selector with live fee, COD order placement, order confirmation page. All wired into router.
+Plan: 4 of 4 in current phase — 04-04 COMPLETE. Phase 4 fully done.
+Status: Phase 4 complete — full order lifecycle implemented (backend + frontend). Next: Phase 5 (I18N-02, remaining features).
+Last activity: 2026-02-18 — 04-04 complete. Customer order history, admin order management (filters, status transitions, notes, audit log), admin delivery zone CRUD, Navbar dropdowns, FR/EN translations for orders and delivery zones.
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
+- Total plans completed: 9
 - Average duration: ~6min
-- Total execution time: ~0.9 hours
+- Total execution time: ~0.95 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [████████░░] 80%
 | 01-foundation | 3 | ~13 min | ~4 min |
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
-| 04-cart-checkout-orders | 3 (so far) | ~12 min | ~4 min |
+| 04-cart-checkout-orders | 4 | ~17 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-03 (cart+checkout frontend), 04-02 (order backend), 04-01 (delivery zones), 03-02 (auth frontend), 03-01 (auth backend)
-- Trend: Active — 04-03 took 5 min (2 minor deviations auto-fixed: Navbar created, RootLayout added)
+- Last 5 plans: 04-04 (order history frontend), 04-03 (cart+checkout frontend), 04-02 (order backend), 04-01 (delivery zones), 03-02 (auth frontend)
+- Trend: Active — 04-04 took 5 min, no deviations
 
 *Updated after each plan completion*
 
@@ -45,6 +45,11 @@ Progress: [████████░░] 80%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [04-04]: Accordion-based order detail for customers — no separate customer detail page; inline expansion sufficient for COD use case
+- [04-04]: Dialog-based delivery zone CRUD mirrors AdminCategoriesPage pattern — simple entity, same CRUD approach
+- [04-04]: Per-transition note textarea shown only after clicking transition button — two-step UX avoids always-visible textarea clutter
+- [04-04]: Navbar refactored to dropdown menus (user + admin) — accommodates growing nav items without horizontal overflow
+- [04-04]: AdminDeliveryZonesPage fee input in MAD, converts to centimes on submit (multiply by 100) — consistent with checkout/product patterns
 - [04-03]: Product name snapshotted at add-time using API-localized product.name (Accept-Language header already set by apiClient interceptor)
 - [04-03]: useCartStore.getState().clearCart() inside usePlaceOrder onSuccess — same outside-render-tree pattern as useAuthStore.getState()
 - [04-03]: location.state carries OrderConfirmation to confirmation page — avoids extra GET /orders/:number API call on confirmation
@@ -116,5 +121,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 04-03-PLAN.md — cart + checkout frontend (Zustand store, CartDrawer/Badge/Item, Navbar, RootLayout, CheckoutPage, OrderConfirmationPage, wired into router with protected routes, FR/EN translations).
+Stopped at: Completed 04-04-PLAN.md — order history and admin order management frontend (MyOrdersPage, AdminOrdersPage, AdminOrderDetailPage, AdminDeliveryZonesPage, Navbar dropdowns, FR/EN translations). Phase 4 fully complete.
 Resume file: None
