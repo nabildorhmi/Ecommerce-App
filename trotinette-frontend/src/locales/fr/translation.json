@@ -123,5 +123,45 @@
       "enName": "Nom en anglais",
       "active": "Actif"
     }
+  },
+  "cart": {
+    "title": "Panier",
+    "empty": "Votre panier est vide",
+    "checkout": "Passer la commande",
+    "subtotal": "Sous-total",
+    "remove": "Supprimer",
+    "quantity": "Quantité",
+    "addedToCart": "Ajouté au panier",
+    "itemCount": "{{count}} article",
+    "itemCount_plural": "{{count}} articles",
+    "maxStock": "Stock maximum atteint"
+  },
+  "checkout": {
+    "title": "Commande",
+    "deliveryCity": "Ville de livraison",
+    "selectCity": "Sélectionnez une ville",
+    "phone": "Numéro de téléphone",
+    "orderSummary": "Récapitulatif de commande",
+    "subtotal": "Sous-total",
+    "deliveryFee": "Frais de livraison",
+    "total": "Total",
+    "note": "Note (optionnel)",
+    "notePlaceholder": "Instructions de livraison, code d'accès...",
+    "placeOrder": "Confirmer la commande",
+    "placingOrder": "Envoi en cours...",
+    "codNotice": "Paiement à la livraison",
+    "orderConfirmation": "Votre commande a bien été enregistrée. Nous vous contacterons pour confirmer la livraison.",
+    "orderNumber": "Numéro de commande",
+    "orderSuccess": "Commande confirmée !",
+    "shopContact": "Contacter la boutique",
+    "viewOrders": "Voir mes commandes",
+    "continueShopping": "Continuer mes achats",
+    "duplicateOrderError": "Vous avez déjà une commande identique en cours.",
+    "orderError": "Une erreur est survenue lors de la commande.",
+    "qty": "Qté"
+  },
+  "common": {
+    "close": "Fermer",
+    "loading": "Chargement..."
   }
 }

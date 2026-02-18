@@ -10,69 +10,86 @@ import { ProtectedRoute } from '../shared/components/ProtectedRoute';
 import { AdminRoute } from '../shared/components/AdminRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { ProfilePage } from '../features/auth/pages/ProfilePage';
+import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
+import { OrderConfirmationPage } from '../features/checkout/pages/OrderConfirmationPage';
+import { RootLayout } from '../shared/components/RootLayout';
 
 // Admin home — redirect to product list (primary admin landing)
 const AdminHomePage = () => <Navigate to="/admin/products" replace />;
 
 export const router = createBrowserRouter([
   {
-    // Home redirects to the product catalog (primary customer experience)
-    path: '/',
-    element: <Navigate to="/products" replace />,
-  },
-  {
-    path: '/products',
-    element: <CatalogPage />,
-  },
-  {
-    path: '/products/:slug',
-    element: <ProductDetailPage />,
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  // Protected routes — require authentication
-  {
-    element: <ProtectedRoute />,
+    // Root layout wraps all routes with the Navbar
+    element: <RootLayout />,
     children: [
       {
-        path: '/profile',
-        element: <ProfilePage />,
-      },
-    ],
-  },
-  // Admin routes — require admin role
-  {
-    element: <AdminRoute />,
-    children: [
-      {
-        path: '/admin',
-        element: <AdminHomePage />,
+        // Home redirects to the product catalog (primary customer experience)
+        path: '/',
+        element: <Navigate to="/products" replace />,
       },
       {
-        path: '/admin/products',
-        element: <AdminProductsPage />,
+        path: '/products',
+        element: <CatalogPage />,
       },
       {
-        path: '/admin/products/create',
-        element: <AdminProductEditPage />,
+        path: '/products/:slug',
+        element: <ProductDetailPage />,
       },
       {
-        path: '/admin/products/:id/edit',
-        element: <AdminProductEditPage />,
+        path: '/login',
+        element: <LoginPage />,
       },
+      // Protected routes — require authentication
       {
-        path: '/admin/categories',
-        element: <AdminCategoriesPage />,
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: '/profile',
+            element: <ProfilePage />,
+          },
+          {
+            path: '/checkout',
+            element: <CheckoutPage />,
+          },
+          {
+            path: '/orders/:orderNumber/confirmation',
+            element: <OrderConfirmationPage />,
+          },
+        ],
       },
+      // Admin routes — require admin role
       {
-        path: '/admin/users',
-        element: <AdminUsersPage />,
-      },
-      {
-        path: '/admin/users/:id',
-        element: <AdminUserDetailPage />,
+        element: <AdminRoute />,
+        children: [
+          {
+            path: '/admin',
+            element: <AdminHomePage />,
+          },
+          {
+            path: '/admin/products',
+            element: <AdminProductsPage />,
+          },
+          {
+            path: '/admin/products/create',
+            element: <AdminProductEditPage />,
+          },
+          {
+            path: '/admin/products/:id/edit',
+            element: <AdminProductEditPage />,
+          },
+          {
+            path: '/admin/categories',
+            element: <AdminCategoriesPage />,
+          },
+          {
+            path: '/admin/users',
+            element: <AdminUsersPage />,
+          },
+          {
+            path: '/admin/users/:id',
+            element: <AdminUserDetailPage />,
+          },
+        ],
       },
     ],
   },

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, Link } from 'react-router';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -8,6 +9,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
 import { useTranslation } from 'react-i18next';
 import { useProduct } from '../api/products';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
@@ -17,6 +19,7 @@ import { StockBadge } from '../components/StockBadge';
 import { WhatsAppButton } from '../components/WhatsAppButton';
 import { TrustSignals } from '../components/TrustSignals';
 import { CategoryBreadcrumb } from '../components/CategoryBreadcrumb';
+import { useCartStore } from '../../cart/store';
 
 function ProductDetailSkeleton() {
   return (
@@ -52,6 +55,9 @@ export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { data: product, isLoading, isError } = useProduct(slug ?? '');
+  const addItem = useCartStore((s) => s.addItem);
+  const items = useCartStore((s) => s.items);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   if (isLoading) {
     return <ProductDetailSkeleton />;
@@ -69,6 +75,18 @@ export function ProductDetailPage() {
       </Container>
     );
   }
+
+  // Check if product is already at max stock in cart
+  const cartItem = items.find((i) => i.productId === product.id);
+  const isAtMaxStock = cartItem ? cartItem.quantity >= product.stock_quantity : false;
+  const isAddDisabled = !product.in_stock || isAtMaxStock;
+
+  const handleAddToCart = () => {
+    // Use product.name which is already localized by the API (via Accept-Language header)
+    const localeName = product.name;
+    addItem(product, localeName);
+    setSnackbarOpen(true);
+  };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -110,14 +128,17 @@ export function ProductDetailPage() {
 
             {/* Actions */}
             <Stack spacing={1.5}>
-              {/* Add to cart placeholder — will be wired in Phase 4 */}
+              {/* Add to cart — wired in Phase 4 */}
               <Button
                 variant="contained"
                 size="large"
-                disabled={!product.in_stock}
+                disabled={isAddDisabled}
+                onClick={handleAddToCart}
                 sx={{ py: 1.5 }}
               >
-                {t('product.addToCart')}
+                {isAtMaxStock && product.in_stock
+                  ? t('cart.maxStock', 'Max stock reached')
+                  : t('product.addToCart')}
               </Button>
 
               {/* WhatsApp contact */}
@@ -134,6 +155,15 @@ export function ProductDetailPage() {
 
       {/* Trust signals */}
       <TrustSignals />
+
+      {/* Added to cart snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2500}
+        onClose={() => setSnackbarOpen(false)}
+        message={t('cart.addedToCart')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Container>
   );
 }
