@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers\Customer;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
+use App\Models\Order;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\ResourceCollection;
+
+class OrderController extends Controller
+{
+    public function __construct(private readonly OrderService $orderService)
+    {
+    }
+
+    public function store(StoreOrderRequest $request): JsonResponse
+    {
+        $order = $this->orderService->createOrder($request->validated(), $request->user()->id);
+
+        return (new OrderResource($order))
+            ->response()
+            ->setStatusCode(201);
+    }
+
+    public function index(Request $request): ResourceCollection
+    {
+        $orders = Order::forUser($request->user()->id)
+            ->with(['items.product.translations', 'deliveryZone'])
+            ->latest()
+            ->paginate(10);
+
+        return OrderResource::collection($orders);
+    }
+
+    public function show(Request $request, Order $order): OrderResource
+    {
+        if ($order->user_id !== $request->user()->id) {
+            abort(403, 'This order does not belong to you.');
+        }
+
+        $order->load(['items.product.translations', 'deliveryZone', 'statusLogs']);
+
+        return new OrderResource($order);
+    }
+}

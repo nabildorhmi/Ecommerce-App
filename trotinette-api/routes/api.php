@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DeliveryZoneController as AdminDeliveryZoneController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
+use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +30,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user',         [AuthController::class, 'me']);
     Route::put('/user',         [AuthController::class, 'updateProfile']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    // Customer order routes
+    Route::get('/orders',          [OrderController::class, 'index']);
+    Route::post('/orders',         [OrderController::class, 'store']);
+    Route::get('/orders/{order}',  [OrderController::class, 'show']);
 
     // Admin-only routes
     Route::middleware('role:admin')->prefix('admin')->group(function () {
@@ -62,5 +69,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/delivery-zones/{delivery_zone}',           [AdminDeliveryZoneController::class, 'update']);
         Route::patch('/delivery-zones/{delivery_zone}',         [AdminDeliveryZoneController::class, 'update']);
         Route::delete('/delivery-zones/{delivery_zone}',        [AdminDeliveryZoneController::class, 'destroy']);
+
+        // Order management
+        Route::get('/orders',                              [AdminOrderController::class, 'index']);
+        Route::get('/orders/{order}',                     [AdminOrderController::class, 'show']);
+        Route::patch('/orders/{order}/status',            [AdminOrderController::class, 'transition']);
+        Route::post('/orders/{order}/note',               [AdminOrderController::class, 'addNote']);
     });
 });
