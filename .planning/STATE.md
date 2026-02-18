@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Customers can browse electric scooters, place orders, and pay cash on delivery — with an admin who controls the entire catalog, orders, and delivery zones.
-**Current focus:** Phase 3 — User Accounts (in progress)
+**Current focus:** Phase 4 — Cart, Checkout & Orders (in progress)
 
 ## Current Position
 
-Phase: 3 of 5 (User Accounts)
-Plan: 2 of 2 in current phase — 03-02 COMPLETE
-Status: Phase 3 COMPLETE — all plans done. Next: Phase 4 (Orders/Checkout).
-Last activity: 2026-02-17 — 03-02 complete. Auth frontend: login/register, profile page, route guards, admin user management UI.
+Phase: 4 of 5 (Cart, Checkout & Orders)
+Plan: 1 of N in current phase — 04-01 COMPLETE
+Status: Phase 4 in progress — delivery zones backend done. Next: 04-02 (cart/order backend).
+Last activity: 2026-02-18 — 04-01 complete. Delivery zones: public GET /api/delivery-zones, admin CRUD, DeliveryZoneResource, 7 routes registered.
 
-Progress: [████████░░] 70%
+Progress: [████████░░] 72%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: ~7min
-- Total execution time: ~0.6 hours
+- Total plans completed: 6
+- Average duration: ~6min
+- Total execution time: ~0.7 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [████████░░] 70%
 | 01-foundation | 3 | ~13 min | ~4 min |
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
+| 04-cart-checkout-orders | 1 (so far) | ~1 min | ~1 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI), 02-02 (storefront UI), 02-01 (catalog backend API)
-- Trend: Active — 03-02 took 5 min (clean execution, 0 deviations)
+- Last 5 plans: 04-01 (delivery zones backend), 03-02 (auth frontend), 03-01 (auth backend), 02-03 (admin UI), 02-02 (storefront UI)
+- Trend: Active — 04-01 took 1 min (clean execution, 0 deviations)
 
 *Updated after each plan completion*
 
@@ -44,6 +45,9 @@ Progress: [████████░░] 70%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [04-01]: Admin DeliveryZoneController aliased as AdminDeliveryZoneController in routes/api.php — avoids PHP class name collision with Customer\DeliveryZoneController
+- [04-01]: Admin index() uses paginate(50), customer index() uses get() — admin sees all zones (including inactive), customer gets only active (small list, no pagination needed)
+- [04-01]: destroy() lets DB FK constraint bubble as 500 for now — orders table not yet created; constraint enforcement deferred to 04-02
 - [03-02]: layout route pattern for guards ({ element: <Guard />, children: [...] }) — React Router v7 recommended; avoids HOC wrapping
 - [03-02]: password_confirmation field name kept exact (not confirm_password) — Laravel confirmed rule requires base_field + _confirmation naming
 - [03-02]: useAuthStore.getState() inside useMutation onSuccess — mutations run outside React render tree, cannot use hook
@@ -98,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Completed 03-02-PLAN.md — auth frontend (login/register, profile page, ProtectedRoute, AdminRoute, admin user list + detail). Phase 3 COMPLETE.
+Last session: 2026-02-18
+Stopped at: Completed 04-01-PLAN.md — delivery zones backend (public GET /api/delivery-zones, admin CRUD, DeliveryZoneResource, 7 routes). Phase 4 plan 1 COMPLETE.
 Resume file: None
