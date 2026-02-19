@@ -86,7 +86,7 @@ export function Navbar() {
               component="img"
               src={miraiLogo}
               alt="MiraiTech"
-              sx={{ height: { xs: 75, md: 100 }, width: 'auto', display: 'block' }}
+              sx={{ height: { xs: 25, md: 35 }, width: 'auto', display: 'block' }}
             />
           </Box>
 
