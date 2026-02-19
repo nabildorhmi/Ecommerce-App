@@ -42,6 +42,7 @@ function buildProductFormData(data: {
     en?: { name?: string; slug?: string; description?: string };
   };
   attributes?: Record<string, string | number>;
+  is_featured?: boolean;
   images?: File[];
   delete_images?: number[];
 }): FormData {
@@ -55,6 +56,8 @@ function buildProductFormData(data: {
     fd.append('category_id', String(data.category_id));
   if (data.is_active !== undefined)
     fd.append('is_active', data.is_active ? '1' : '0');
+  if (data.is_featured !== undefined)
+    fd.append('is_featured', data.is_featured ? '1' : '0');
 
   // Nested translations: translations[fr][name], etc.
   if (data.translations) {
@@ -101,6 +104,7 @@ interface CreateProductInput {
   stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
+  is_featured: boolean;
   translations: {
     fr: { name: string; slug: string; description: string };
     en: { name: string; slug: string; description: string };
@@ -138,6 +142,7 @@ interface UpdateProductInput {
   stock_quantity?: number;
   category_id?: number | null;
   is_active?: boolean;
+  is_featured?: boolean;
   translations?: {
     fr?: { name?: string; slug?: string; description?: string };
     en?: { name?: string; slug?: string; description?: string };

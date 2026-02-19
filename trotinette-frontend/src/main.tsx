@@ -10,10 +10,12 @@ import { RTLProvider } from './shared/components/RTLProvider';
 // i18n MUST be imported before ReactDOM.createRoot to avoid FOUC.
 // With preloaded resources (no HTTP backend), init resolves synchronously.
 import './app/i18n';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
+      {/* RTLProvider wraps miraiTheme + CssBaseline + direction handling */}
       <RTLProvider>
         <RouterProvider router={router} />
       </RTLProvider>

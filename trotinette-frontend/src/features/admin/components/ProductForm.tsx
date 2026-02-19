@@ -40,6 +40,7 @@ const schema = z.object({
     .min(0),
   category_id: z.number({ error: 'Categorie requise' }).nullable(),
   is_active: z.boolean(),
+  is_featured: z.boolean(),
   translations: z.object({
     fr: z.object({
       name: z.string().min(1, 'Nom FR requis').max(255),
@@ -96,6 +97,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     stock_quantity: product?.stock_quantity ?? 0,
     category_id: product?.category_id ?? null,
     is_active: product?.is_active ?? true,
+    is_featured: product?.is_featured ?? false,
     translations: {
       fr: {
         name: product?.translations?.fr?.name ?? '',
@@ -162,6 +164,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       stock_quantity: values.stock_quantity,
       category_id: values.category_id,
       is_active: values.is_active,
+      is_featured: values.is_featured,
       translations: {
         fr: {
           name: values.translations.fr.name,
@@ -271,6 +274,23 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                   />
                 }
                 label="Actif / Active"
+              />
+            )}
+          />
+        </Box>
+        <Box mt={1}>
+          <Controller
+            name="is_featured"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                }
+                label="En vedette / Featured (Homepage carousel)"
               />
             )}
           />

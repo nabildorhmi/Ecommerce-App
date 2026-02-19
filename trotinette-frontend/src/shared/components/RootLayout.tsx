@@ -1,18 +1,20 @@
 import { Outlet } from 'react-router';
 import Box from '@mui/material/Box';
 import { Navbar } from './Navbar';
+import { Footer } from './Footer';
 
 /**
- * RootLayout — wraps all routes with the Navbar.
- * Used as the root layout route in the router configuration.
+ * RootLayout — wraps all routes with Navbar + Footer.
  */
 export function RootLayout() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#0B0B0E' }}>
       <Navbar />
       <Box component="main" sx={{ flex: 1 }}>
         <Outlet />
       </Box>
+      <Footer />
     </Box>
   );
 }
+

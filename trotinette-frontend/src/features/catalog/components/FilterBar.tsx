@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
@@ -9,20 +9,26 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import TuneIcon from '@mui/icons-material/Tune';
 import { useTranslation } from 'react-i18next';
 import { useCategories } from '../api/categories';
 import { useCatalogFilters } from '../hooks/useCatalogFilters';
 
+const LABEL_STYLE = {
+  fontSize: '0.65rem',
+  fontWeight: 700,
+  letterSpacing: '0.1em',
+  color: '#9CA3AF',
+  textTransform: 'uppercase' as const,
+  mb: 1,
+};
+
 /**
- * FilterBar manages all product filters:
- * - Full-text search (debounced 300ms)
- * - Category select (populated from API)
- * - Price range (min/max in MAD, converted to centimes for API)
- * - In-stock toggle
- * - Clear all filters button
- * All state is persisted in URL search params via useCatalogFilters.
+ * MiraiTech FilterBar — vertical sidebar filter panel.
  */
 export function FilterBar() {
   const { t } = useTranslation();
@@ -30,11 +36,9 @@ export function FilterBar() {
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
 
-  // Local state for search to enable debounce without URL thrashing
   const [searchInput, setSearchInput] = useState(filters['filter[search]'] ?? '');
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Keep local search input in sync if external filter is cleared
   useEffect(() => {
     setSearchInput(filters['filter[search]'] ?? '');
   }, [filters['filter[search]']]);
@@ -50,7 +54,6 @@ export function FilterBar() {
     [setFilter]
   );
 
-  // Price range: user enters MAD, API expects centimes (multiply by 100)
   const handleMinPrice = (value: string) => {
     const centimes = value ? String(Math.round(parseFloat(value) * 100)) : '';
     setFilter('filter[min_price]', centimes);
@@ -61,7 +64,6 @@ export function FilterBar() {
     setFilter('filter[max_price]', centimes);
   };
 
-  // Display MAD value from centimes stored in URL
   const minPriceDisplay = filters['filter[min_price]']
     ? String(parseInt(filters['filter[min_price]']!, 10) / 100)
     : '';
@@ -74,74 +76,126 @@ export function FilterBar() {
     clearFilters();
   };
 
+  const hasActiveFilters =
+    !!filters['filter[search]'] ||
+    !!filters['filter[category_id]'] ||
+    !!filters['filter[min_price]'] ||
+    !!filters['filter[max_price]'] ||
+    !!filters['filter[in_stock]'];
+
   return (
-    <Paper elevation={1} sx={{ p: 2, mb: 3 }}>
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        spacing={2}
-        alignItems={{ md: 'center' }}
-        flexWrap="wrap"
-      >
+    <Box
+      sx={{
+        backgroundColor: '#111116',
+        border: '1px solid #1E1E28',
+        borderRadius: '8px',
+        p: 2.5,
+        position: { md: 'sticky' },
+        top: { md: 80 },
+      }}
+    >
+      {/* Header */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <TuneIcon sx={{ fontSize: '1rem', color: '#00C2FF' }} />
+          <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: '#F5F7FA', textTransform: 'uppercase' }}>
+            {t('catalog.filters', 'Filters')}
+          </Typography>
+        </Box>
+        {hasActiveFilters && (
+          <Button
+            size="small"
+            onClick={handleClear}
+            sx={{
+              fontSize: '0.65rem',
+              color: '#E63946',
+              minWidth: 'auto',
+              p: '2px 6px',
+              '&:hover': { backgroundColor: 'rgba(230,57,70,0.08)' },
+            }}
+          >
+            {t('catalog.clearFilters', 'Clear')}
+          </Button>
+        )}
+      </Box>
+
+      <Stack spacing={2.5}>
         {/* Search */}
-        <TextField
-          size="small"
-          label={t('catalog.search')}
-          value={searchInput}
-          onChange={(e) => handleSearchChange(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{ minWidth: 200 }}
-        />
+        <Box>
+          <Typography sx={LABEL_STYLE}>{t('catalog.search', 'Search')}</Typography>
+          <TextField
+            size="small"
+            placeholder={t('catalog.searchPlaceholder', 'Search scooters...')}
+            value={searchInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            fullWidth
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: '#9CA3AF' }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+            sx={{ '& input': { fontSize: '0.82rem' } }}
+          />
+        </Box>
+
+        <Divider sx={{ borderColor: '#1E1E28' }} />
 
         {/* Category */}
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>{t('catalog.category')}</InputLabel>
-          <Select
-            value={filters['filter[category_id]'] ?? ''}
-            label={t('catalog.category')}
-            onChange={(e) => setFilter('filter[category_id]', e.target.value)}
-          >
-            <MenuItem value="">
-              <em>{t('catalog.allCategories')}</em>
-            </MenuItem>
-            {categories.map((cat) => (
-              <MenuItem key={cat.id} value={String(cat.id)}>
-                {cat.name}
+        <Box>
+          <Typography sx={LABEL_STYLE}>{t('catalog.category', 'Category')}</Typography>
+          <FormControl size="small" fullWidth>
+            <Select
+              value={filters['filter[category_id]'] ?? ''}
+              onChange={(e) => setFilter('filter[category_id]', e.target.value)}
+              displayEmpty
+              sx={{ fontSize: '0.82rem' }}
+            >
+              <MenuItem value="" sx={{ fontSize: '0.82rem' }}>
+                <em style={{ fontStyle: 'normal', color: '#9CA3AF' }}>{t('catalog.allCategories', 'All Categories')}</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={String(cat.id)} sx={{ fontSize: '0.82rem' }}>
+                  {cat.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
-        {/* Price range */}
-        <Stack direction="row" spacing={1} alignItems="center">
-          <TextField
-            size="small"
-            label={t('catalog.minPrice')}
-            type="number"
-            value={minPriceDisplay}
-            onChange={(e) => handleMinPrice(e.target.value)}
-            slotProps={{ input: { inputProps: { min: 0 } } }}
-            sx={{ width: 110 }}
-          />
-          <TextField
-            size="small"
-            label={t('catalog.maxPrice')}
-            type="number"
-            value={maxPriceDisplay}
-            onChange={(e) => handleMaxPrice(e.target.value)}
-            slotProps={{ input: { inputProps: { min: 0 } } }}
-            sx={{ width: 110 }}
-          />
-        </Stack>
+        <Divider sx={{ borderColor: '#1E1E28' }} />
 
-        {/* In-stock toggle */}
+        {/* Price Range */}
+        <Box>
+          <Typography sx={LABEL_STYLE}>{t('catalog.priceRange', 'Price Range')}</Typography>
+          <Stack direction="row" spacing={1}>
+            <TextField
+              size="small"
+              placeholder={t('catalog.min', 'Min')}
+              type="number"
+              value={minPriceDisplay}
+              onChange={(e) => handleMinPrice(e.target.value)}
+              slotProps={{ input: { inputProps: { min: 0 } } }}
+              sx={{ '& input': { fontSize: '0.82rem' } }}
+            />
+            <TextField
+              size="small"
+              placeholder={t('catalog.max', 'Max')}
+              type="number"
+              value={maxPriceDisplay}
+              onChange={(e) => handleMaxPrice(e.target.value)}
+              slotProps={{ input: { inputProps: { min: 0 } } }}
+              sx={{ '& input': { fontSize: '0.82rem' } }}
+            />
+          </Stack>
+        </Box>
+
+        <Divider sx={{ borderColor: '#1E1E28' }} />
+
+        {/* In Stock */}
         <FormControlLabel
           control={
             <Switch
@@ -150,14 +204,15 @@ export function FilterBar() {
               size="small"
             />
           }
-          label={t('catalog.inStockOnly')}
+          label={
+            <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', fontWeight: 500 }}>
+              {t('catalog.inStockOnly', 'In Stock Only')}
+            </Typography>
+          }
+          sx={{ mx: 0 }}
         />
-
-        {/* Clear filters */}
-        <Button variant="outlined" size="small" onClick={handleClear} color="secondary">
-          {t('catalog.clearFilters')}
-        </Button>
       </Stack>
-    </Paper>
+    </Box>
   );
 }
+

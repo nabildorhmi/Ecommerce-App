@@ -25,6 +25,7 @@ export interface AdminProduct {
   price: number; // in centimes
   stock_quantity: number;
   is_active: boolean;
+  is_featured: boolean;
   category_id: number | null;
   attributes: Record<string, string | number>;
   translations: {
@@ -55,6 +56,7 @@ export interface ProductFormData {
   stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
+  is_featured: boolean;
   translations: {
     fr: { name: string; slug: string; description: string };
     en: { name: string; slug: string; description: string };

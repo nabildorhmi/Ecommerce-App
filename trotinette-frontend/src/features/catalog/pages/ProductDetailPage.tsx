@@ -5,11 +5,15 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Skeleton from '@mui/material/Skeleton';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BoltIcon from '@mui/icons-material/Bolt';
 import { useTranslation } from 'react-i18next';
 import { useProduct } from '../api/products';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
@@ -23,33 +27,35 @@ import { useCartStore } from '../../cart/store';
 
 function ProductDetailSkeleton() {
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Skeleton variant="text" width={200} height={24} sx={{ mb: 2 }} />
-      <Grid container spacing={4}>
-        <Grid size={{ xs: 12, md: 7 }}>
-          <Skeleton variant="rectangular" height={400} sx={{ mb: 1, borderRadius: 1 }} />
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            {[0, 1, 2].map((i) => (
-              <Skeleton key={i} variant="rectangular" width={80} height={60} sx={{ borderRadius: 1 }} />
-            ))}
-          </Box>
+    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh', py: 4 }}>
+      <Container maxWidth="lg">
+        <Skeleton variant="text" width={200} height={24} sx={{ mb: 3, bgcolor: '#1E1E28' }} />
+        <Grid container spacing={5}>
+          <Grid size={{ xs: 12, md: 7 }}>
+            <Skeleton variant="rectangular" height={440} sx={{ mb: 1.5, borderRadius: 2, bgcolor: '#111116' }} />
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              {[0, 1, 2].map((i) => (
+                <Skeleton key={i} variant="rectangular" width={80} height={64} sx={{ borderRadius: 1, bgcolor: '#111116' }} />
+              ))}
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Skeleton variant="text" height={48} sx={{ mb: 1, bgcolor: '#1E1E28' }} />
+            <Skeleton variant="text" height={40} width={140} sx={{ mb: 2, bgcolor: '#1E1E28' }} />
+            <Skeleton variant="rounded" width={100} height={28} sx={{ mb: 3, bgcolor: '#1E1E28' }} />
+            <Skeleton variant="rectangular" height={56} sx={{ mb: 1.5, borderRadius: 1, bgcolor: '#1E1E28' }} />
+            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1, bgcolor: '#1E1E28' }} />
+          </Grid>
         </Grid>
-        <Grid size={{ xs: 12, md: 5 }}>
-          <Skeleton variant="text" height={40} sx={{ mb: 1 }} />
-          <Skeleton variant="text" height={32} width={120} sx={{ mb: 1 }} />
-          <Skeleton variant="rounded" width={90} height={24} sx={{ mb: 2 }} />
-          <Skeleton variant="rectangular" height={48} sx={{ mb: 1, borderRadius: 1 }} />
-          <Skeleton variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </Box>
   );
 }
 
 /**
  * ProductDetailPage — /products/:slug
- * Full product detail: gallery, specs table, price, stock badge,
- * WhatsApp contact button, trust signals, and category breadcrumb.
+ * MiraiTech dark redesign: glow price, sticky add-to-cart panel,
+ * gallery, specs table, trust signals, category breadcrumb.
  */
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -59,102 +65,180 @@ export function ProductDetailPage() {
   const items = useCartStore((s) => s.items);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  if (isLoading) {
-    return <ProductDetailSkeleton />;
-  }
+  if (isLoading) return <ProductDetailSkeleton />;
 
   if (isError || !product) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          {t('product.notFound')}
-        </Alert>
-        <Button component={Link} to="/products" variant="outlined">
-          {t('product.backToCatalog')}
-        </Button>
-      </Container>
+      <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh', py: 6 }}>
+        <Container maxWidth="lg">
+          <Alert severity="warning" sx={{ mb: 3, backgroundColor: '#1E1E28', color: '#F5F7FA' }}>
+            {t('product.notFound')}
+          </Alert>
+          <Button component={Link} to="/products" variant="outlined" startIcon={<ArrowBackIcon />}>
+            {t('product.backToCatalog')}
+          </Button>
+        </Container>
+      </Box>
     );
   }
 
-  // Check if product is already at max stock in cart
   const cartItem = items.find((i) => i.productId === product.id);
   const isAtMaxStock = cartItem ? cartItem.quantity >= product.stock_quantity : false;
   const isAddDisabled = !product.in_stock || isAtMaxStock;
 
   const handleAddToCart = () => {
-    // Use product.name which is already localized by the API (via Accept-Language header)
-    const localeName = product.name;
-    addItem(product, localeName);
+    addItem(product, product.name);
     setSnackbarOpen(true);
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {/* Breadcrumb navigation */}
-      <CategoryBreadcrumb category={product.category} />
+    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh' }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+        {/* Breadcrumb */}
+        <Box sx={{ mb: 3 }}>
+          <CategoryBreadcrumb category={product.category} />
+        </Box>
 
-      <Grid container spacing={4}>
-        {/* Left: Image gallery */}
-        <Grid size={{ xs: 12, md: 7 }}>
-          <ProductGallery images={product.images} />
-        </Grid>
+        <Grid container spacing={{ xs: 3, md: 6 }}>
+          {/* Left: Image gallery */}
+          <Grid size={{ xs: 12, md: 7 }}>
+            <ProductGallery images={product.images} />
 
-        {/* Right: Product info */}
-        <Grid size={{ xs: 12, md: 5 }}>
-          <Stack spacing={2}>
-            {/* Product name */}
-            <Typography variant="h4" fontWeight={700} component="h1">
-              {product.name}
-            </Typography>
-
-            {/* Price */}
-            <Typography variant="h5" color="primary" fontWeight={700}>
-              {formatCurrency(product.price)}
-            </Typography>
-
-            {/* Stock status */}
-            <Box>
-              <StockBadge inStock={product.in_stock} />
-            </Box>
-
-            <Divider />
-
-            {/* Description */}
-            {product.description && (
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                {product.description}
-              </Typography>
+            {/* Specs — displayed below gallery on desktop */}
+            {product.attributes && Object.keys(product.attributes).length > 0 && (
+              <Box sx={{ mt: 4 }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.12em',
+                    color: '#00C2FF',
+                    textTransform: 'uppercase',
+                    mb: 1.5,
+                  }}
+                >
+                  スペック / SPECIFICATIONS
+                </Typography>
+                <SpecsTable attributes={product.attributes} />
+              </Box>
             )}
+          </Grid>
 
-            {/* Actions */}
-            <Stack spacing={1.5}>
-              {/* Add to cart — wired in Phase 4 */}
-              <Button
-                variant="contained"
-                size="large"
-                disabled={isAddDisabled}
-                onClick={handleAddToCart}
-                sx={{ py: 1.5 }}
-              >
-                {isAtMaxStock && product.in_stock
-                  ? t('cart.maxStock', 'Max stock reached')
-                  : t('product.addToCart')}
-              </Button>
+          {/* Right: Sticky product info panel */}
+          <Grid size={{ xs: 12, md: 5 }}>
+            <Box
+              sx={{
+                position: { md: 'sticky' },
+                top: { md: 90 },
+                backgroundColor: '#111116',
+                border: '1px solid #1E1E28',
+                borderRadius: '12px',
+                p: { xs: 2.5, md: 3.5 },
+              }}
+            >
+              <Stack spacing={2.5}>
+                {/* Category chip */}
+                {product.category && (
+                  <Chip
+                    label={product.category.name}
+                    size="small"
+                    sx={{
+                      alignSelf: 'flex-start',
+                      backgroundColor: 'rgba(0,194,255,0.12)',
+                      color: '#00C2FF',
+                      fontSize: '0.65rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  />
+                )}
 
-              {/* WhatsApp contact */}
-              <WhatsAppButton productName={product.name} />
-            </Stack>
-          </Stack>
+                {/* Product name */}
+                <Typography
+                  component="h1"
+                  sx={{
+                    fontSize: { xs: '1.5rem', md: '1.8rem' },
+                    fontWeight: 800,
+                    lineHeight: 1.2,
+                    color: '#F5F7FA',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  {product.name}
+                </Typography>
+
+                {/* Price */}
+                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                  <BoltIcon sx={{ fontSize: '1.2rem', color: '#00C2FF', mb: '-2px' }} />
+                  <Typography
+                    sx={{
+                      fontSize: '2rem',
+                      fontWeight: 800,
+                      color: '#00C2FF',
+                      lineHeight: 1,
+                      textShadow: '0 0 20px rgba(0,194,255,0.4)',
+                    }}
+                  >
+                    {formatCurrency(product.price)}
+                  </Typography>
+                </Box>
+
+                {/* Stock status */}
+                <StockBadge inStock={product.in_stock} />
+
+                <Divider sx={{ borderColor: '#1E1E28' }} />
+
+                {/* Description */}
+                {product.description && (
+                  <Typography
+                    sx={{
+                      fontSize: '0.88rem',
+                      color: '#9CA3AF',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {product.description}
+                  </Typography>
+                )}
+
+                {/* CTA Actions */}
+                <Stack spacing={1.5} sx={{ pt: 0.5 }}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    disabled={isAddDisabled}
+                    onClick={handleAddToCart}
+                    startIcon={<ShoppingCartIcon />}
+                    sx={{
+                      py: 1.75,
+                      fontSize: '0.88rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      boxShadow: isAddDisabled
+                        ? 'none'
+                        : '0 0 24px rgba(0,194,255,0.35)',
+                    }}
+                  >
+                    {isAtMaxStock && product.in_stock
+                      ? t('cart.maxStock', 'Max stock reached')
+                      : t('product.addToCart')}
+                  </Button>
+
+                  <WhatsAppButton productName={product.name} />
+                </Stack>
+              </Stack>
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
 
-      {/* Specs table — full width below gallery */}
-      {product.attributes && Object.keys(product.attributes).length > 0 && (
-        <SpecsTable attributes={product.attributes} />
-      )}
-
-      {/* Trust signals */}
-      <TrustSignals />
+        {/* Trust signals */}
+        <Box sx={{ mt: 6 }}>
+          <TrustSignals />
+        </Box>
+      </Container>
 
       {/* Added to cart snackbar */}
       <Snackbar
@@ -164,6 +248,6 @@ export function ProductDetailPage() {
         message={t('cart.addedToCart')}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
-    </Container>
+    </Box>
   );
 }

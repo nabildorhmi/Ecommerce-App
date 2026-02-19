@@ -41,3 +41,20 @@ export function useProduct(slug: string) {
     staleTime: 5 * 60 * 1000,
   });
 }
+
+/**
+ * Fetch featured products for the homepage carousel.
+ * Uses the `filter[is_featured]=1` query param added in the backend.
+ */
+export function useFeaturedProducts() {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: ['products', 'featured'],
+    queryFn: async () => {
+      const response = await apiClient.get<PaginatedResponse<Product>>('/products', {
+        params: { 'filter[is_featured]': 1 },
+      });
+      return response.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}

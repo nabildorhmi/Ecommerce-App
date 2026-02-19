@@ -17,6 +17,7 @@ import { MyOrdersPage } from '../features/orders/pages/MyOrdersPage';
 import { AdminOrdersPage } from '../features/orders/pages/AdminOrdersPage';
 import { AdminOrderDetailPage } from '../features/orders/pages/AdminOrderDetailPage';
 import { RootLayout } from '../shared/components/RootLayout';
+import { HomePage } from '../features/home/pages/HomePage';
 
 // Admin home — redirect to product list (primary admin landing)
 const AdminHomePage = () => <Navigate to="/admin/products" replace />;
@@ -27,9 +28,9 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        // Home redirects to the product catalog (primary customer experience)
+        // Homepage — MiraiTech landing page with hero + featured carousel
         path: '/',
-        element: <Navigate to="/products" replace />,
+        element: <HomePage />,
       },
       {
         path: '/products',

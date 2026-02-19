@@ -24,6 +24,7 @@ export interface Product {
   in_stock: boolean;
   attributes: Record<string, string | number> | null;
   is_active: boolean;
+  is_featured: boolean;
   name: string;
   description: string | null;
   slug: string;
@@ -59,6 +60,7 @@ export interface CatalogFilters {
   'filter[max_price]'?: string;
   'filter[in_stock]'?: string;
   'filter[search]'?: string;
+  'filter[is_featured]'?: string;
   sort?: string;
   page?: number;
 }

@@ -22,11 +22,13 @@ class Product extends Model implements HasMedia
         'attributes',
         'category_id',
         'is_active',
+        'is_featured',
     ];
 
     protected $casts = [
         'attributes'     => 'array',
         'is_active'      => 'boolean',
+        'is_featured'    => 'boolean',
         'stock_quantity' => 'integer',
         'price'          => 'integer',
     ];

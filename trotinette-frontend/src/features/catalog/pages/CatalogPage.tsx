@@ -1,17 +1,33 @@
+import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
-import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Skeleton from '@mui/material/Skeleton';
 import { useTranslation } from 'react-i18next';
 import { useProducts } from '../api/products';
 import { useCatalogFilters } from '../hooks/useCatalogFilters';
 import { FilterBar } from '../components/FilterBar';
-import { ProductGrid } from '../components/ProductGrid';
+import { ProductCard } from '../components/ProductCard';
+
+function ProductGridSkeleton() {
+  return (
+    <Grid container spacing={2.5}>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Grid key={i} size={{ xs: 12, sm: 6, lg: 4 }}>
+          <Skeleton variant="rectangular" height={340} sx={{ borderRadius: '8px', bgcolor: '#111116' }} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
 
 /**
  * CatalogPage — /products
- * Composes FilterBar + ProductGrid + Pagination.
- * All filter/page state lives in the URL via useCatalogFilters.
+ * Sidebar FilterBar + product grid + pagination.
  */
 export function CatalogPage() {
   const { t } = useTranslation();
@@ -24,35 +40,128 @@ export function CatalogPage() {
   const total = data?.meta?.total ?? 0;
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h4" fontWeight={700} gutterBottom>
-        {t('catalog.title')}
-      </Typography>
+    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh' }}>
+      {/* Page header */}
+      <Box
+        sx={{
+          borderBottom: '1px solid #1E1E28',
+          py: 4,
+          backgroundColor: '#111116',
+        }}
+      >
+        <Container maxWidth="xl">
+          <Typography
+            sx={{
+              fontSize: '0.68rem',
+              letterSpacing: '0.3em',
+              color: '#00C2FF',
+              fontWeight: 600,
+              mb: 1,
+              textTransform: 'uppercase',
+            }}
+          >
+            スクーター — CATALOG
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
+            <Typography variant="h4" sx={{ color: '#F5F7FA', fontWeight: 800, letterSpacing: '0.04em' }}>
+              {t('catalog.title')}
+            </Typography>
+            {!isLoading && total > 0 && (
+              <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
+                {t('catalog.showing', { count: total })}
+              </Typography>
+            )}
+          </Box>
+        </Container>
+      </Box>
 
-      {/* Show total count when data is loaded */}
-      {!isLoading && total > 0 && (
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          {t('catalog.showing', { count: total })}
-        </Typography>
-      )}
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Grid container spacing={3}>
+          {/* Sidebar Filters */}
+          <Grid size={{ xs: 12, md: 3, lg: 2.5 }}>
+            <FilterBar />
+          </Grid>
 
-      <FilterBar />
+          {/* Product Grid */}
+          <Grid size={{ xs: 12, md: 9, lg: 9.5 }}>
+            {/* Sort bar */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3, gap: 2, alignItems: 'center' }}>
+              <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                Sort by
+              </Typography>
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <Select
+                  value={filters.sort ?? '-created_at'}
+                  onChange={(e) => setFilter('sort', e.target.value)}
+                  sx={{
+                    fontSize: '0.82rem',
+                    color: '#F5F7FA',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#1E1E28' },
+                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00C2FF' },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00C2FF' },
+                    '& .MuiSvgIcon-root': { color: '#9CA3AF' },
+                    backgroundColor: '#16161C',
+                  }}
+                >
+                  <MenuItem value="-created_at" sx={{ fontSize: '0.82rem' }}>Newest First</MenuItem>
+                  <MenuItem value="created_at" sx={{ fontSize: '0.82rem' }}>Oldest First</MenuItem>
+                  <MenuItem value="price" sx={{ fontSize: '0.82rem' }}>Price: Low → High</MenuItem>
+                  <MenuItem value="-price" sx={{ fontSize: '0.82rem' }}>Price: High → Low</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
 
-      <ProductGrid products={products} loading={isLoading} />
+            {isLoading ? (
+              <ProductGridSkeleton />
+            ) : products.length === 0 ? (
+              <Box
+                sx={{
+                  textAlign: 'center',
+                  py: 10,
+                  color: '#9CA3AF',
+                }}
+              >
+                <Typography sx={{ fontSize: '3rem', fontWeight: 900, color: '#1E1E28', mb: 2 }}>
+                  空
+                </Typography>
+                <Typography sx={{ color: '#9CA3AF', mb: 1 }}>
+                  {t('catalog.noProducts', 'No products found')}
+                </Typography>
+              </Box>
+            ) : (
+              <Grid container spacing={2.5}>
+                {products.map((product) => (
+                  <Grid key={product.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                    <ProductCard product={product} />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
 
-      {/* Pagination — only show if there's more than one page */}
-      {totalPages > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <Pagination
-            count={totalPages}
-            page={currentPage}
-            onChange={(_, page) => setFilter('page', String(page))}
-            color="primary"
-            showFirstButton
-            showLastButton
-          />
-        </Box>
-      )}
-    </Container>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(_, page) => setFilter('page', String(page))}
+                  color="primary"
+                  showFirstButton
+                  showLastButton
+                  sx={{
+                    '& .MuiPaginationItem-root': {
+                      color: '#9CA3AF',
+                      borderColor: '#1E1E28',
+                      fontSize: '0.82rem',
+                    },
+                  }}
+                />
+              </Box>
+            )}
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
   );
 }
+

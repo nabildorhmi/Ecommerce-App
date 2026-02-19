@@ -9,16 +9,12 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+import Autocomplete from '@mui/material/Autocomplete';
 import { useCartStore } from '../../cart/store';
 import { useAuthStore } from '../../auth/store';
 import { useDeliveryZones } from '../api/deliveryZones';
@@ -54,6 +50,7 @@ export function CheckoutPage() {
     register,
     handleSubmit,
     watch,
+    setValue,
     control,
     formState: { errors },
   } = useForm<CheckoutFormData>({
@@ -66,9 +63,11 @@ export function CheckoutPage() {
   });
 
   const selectedZoneId = watch('delivery_zone_id');
-  const selectedZone = deliveryZones?.find((z) => z.id === selectedZoneId);
+  const selectedZone = (deliveryZones ?? []).find((z) => z.id === selectedZoneId);
   const deliveryFeeCentimes = selectedZone?.fee ?? 0;
   const totalCentimes = subtotalCentimes + deliveryFeeCentimes;
+
+  const zones = deliveryZones ?? [];
 
   const onSubmit = (data: CheckoutFormData) => {
     placeOrder({
@@ -137,37 +136,39 @@ export function CheckoutPage() {
           </Paper>
 
           {/* Delivery city */}
-          <FormControl fullWidth error={Boolean(errors.delivery_zone_id)}>
-            <InputLabel id="delivery-zone-label">
-              {t('checkout.deliveryCity')}
-            </InputLabel>
-            <Controller
-              name="delivery_zone_id"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  labelId="delivery-zone-label"
-                  label={t('checkout.deliveryCity')}
-                  {...field}
-                  value={field.value ?? ''}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                  disabled={zonesLoading}
-                >
-                  <MenuItem value="" disabled>
-                    {zonesLoading ? t('common.loading', 'Loading...') : t('checkout.selectCity')}
-                  </MenuItem>
-                  {(deliveryZones ?? []).map((zone) => (
-                    <MenuItem key={zone.id} value={zone.id}>
-                      {zone.city} — {formatCurrency(zone.fee)}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
-            />
-            {errors.delivery_zone_id && (
-              <FormHelperText>{errors.delivery_zone_id.message}</FormHelperText>
+          <Controller
+            name="delivery_zone_id"
+            control={control}
+            render={({ field }) => (
+              <Autocomplete
+                options={zones}
+                getOptionLabel={(zone) => zone.city}
+                loading={zonesLoading}
+                value={zones.find((z) => z.id === field.value) ?? null}
+                onChange={(_e, zone) => field.onChange(zone?.id ?? undefined)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label={t('checkout.deliveryCity', 'City')}
+                    error={Boolean(errors.delivery_zone_id)}
+                    helperText={
+                      errors.delivery_zone_id?.message ??
+                      (selectedZone ? `${t('checkout.deliveryFee', 'Delivery fee')}: ${formatCurrency(selectedZone.fee)}` : undefined)
+                    }
+                    required
+                  />
+                )}
+                renderOption={(props, zone) => (
+                  <li {...props} key={zone.id}>
+                    <Stack direction="row" justifyContent="space-between" width="100%">
+                      <span>{zone.city}</span>
+                      <Typography variant="caption" color="text.secondary">{formatCurrency(zone.fee)}</Typography>
+                    </Stack>
+                  </li>
+                )}
+              />
             )}
-          </FormControl>
+          />
 
           {/* Phone number */}
           <TextField

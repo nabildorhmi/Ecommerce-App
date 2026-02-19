@@ -22,6 +22,7 @@ class UpdateProductRequest extends FormRequest
             'stock_quantity'                  => 'sometimes|integer|min:0',
             'category_id'                     => 'sometimes|exists:categories,id',
             'is_active'                       => 'sometimes|boolean',
+            'is_featured'                     => 'sometimes|boolean',
             'translations'                    => 'sometimes|array',
             'translations.fr'                 => 'sometimes|array',
             'translations.fr.name'            => 'required_with:translations.fr|string|max:255',

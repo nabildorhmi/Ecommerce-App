@@ -23,6 +23,8 @@ import Alert from '@mui/material/Alert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAdminProducts, useDeleteProduct, useUpdateProduct } from '../api/products';
 import type { AdminProduct } from '../types';
 
@@ -143,6 +145,13 @@ export function AdminProductsPage() {
     });
   };
 
+  const handleToggleFeatured = async (product: AdminProduct) => {
+    await updateMutation.mutateAsync({
+      id: product.id,
+      is_featured: !product.is_featured,
+    });
+  };
+
   const handleDelete = async (id: number) => {
     await deleteMutation.mutateAsync(id);
     setDeleteTarget(null);
@@ -195,6 +204,7 @@ export function AdminProductsPage() {
               <TableCell>Prix / Price</TableCell>
               <TableCell>Stock</TableCell>
               <TableCell>Actif / Active</TableCell>
+              <TableCell>Vedette / Featured</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -258,6 +268,16 @@ export function AdminProductsPage() {
                         onClick={() => void handleToggleActive(product)}
                         sx={{ cursor: 'pointer' }}
                       />
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        size="small"
+                        title={product.is_featured ? 'Retirer de la vedette / Unfeature' : 'Mettre en vedette / Feature'}
+                        onClick={() => void handleToggleFeatured(product)}
+                        sx={{ color: product.is_featured ? '#F59E0B' : 'text.disabled' }}
+                      >
+                        {product.is_featured ? <StarIcon fontSize="small" /> : <StarBorderIcon fontSize="small" />}
+                      </IconButton>
                     </TableCell>
                     <TableCell align="right">
                       <IconButton
