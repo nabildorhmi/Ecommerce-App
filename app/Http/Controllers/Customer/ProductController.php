@@ -27,6 +27,7 @@ class ProductController extends Controller
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
+                AllowedFilter::exact('is_featured'),
                 AllowedFilter::callback('min_price', fn ($query, $value) =>
                     $query->where('price', '>=', (int) $value)
                 ),

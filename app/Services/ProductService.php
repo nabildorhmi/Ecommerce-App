@@ -16,6 +16,7 @@ class ProductService
             'attributes'     => $data['attributes'] ?? [],
             'category_id'    => $data['category_id'],
             'is_active'      => $data['is_active'] ?? true,
+            'is_featured'    => $data['is_featured'] ?? false,
         ]);
 
         // Store translations for each provided locale
@@ -48,6 +49,7 @@ class ProductService
             'attributes'     => $data['attributes'] ?? null,
             'category_id'    => $data['category_id'] ?? null,
             'is_active'      => $data['is_active'] ?? null,
+            'is_featured'    => $data['is_featured'] ?? null,
         ], fn ($v) => $v !== null));
 
         // Sync translations if provided

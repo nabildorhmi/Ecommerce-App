@@ -20,6 +20,7 @@ class ProductResource extends JsonResource
             'in_stock'       => $this->stock_quantity > 0,
             'attributes'     => $this->attributes,
             'is_active'      => $this->is_active,
+            'is_featured'    => $this->is_featured,
             'name'           => $translation?->name,
             'description'    => $translation?->description,
             'slug'           => $translation?->slug,

@@ -19,6 +19,7 @@ class StoreProductRequest extends FormRequest
             'stock_quantity'                  => 'required|integer|min:0',
             'category_id'                     => 'required|exists:categories,id',
             'is_active'                       => 'boolean',
+            'is_featured'                     => 'boolean',
             'translations'                    => 'required|array',
             'translations.fr'                 => 'required|array',
             'translations.fr.name'            => 'required|string|max:255',
