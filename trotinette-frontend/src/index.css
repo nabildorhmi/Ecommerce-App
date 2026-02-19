@@ -25,8 +25,7 @@ html, body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-color: var(--mirai-black);
-  color: var(--mirai-white);
+  /* Background and color are controlled by MUI CssBaseline based on current theme */
 }
 
 #root {

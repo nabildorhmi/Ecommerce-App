@@ -86,8 +86,9 @@ export function FilterBar() {
   return (
     <Box
       sx={{
-        backgroundColor: '#111116',
-        border: '1px solid #1E1E28',
+        backgroundColor: 'background.paper',
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: '8px',
         p: 2.5,
         position: { md: 'sticky' },
@@ -98,7 +99,7 @@ export function FilterBar() {
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TuneIcon sx={{ fontSize: '1rem', color: '#00C2FF' }} />
-          <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: '#F5F7FA', textTransform: 'uppercase' }}>
+          <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: 'text.primary', textTransform: 'uppercase' }}>
             {t('catalog.filters', 'Filters')}
           </Typography>
         </Box>

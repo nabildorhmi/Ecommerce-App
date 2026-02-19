@@ -14,6 +14,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
+import Tooltip from '@mui/material/Tooltip';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -24,11 +25,14 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import { useAuthStore } from '../../features/auth/store';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
 import { useCategories } from '../../features/catalog/api/categories';
+import { useThemeStore } from '../../app/themeStore';
 
 /**
  * MiraiTech Navbar — sticky, transparent/dark blur, dynamic categories.
@@ -39,6 +43,7 @@ export function Navbar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
+  const { mode, toggleMode } = useThemeStore();
 
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
@@ -71,39 +76,17 @@ export function Navbar() {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 0.75,
               textDecoration: 'none',
               mr: { md: 4 },
+              flexShrink: 0,
             }}
           >
             <Box
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: '4px',
-                background: 'linear-gradient(135deg, #00C2FF 0%, #0099CC 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Typography sx={{ fontWeight: 900, fontSize: 13, color: '#0B0B0E', lineHeight: 1 }}>
-                M
-              </Typography>
-            </Box>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                letterSpacing: '0.12em',
-                color: '#F5F7FA',
-                textTransform: 'uppercase',
-                fontSize: { xs: '0.88rem', md: '1rem' },
-                lineHeight: 1,
-              }}
-            >
-              MIRAI<Box component="span" sx={{ color: '#00C2FF' }}>TECH</Box>
-            </Typography>
+              component="img"
+              src="../../assets/miraiTech-Logo.png"
+              alt="MiraiTech"
+              sx={{ height: { xs: 36, md: 44 }, width: 'auto', display: 'block' }}
+            />
           </Box>
 
           {/* ── Desktop Category Nav ── */}
@@ -189,6 +172,19 @@ export function Navbar() {
 
           {/* ── Right Actions ── */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, ml: 'auto' }}>
+            {/* ── Theme Toggle ── */}
+            <Tooltip title={mode === 'dark' ? 'Light mode' : 'Dark mode'}>
+              <IconButton
+                onClick={toggleMode}
+                size="small"
+                sx={{ color: '#9CA3AF', '&:hover': { color: '#F5F7FA', backgroundColor: 'rgba(255,255,255,0.06)' } }}
+              >
+                {mode === 'dark'
+                  ? <LightModeRoundedIcon fontSize="small" />
+                  : <DarkModeRoundedIcon fontSize="small" />}
+              </IconButton>
+            </Tooltip>
+
             <LanguageSwitcher />
 
             <CartBadge onToggle={() => setDrawerOpen(true)} />

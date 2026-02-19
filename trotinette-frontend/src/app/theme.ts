@@ -1,41 +1,56 @@
 import { createTheme } from '@mui/material/styles';
+import type { PaletteMode } from '@mui/material';
 
 // ─── MiraiTech Design Tokens ───────────────────────────────────────────────
 const MIRAI_BLACK   = '#0B0B0E';
-const MIRAI_SURFACE = '#111116';
-const MIRAI_CARD    = '#16161C';
-const MIRAI_BORDER  = '#1E1E28';
+const MIRAI_SURFACE_D = '#111116';
+const MIRAI_CARD_D    = '#16161C';
+const MIRAI_BORDER_D  = '#1E1E28';
+
+// Light palette tokens
+const LIGHT_BG      = '#F8FAFB';
+const LIGHT_PAPER   = '#FFFFFF';
+const LIGHT_BORDER  = '#E5E7EB';
+const LIGHT_TEXT    = '#0B0B0E';
+const LIGHT_SUBTEXT = '#4B5563';
 const MIRAI_CYAN    = '#00C2FF';
 const MIRAI_CYAN_DK = '#0099CC';
 const MIRAI_WHITE   = '#F5F7FA';
 const MIRAI_GRAY    = '#9CA3AF';
 const MIRAI_RED     = '#E63946';
 
-export const miraiTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: MIRAI_BLACK,
-      paper:   MIRAI_SURFACE,
-    },
-    primary: {
-      main:        MIRAI_CYAN,
-      dark:        MIRAI_CYAN_DK,
-      light:       '#33CFFF',
-      contrastText: MIRAI_BLACK,
-    },
-    secondary: {
-      main:        MIRAI_RED,
-      contrastText: '#FFFFFF',
-    },
-    text: {
-      primary:   MIRAI_WHITE,
-      secondary: MIRAI_GRAY,
-    },
-    divider: MIRAI_BORDER,
-    error: {
-      main: MIRAI_RED,
-    },
+/**
+ * Creates the MiraiTech MUI theme.
+ * AppBar is ALWAYS dark (#0B0B0E) regardless of mode.
+ */
+export function createMiraiTheme(mode: PaletteMode = 'dark', direction: 'ltr' | 'rtl' = 'ltr') {
+  const isDark = mode === 'dark';
+  return createTheme({
+    direction,
+    palette: {
+      mode,
+      background: {
+        default: isDark ? MIRAI_BLACK : LIGHT_BG,
+        paper:   isDark ? MIRAI_SURFACE_D : LIGHT_PAPER,
+      },
+      primary: {
+        main:        MIRAI_CYAN,
+        dark:        MIRAI_CYAN_DK,
+        light:       '#33CFFF',
+        contrastText: MIRAI_BLACK,
+      },
+      secondary: {
+        main:        MIRAI_RED,
+        contrastText: '#FFFFFF',
+      },
+      text: {
+        primary:   isDark ? MIRAI_WHITE   : LIGHT_TEXT,
+        secondary: isDark ? MIRAI_GRAY    : LIGHT_SUBTEXT,
+      },
+      divider: isDark ? MIRAI_BORDER_D : LIGHT_BORDER,
+      error: {
+        main: MIRAI_RED,
+      },
     success: {
       main: '#00E676',
     },
@@ -79,25 +94,30 @@ export const miraiTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: MIRAI_BLACK,
-          scrollbarColor: `${MIRAI_BORDER} ${MIRAI_BLACK}`,
+          backgroundColor: isDark ? MIRAI_BLACK : LIGHT_BG,
+          color: isDark ? MIRAI_WHITE : LIGHT_TEXT,
+          scrollbarColor: isDark
+            ? `${MIRAI_BORDER_D} ${MIRAI_BLACK}`
+            : `${LIGHT_BORDER} ${LIGHT_BG}`,
           '&::-webkit-scrollbar': { width: 6 },
-          '&::-webkit-scrollbar-track': { background: MIRAI_BLACK },
+          '&::-webkit-scrollbar-track': { background: isDark ? MIRAI_BLACK : LIGHT_BG },
           '&::-webkit-scrollbar-thumb': {
-            background: MIRAI_BORDER,
+            background: isDark ? MIRAI_BORDER_D : LIGHT_BORDER,
             borderRadius: 3,
             '&:hover': { background: MIRAI_CYAN_DK },
           },
         },
       },
     },
+    // AppBar is ALWAYS black regardless of theme mode
     MuiAppBar: {
       styleOverrides: {
         root: {
-          backgroundColor: 'rgba(11,11,14,0.85)',
+          backgroundColor: 'rgba(11,11,14,0.92)',
           backdropFilter: 'blur(16px)',
-          borderBottom: `1px solid ${MIRAI_BORDER}`,
+          borderBottom: `1px solid ${MIRAI_BORDER_D}`,
           boxShadow: 'none',
+          color: MIRAI_WHITE,
         },
       },
     },
@@ -130,8 +150,8 @@ export const miraiTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: MIRAI_CARD,
-          border: `1px solid ${MIRAI_BORDER}`,
+          backgroundColor: isDark ? MIRAI_CARD_D : LIGHT_PAPER,
+          border: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
           backgroundImage: 'none',
         },
       },
@@ -140,16 +160,16 @@ export const miraiTheme = createTheme({
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: MIRAI_SURFACE,
-          border: `1px solid ${MIRAI_BORDER}`,
+          backgroundColor: isDark ? MIRAI_SURFACE_D : LIGHT_PAPER,
+          border: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
         },
       },
     },
     MuiTableContainer: {
       styleOverrides: {
         root: {
-          backgroundColor: MIRAI_SURFACE,
-          border: `1px solid ${MIRAI_BORDER}`,
+          backgroundColor: isDark ? MIRAI_SURFACE_D : LIGHT_PAPER,
+          border: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
         },
       },
     },
@@ -163,7 +183,7 @@ export const miraiTheme = createTheme({
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
             fontSize: '0.7rem',
-            borderBottom: `1px solid ${MIRAI_BORDER}`,
+            borderBottom: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
           },
         },
       },
@@ -171,7 +191,7 @@ export const miraiTheme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottom: `1px solid ${MIRAI_BORDER}`,
+          borderBottom: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
         },
       },
     },
@@ -197,7 +217,7 @@ export const miraiTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            '& fieldset': { borderColor: MIRAI_BORDER },
+            '& fieldset': { borderColor: isDark ? MIRAI_BORDER_D : LIGHT_BORDER },
             '&:hover fieldset': { borderColor: MIRAI_CYAN },
             '&.Mui-focused fieldset': {
               borderColor: MIRAI_CYAN,
@@ -210,22 +230,24 @@ export const miraiTheme = createTheme({
     MuiSelect: {
       styleOverrides: {
         outlined: {
-          '& .MuiOutlinedInput-notchedOutline': { borderColor: MIRAI_BORDER },
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: isDark ? MIRAI_BORDER_D : LIGHT_BORDER,
+          },
         },
       },
     },
     MuiDivider: {
       styleOverrides: {
         root: {
-          borderColor: MIRAI_BORDER,
+          borderColor: isDark ? MIRAI_BORDER_D : LIGHT_BORDER,
         },
       },
     },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: MIRAI_SURFACE,
-          border: `1px solid ${MIRAI_BORDER}`,
+          backgroundColor: isDark ? MIRAI_SURFACE_D : LIGHT_PAPER,
+          border: `1px solid ${isDark ? MIRAI_BORDER_D : LIGHT_BORDER}`,
         },
       },
     },
@@ -249,7 +271,7 @@ export const miraiTheme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiPaginationItem-root': {
-            color: MIRAI_GRAY,
+            color: isDark ? MIRAI_GRAY : LIGHT_SUBTEXT,
             '&.Mui-selected': {
               backgroundColor: MIRAI_CYAN,
               color: MIRAI_BLACK,
@@ -276,12 +298,23 @@ export const miraiTheme = createTheme({
     MuiLinearProgress: {
       styleOverrides: {
         root: {
-          backgroundColor: MIRAI_BORDER,
+          backgroundColor: isDark ? MIRAI_BORDER_D : LIGHT_BORDER,
         },
         bar: {
           backgroundColor: MIRAI_CYAN,
         },
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+        },
+      },
+    },
   },
-});
+  });
+}
+
+// Default dark theme export for backward-compat
+export const miraiTheme = createMiraiTheme('dark', 'ltr');

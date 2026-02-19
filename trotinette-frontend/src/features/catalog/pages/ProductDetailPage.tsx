@@ -27,7 +27,7 @@ import { useCartStore } from '../../cart/store';
 
 function ProductDetailSkeleton() {
   return (
-    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh', py: 4 }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4 }}>
       <Container maxWidth="lg">
         <Skeleton variant="text" width={200} height={24} sx={{ mb: 3, bgcolor: '#1E1E28' }} />
         <Grid container spacing={5}>
@@ -69,7 +69,7 @@ export function ProductDetailPage() {
 
   if (isError || !product) {
     return (
-      <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh', py: 6 }}>
+      <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 6 }}>
         <Container maxWidth="lg">
           <Alert severity="warning" sx={{ mb: 3, backgroundColor: '#1E1E28', color: '#F5F7FA' }}>
             {t('product.notFound')}
@@ -92,7 +92,7 @@ export function ProductDetailPage() {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
         {/* Breadcrumb */}
         <Box sx={{ mb: 3 }}>
@@ -130,8 +130,9 @@ export function ProductDetailPage() {
               sx={{
                 position: { md: 'sticky' },
                 top: { md: 90 },
-                backgroundColor: '#111116',
-                border: '1px solid #1E1E28',
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: '12px',
                 p: { xs: 2.5, md: 3.5 },
               }}

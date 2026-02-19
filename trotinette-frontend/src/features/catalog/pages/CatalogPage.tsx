@@ -40,7 +40,7 @@ export function CatalogPage() {
   const total = data?.meta?.total ?? 0;
 
   return (
-    <Box sx={{ backgroundColor: '#0B0B0E', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       {/* Page header */}
       <Box
         sx={{
