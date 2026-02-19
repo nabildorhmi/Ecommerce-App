@@ -33,6 +33,7 @@ import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
 import { useCategories } from '../../features/catalog/api/categories';
 import { useThemeStore } from '../../app/themeStore';
+import miraiLogo from '../../assets/miraiTech-Logo.png';
 
 /**
  * MiraiTech Navbar — sticky, transparent/dark blur, dynamic categories.
@@ -83,9 +84,9 @@ export function Navbar() {
           >
             <Box
               component="img"
-              src="../../assets/miraiTech-Logo.png"
+              src={miraiLogo}
               alt="MiraiTech"
-              sx={{ height: { xs: 36, md: 44 }, width: 'auto', display: 'block' }}
+              sx={{ height: { xs: 75, md: 100 }, width: 'auto', display: 'block' }}
             />
           </Box>
 
