@@ -95,11 +95,11 @@ Plans:
   1. A logged-in customer can add a product to their wishlist from the product detail page, view all saved products in their account, navigate to any wishlist item, and remove products they no longer want
   2. Every button, label, error message, status badge, and notification visible to the customer is correctly rendered in French, Arabic, and English when the language is switched — with no missing translation keys (no raw key strings visible in the UI)
   3. Switching between FR, AR, and EN at any point in the application (catalog, cart, checkout, order history, account) produces a complete translation with no untranslated fallback text visible to the user
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 05-01: Wishlist backend and frontend — Wishlist model and endpoints, add/remove from product detail page, wishlist view in user account
-- [ ] 05-02: Full translation pass — audit and complete FR/AR/EN locale JSON files for all UI strings added in Phases 2, 3, and 4; verify no missing keys across all routes
+- [ ] 05-01-PLAN.md — Wishlist backend and frontend: pivot table migration, model relations, toggle/list controller, ProductResource is_wishlisted, TanStack Query hooks, WishlistPage with card grid, heart toggle on ProductDetailPage, router and navbar wiring, FR/EN wishlist i18n keys
+- [ ] 05-02-PLAN.md — Full translation pass: fix hardcoded strings in AdminOrderDetailPage, AdminDeliveryZonesPage, CategoryForm, ProductForm, ProductGallery; audit all t() keys against JSON files; add missing keys; remove dead keys (deliveryZones.cityAr, smoke_test.*); verify FR translations are genuine French
 
 ## Progress
 
