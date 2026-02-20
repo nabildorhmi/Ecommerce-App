@@ -233,19 +233,11 @@ export function AdminProductsPage() {
                           }}
                         />
                       ) : (
-                        <Box
-                          width={48}
-                          height={48}
-                          bgcolor="grey.100"
-                          borderRadius={1}
-                          display="flex"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <Typography variant="caption" color="text.disabled" textAlign="center" lineHeight={1.2}>
-                            MiraiTech
-                          </Typography>
-                        </Box>
+                        <img
+                          src="https://placehold.co/48x48/111116/00C2FF?text=M"
+                          alt="MiraiTech"
+                          style={{ width: 48, height: 48, borderRadius: 4 }}
+                        />
                       )}
                     </TableCell>
                     <TableCell>

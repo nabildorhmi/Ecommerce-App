@@ -113,8 +113,8 @@ export function ImageUploader({
                 borderColor="divider"
               >
                 <img
-                  src={img.thumbnail_url || img.url}
-                  alt={img.name}
+                  src={img.thumbnail || img.original}
+                  alt="product"
                   style={{
                     width: '100%',
                     height: '100%',
