@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 Phase: 4 of 5 (Cart, Checkout & Orders)
 Plan: 4 of 4 in current phase — 04-04 COMPLETE. Phase 4 fully done.
 Status: Phase 4 complete — full order lifecycle implemented (backend + frontend). Next: Phase 5 (I18N-02, remaining features).
-Last activity: 2026-02-18 — 04-04 complete. Customer order history, admin order management (filters, status transitions, notes, audit log), admin delivery zone CRUD, Navbar dropdowns, FR/EN translations for orders and delivery zones.
+Last activity: 2026-02-20 - Completed quick task 1: Remove delivery zones, inline checkout registration, product card bg-image, admin pending badge, light mode fixes
 
 Progress: [█████████░] 90%
 
@@ -117,6 +117,12 @@ None.
 ### Blockers/Concerns
 
 - [Pre-Phase 2]: MySQL must be started manually before API: `"C:/Program Files/MySQL/MySQL Server 8.4/bin/mysqld.exe" --datadir="C:/Users/User/mysql-data" --console &`
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Remove delivery zones table (city text input), inline registration at checkout, light mode UI fixes, product card image as bg, admin pending orders badge | 2026-02-20 | 3a30b62 | [1-remove-delivery-zones-table-city-text-in](./quick/1-remove-delivery-zones-table-city-text-in/) |
 
 ## Session Continuity
 
