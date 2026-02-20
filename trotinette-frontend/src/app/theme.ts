@@ -115,6 +115,7 @@ export function createMiraiTheme(mode: PaletteMode = 'dark', direction: 'ltr' | 
         root: {
           backgroundColor: 'rgba(11,11,14,0.92)',
           backdropFilter: 'blur(16px)',
+          border: 'none',
           borderBottom: `1px solid ${MIRAI_BORDER_D}`,
           boxShadow: 'none',
           color: MIRAI_WHITE,

@@ -17,9 +17,9 @@ function ProductGridSkeleton() {
     <Grid container spacing={2}>
       {Array.from({ length: 8 }).map((_, i) => (
         <Grid key={i} size={{ xs: 6, sm: 4, md: 3 }}>
-          <Skeleton variant="rectangular" sx={{ borderRadius: '8px', bgcolor: '#111116', aspectRatio: '1 / 1', mb: 1 }} />
-          <Skeleton height={18} sx={{ bgcolor: '#111116', mb: 0.5 }} />
-          <Skeleton height={16} width="50%" sx={{ bgcolor: '#111116' }} />
+          <Skeleton variant="rectangular" sx={{ borderRadius: '8px', bgcolor: 'action.hover', aspectRatio: '1 / 1', mb: 1 }} />
+          <Skeleton height={18} sx={{ bgcolor: 'action.hover', mb: 0.5 }} />
+          <Skeleton height={16} width="50%" sx={{ bgcolor: 'action.hover' }} />
         </Grid>
       ))}
     </Grid>
@@ -44,9 +44,10 @@ export function CatalogPage() {
       {/* Page header */}
       <Box
         sx={{
-          borderBottom: '1px solid #1E1E28',
+          borderBottom: '1px solid',
+          borderBottomColor: 'divider',
           py: 4,
-          backgroundColor: '#111116',
+          backgroundColor: 'background.paper',
         }}
       >
         <Container maxWidth="xl">
@@ -63,11 +64,11 @@ export function CatalogPage() {
             スクーター — CATALOGUE
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-            <Typography variant="h4" sx={{ color: '#F5F7FA', fontWeight: 800, letterSpacing: '0.04em' }}>
+            <Typography variant="h4" sx={{ color: 'text.primary', fontWeight: 800, letterSpacing: '0.04em' }}>
               {"Catalogue"}
             </Typography>
             {!isLoading && total > 0 && (
-              <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 {`${total} produit(s) trouvé(s)`}
               </Typography>
             )}
@@ -86,7 +87,7 @@ export function CatalogPage() {
           <Grid size={{ xs: 12, md: 9, lg: 9.5 }}>
             {/* Sort bar */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3, gap: 2, alignItems: 'center' }}>
-              <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', letterSpacing: '0.06em' }}>
+              <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', letterSpacing: '0.06em' }}>
                 Trier par
               </Typography>
               <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -95,12 +96,12 @@ export function CatalogPage() {
                   onChange={(e) => setFilter('sort', e.target.value)}
                   sx={{
                     fontSize: '0.82rem',
-                    color: '#F5F7FA',
-                    '& .MuiOutlinedInput-notchedOutline': { borderColor: '#1E1E28' },
+                    color: 'text.primary',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00C2FF' },
                     '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00C2FF' },
-                    '& .MuiSvgIcon-root': { color: '#9CA3AF' },
-                    backgroundColor: '#16161C',
+                    '& .MuiSvgIcon-root': { color: 'text.secondary' },
+                    backgroundColor: 'background.paper',
                   }}
                 >
                   <MenuItem value="-created_at" sx={{ fontSize: '0.82rem' }}>Plus récent</MenuItem>
@@ -118,13 +119,13 @@ export function CatalogPage() {
                 sx={{
                   textAlign: 'center',
                   py: 10,
-                  color: '#9CA3AF',
+                  color: 'text.secondary',
                 }}
               >
-                <Typography sx={{ fontSize: '3rem', fontWeight: 900, color: '#1E1E28', mb: 2 }}>
+                <Typography sx={{ fontSize: '3rem', fontWeight: 900, color: 'divider', mb: 2 }}>
                   空
                 </Typography>
-                <Typography sx={{ color: '#9CA3AF', mb: 1 }}>
+                <Typography sx={{ color: 'text.secondary', mb: 1 }}>
                   {"Aucun produit trouvé"}
                 </Typography>
               </Box>
@@ -150,8 +151,8 @@ export function CatalogPage() {
                   showLastButton
                   sx={{
                     '& .MuiPaginationItem-root': {
-                      color: '#9CA3AF',
-                      borderColor: '#1E1E28',
+                      color: 'text.secondary',
+                      borderColor: 'divider',
                       fontSize: '0.82rem',
                     },
                   }}

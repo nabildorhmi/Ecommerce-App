@@ -20,7 +20,7 @@ const LABEL_STYLE = {
   fontSize: '0.65rem',
   fontWeight: 700,
   letterSpacing: '0.1em',
-  color: '#9CA3AF',
+  color: 'text.secondary' as const,
   textTransform: 'uppercase' as const,
   mb: 1,
 };
@@ -131,7 +131,7 @@ export function FilterBar() {
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon fontSize="small" sx={{ color: '#9CA3AF' }} />
+                    <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                   </InputAdornment>
                 ),
               },
@@ -140,7 +140,7 @@ export function FilterBar() {
           />
         </Box>
 
-        <Divider sx={{ borderColor: '#1E1E28' }} />
+        <Divider />
 
         {/* Category */}
         <Box>
@@ -153,7 +153,7 @@ export function FilterBar() {
               sx={{ fontSize: '0.82rem' }}
             >
               <MenuItem value="" sx={{ fontSize: '0.82rem' }}>
-                <em style={{ fontStyle: 'normal', color: '#9CA3AF' }}>{"Toutes les catégories"}</em>
+                <em style={{ fontStyle: 'normal' }} className="filter-placeholder">{"Toutes les catégories"}</em>
               </MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat.id} value={String(cat.id)} sx={{ fontSize: '0.82rem' }}>
@@ -164,7 +164,7 @@ export function FilterBar() {
           </FormControl>
         </Box>
 
-        <Divider sx={{ borderColor: '#1E1E28' }} />
+        <Divider />
 
         {/* Price Range */}
         <Box>
@@ -191,7 +191,7 @@ export function FilterBar() {
           </Stack>
         </Box>
 
-        <Divider sx={{ borderColor: '#1E1E28' }} />
+        <Divider />
 
         {/* In Stock */}
         <FormControlLabel
@@ -203,7 +203,7 @@ export function FilterBar() {
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', fontWeight: 500 }}>
+            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
               {"En stock uniquement"}
             </Typography>
           }

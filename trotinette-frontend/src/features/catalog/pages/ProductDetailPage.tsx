@@ -28,22 +28,22 @@ function ProductDetailSkeleton() {
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 4 }}>
       <Container maxWidth="lg">
-        <Skeleton variant="text" width={200} height={24} sx={{ mb: 3, bgcolor: '#1E1E28' }} />
+        <Skeleton variant="text" width={200} height={24} sx={{ mb: 3, bgcolor: 'action.hover' }} />
         <Grid container spacing={5}>
           <Grid size={{ xs: 12, md: 7 }}>
-            <Skeleton variant="rectangular" height={440} sx={{ mb: 1.5, borderRadius: 2, bgcolor: '#111116' }} />
+            <Skeleton variant="rectangular" height={440} sx={{ mb: 1.5, borderRadius: 2, bgcolor: 'action.hover' }} />
             <Box sx={{ display: 'flex', gap: 1 }}>
               {[0, 1, 2].map((i) => (
-                <Skeleton key={i} variant="rectangular" width={80} height={64} sx={{ borderRadius: 1, bgcolor: '#111116' }} />
+                <Skeleton key={i} variant="rectangular" width={80} height={64} sx={{ borderRadius: 1, bgcolor: 'action.hover' }} />
               ))}
             </Box>
           </Grid>
           <Grid size={{ xs: 12, md: 5 }}>
-            <Skeleton variant="text" height={48} sx={{ mb: 1, bgcolor: '#1E1E28' }} />
-            <Skeleton variant="text" height={40} width={140} sx={{ mb: 2, bgcolor: '#1E1E28' }} />
-            <Skeleton variant="rounded" width={100} height={28} sx={{ mb: 3, bgcolor: '#1E1E28' }} />
-            <Skeleton variant="rectangular" height={56} sx={{ mb: 1.5, borderRadius: 1, bgcolor: '#1E1E28' }} />
-            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1, bgcolor: '#1E1E28' }} />
+            <Skeleton variant="text" height={48} sx={{ mb: 1, bgcolor: 'action.hover' }} />
+            <Skeleton variant="text" height={40} width={140} sx={{ mb: 2, bgcolor: 'action.hover' }} />
+            <Skeleton variant="rounded" width={100} height={28} sx={{ mb: 3, bgcolor: 'action.hover' }} />
+            <Skeleton variant="rectangular" height={56} sx={{ mb: 1.5, borderRadius: 1, bgcolor: 'action.hover' }} />
+            <Skeleton variant="rectangular" height={56} sx={{ borderRadius: 1, bgcolor: 'action.hover' }} />
           </Grid>
         </Grid>
       </Container>
@@ -69,7 +69,7 @@ export function ProductDetailPage() {
     return (
       <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 6 }}>
         <Container maxWidth="lg">
-          <Alert severity="warning" sx={{ mb: 3, backgroundColor: '#1E1E28', color: '#F5F7FA' }}>
+          <Alert severity="warning" sx={{ mb: 3 }}>
             {"Produit introuvable"}
           </Alert>
           <Button component={Link} to="/products" variant="outlined" startIcon={<ArrowBackIcon />}>
@@ -160,7 +160,7 @@ export function ProductDetailPage() {
                     fontSize: { xs: '1.5rem', md: '1.8rem' },
                     fontWeight: 800,
                     lineHeight: 1.2,
-                    color: '#F5F7FA',
+                    color: 'text.primary',
                     letterSpacing: '-0.02em',
                   }}
                 >
@@ -186,14 +186,14 @@ export function ProductDetailPage() {
                 {/* Stock status */}
                 <StockBadge inStock={product.in_stock} />
 
-                <Divider sx={{ borderColor: '#1E1E28' }} />
+                <Divider />
 
                 {/* Description */}
                 {product.description && (
                   <Typography
                     sx={{
                       fontSize: '0.88rem',
-                      color: '#9CA3AF',
+                      color: 'text.secondary',
                       lineHeight: 1.7,
                     }}
                   >

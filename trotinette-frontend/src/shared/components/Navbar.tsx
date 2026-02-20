@@ -108,7 +108,7 @@ export function Navbar() {
               component={Link}
               to="/products"
               sx={{
-                color: isActive('/products') && !location.search.includes('category_id') ? '#00C2FF' : 'text.secondary',
+                color: isActive('/products') && !location.search.includes('category_id') ? '#00C2FF' : '#9CA3AF',
                 fontWeight: 600,
                 fontSize: '0.75rem',
                 letterSpacing: '0.08em',
@@ -116,7 +116,7 @@ export function Navbar() {
                 py: 0.75,
                 borderRadius: '4px',
                 minWidth: 'auto',
-                '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
+                '&:hover': { color: '#F5F7FA', backgroundColor: 'rgba(255,255,255,0.04)' },
               }}
             >
               TOUS LES SCOOTERS
@@ -128,7 +128,7 @@ export function Navbar() {
                   endIcon={<KeyboardArrowDownIcon sx={{ fontSize: '0.9rem !important' }} />}
                   onClick={(e) => setCatMenuAnchor(e.currentTarget)}
                   sx={{
-                    color: 'text.secondary',
+                    color: '#9CA3AF',
                     fontWeight: 600,
                     fontSize: '0.75rem',
                     letterSpacing: '0.08em',
@@ -136,7 +136,7 @@ export function Navbar() {
                     py: 0.75,
                     borderRadius: '4px',
                     minWidth: 'auto',
-                    '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
+                    '&:hover': { color: '#F5F7FA', backgroundColor: 'rgba(255,255,255,0.04)' },
                   }}
                 >
                   CATÉGORIES
