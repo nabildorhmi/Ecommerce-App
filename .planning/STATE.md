@@ -123,9 +123,10 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Remove delivery zones table (city text input), inline registration at checkout, light mode UI fixes, product card image as bg, admin pending orders badge | 2026-02-20 | 3a30b62 | [1-remove-delivery-zones-table-city-text-in](./quick/1-remove-delivery-zones-table-city-text-in/) |
+| 2 | Remove i18n infrastructure (French-only app), fix attributes double-encoding, fix product card images | 2026-02-20 | 451f35a, eae31ad | [2-remove-i18n-french-only-fix-specs-displa](./quick/2-remove-i18n-french-only-fix-specs-displa/) |
 
 ## Session Continuity
 
-Last session: 2026-02-18
-Stopped at: Completed 04-04-PLAN.md — order history and admin order management frontend (MyOrdersPage, AdminOrdersPage, AdminOrderDetailPage, AdminDeliveryZonesPage, Navbar dropdowns, FR/EN translations). Phase 4 fully complete.
+Last session: 2026-02-20
+Stopped at: Completed quick task 2 — removed i18n infrastructure (French-only app), fixed attributes double-encoding bug, fixed product card background images. Codebase simplified by 695 lines, removed 5 npm packages.
 Resume file: None
