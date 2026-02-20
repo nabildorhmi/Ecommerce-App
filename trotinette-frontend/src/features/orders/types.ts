@@ -38,17 +38,18 @@ export interface Order {
   id: number;
   order_number: string;
   phone: string;
+  city: string | null;
   status: OrderStatus;
   status_label: string;
   subtotal: number;
   delivery_fee: number;
   total: number;
   note: string | null;
-  delivery_zone: {
+  delivery_zone?: {
     id: number;
     city: string;
     fee: number;
-  };
+  } | null;
   items: OrderItem[];
   status_logs?: OrderStatusLog[];
   allowed_transitions: string[];

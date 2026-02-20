@@ -140,7 +140,7 @@ export function AdminOrderDetailPage() {
             <Typography variant="caption" color="text.secondary">
               {t('orders.city')}
             </Typography>
-            <Typography>{order.delivery_zone.city}</Typography>
+            <Typography>{order.city ?? order.delivery_zone?.city ?? '—'}</Typography>
           </Box>
         </Box>
       </Paper>

@@ -108,13 +108,10 @@ export function OrderConfirmationPage() {
               <Typography variant="body2">{formatCurrency(order.subtotal)}</Typography>
             </Stack>
             <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2">{t('checkout.deliveryFee')}</Typography>
-              <Typography variant="body2">{formatCurrency(order.delivery_fee)}</Typography>
-            </Stack>
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2" color="text.secondary">
-                {order.delivery_zone.city}
+              <Typography variant="body2">
+                {t('checkout.deliveryFee')} ({order.city ?? order.delivery_zone?.city ?? '—'})
               </Typography>
+              <Typography variant="body2">{formatCurrency(order.delivery_fee)}</Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">

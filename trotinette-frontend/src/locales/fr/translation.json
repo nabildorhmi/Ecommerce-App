@@ -144,6 +144,7 @@
     "orderSummary": "Récapitulatif de commande",
     "subtotal": "Sous-total",
     "deliveryFee": "Frais de livraison",
+    "freeDelivery": "Gratuit",
     "total": "Total",
     "note": "Note (optionnel)",
     "notePlaceholder": "Instructions de livraison, code d'accès...",

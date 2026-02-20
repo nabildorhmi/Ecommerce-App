@@ -92,7 +92,7 @@ export function MyOrdersPage() {
                     {new Date(order.created_at).toLocaleDateString()}
                   </Typography>
                   <Typography variant="body2">
-                    {order.delivery_zone.city}
+                    {order.city ?? order.delivery_zone?.city ?? '—'}
                   </Typography>
                   <Typography fontWeight="medium">
                     {formatCurrency(order.total)}
@@ -140,7 +140,7 @@ export function MyOrdersPage() {
                     {t('checkout.subtotal')}: {formatCurrency(order.subtotal)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {t('checkout.deliveryFee')} ({order.delivery_zone.city}): {formatCurrency(order.delivery_fee)}
+                    {t('checkout.deliveryFee')} ({order.city ?? order.delivery_zone?.city ?? '—'}): {formatCurrency(order.delivery_fee)}
                   </Typography>
                   <Typography fontWeight="bold" mt={0.5}>
                     {t('checkout.total')}: {formatCurrency(order.total)}

@@ -144,6 +144,7 @@
     "orderSummary": "Order summary",
     "subtotal": "Subtotal",
     "deliveryFee": "Delivery fee",
+    "freeDelivery": "Free",
     "total": "Total",
     "note": "Note (optional)",
     "notePlaceholder": "Delivery instructions, access code...",

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
@@ -14,16 +14,14 @@ import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
-import Autocomplete from '@mui/material/Autocomplete';
 import { useCartStore } from '../../cart/store';
 import { useAuthStore } from '../../auth/store';
-import { useDeliveryZones } from '../api/deliveryZones';
 import { usePlaceOrder } from '../api/orders';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 
 const checkoutSchema = z.object({
   phone: z.string().min(1, { error: 'Phone required' }).regex(/^\+?\d{6,15}$/, { error: 'Invalid phone number' }),
-  delivery_zone_id: z.number({ error: 'Please select a city' }).positive({ error: 'Please select a city' }),
+  city: z.string().min(1, { error: 'City required' }).max(100, { error: 'City must be 100 characters or less' }),
   note: z.string().max(500, { error: 'Note must be 500 characters or less' }).optional(),
 });
 
@@ -36,7 +34,6 @@ export function CheckoutPage() {
   const subtotalCentimes = useCartStore((s) => s.subtotalCentimes());
   const user = useAuthStore((s) => s.user);
 
-  const { data: deliveryZones, isLoading: zonesLoading } = useDeliveryZones();
   const { mutate: placeOrder, isPending, error: orderError } = usePlaceOrder();
 
   // Redirect to catalog if cart is empty
@@ -49,30 +46,22 @@ export function CheckoutPage() {
   const {
     register,
     handleSubmit,
-    watch,
-    setValue,
-    control,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       phone: user?.phone ?? '',
-      delivery_zone_id: undefined,
+      city: '',
       note: '',
     },
   });
 
-  const selectedZoneId = watch('delivery_zone_id');
-  const selectedZone = (deliveryZones ?? []).find((z) => z.id === selectedZoneId);
-  const deliveryFeeCentimes = selectedZone?.fee ?? 0;
-  const totalCentimes = subtotalCentimes + deliveryFeeCentimes;
-
-  const zones = deliveryZones ?? [];
+  const totalCentimes = subtotalCentimes;
 
   const onSubmit = (data: CheckoutFormData) => {
     placeOrder({
       phone: data.phone,
-      delivery_zone_id: data.delivery_zone_id,
+      city: data.city,
       items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
       note: data.note || undefined,
     });
@@ -136,38 +125,13 @@ export function CheckoutPage() {
           </Paper>
 
           {/* Delivery city */}
-          <Controller
-            name="delivery_zone_id"
-            control={control}
-            render={({ field }) => (
-              <Autocomplete
-                options={zones}
-                getOptionLabel={(zone) => zone.city}
-                loading={zonesLoading}
-                value={zones.find((z) => z.id === field.value) ?? null}
-                onChange={(_e, zone) => field.onChange(zone?.id ?? undefined)}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label={t('checkout.deliveryCity', 'City')}
-                    error={Boolean(errors.delivery_zone_id)}
-                    helperText={
-                      errors.delivery_zone_id?.message ??
-                      (selectedZone ? `${t('checkout.deliveryFee', 'Delivery fee')}: ${formatCurrency(selectedZone.fee)}` : undefined)
-                    }
-                    required
-                  />
-                )}
-                renderOption={(props, zone) => (
-                  <li {...props} key={zone.id}>
-                    <Stack direction="row" justifyContent="space-between" width="100%">
-                      <span>{zone.city}</span>
-                      <Typography variant="caption" color="text.secondary">{formatCurrency(zone.fee)}</Typography>
-                    </Stack>
-                  </li>
-                )}
-              />
-            )}
+          <TextField
+            label={t('checkout.deliveryCity', 'City')}
+            fullWidth
+            required
+            error={Boolean(errors.city)}
+            helperText={errors.city?.message}
+            {...register('city')}
           />
 
           {/* Phone number */}
@@ -189,15 +153,15 @@ export function CheckoutPage() {
               </Stack>
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body2">{t('checkout.deliveryFee')}</Typography>
-                <Typography variant="body2">
-                  {selectedZone ? formatCurrency(deliveryFeeCentimes) : '—'}
+                <Typography variant="body2" color="success.main">
+                  {t('checkout.freeDelivery', 'Free')}
                 </Typography>
               </Stack>
               <Divider />
               <Stack direction="row" justifyContent="space-between">
                 <Typography variant="body1" fontWeight={700}>{t('checkout.total')}</Typography>
                 <Typography variant="body1" fontWeight={700} color="primary">
-                  {selectedZone ? formatCurrency(totalCentimes) : '—'}
+                  {formatCurrency(totalCentimes)}
                 </Typography>
               </Stack>
             </Stack>

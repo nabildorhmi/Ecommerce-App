@@ -24,6 +24,7 @@ export function useMyOrders(page: number = 1) {
 export interface AdminOrderFilters {
   'filter[status]'?: string;
   'filter[delivery_zone_id]'?: number | string;
+  'filter[city]'?: string;
   'filter[date_from]'?: string;
   'filter[date_to]'?: string;
   page?: number;

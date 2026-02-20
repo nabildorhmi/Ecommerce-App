@@ -20,7 +20,6 @@ import Alert from '@mui/material/Alert';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { useAdminOrders } from '../api/orders';
 import { OrderStatusChip } from '../components/OrderStatusChip';
-import { useDeliveryZones } from '../../checkout/api/deliveryZones';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import type { AdminOrderFilters } from '../api/orders';
 
@@ -37,7 +36,7 @@ export function AdminOrdersPage() {
 
   // Read filters from URL
   const status = searchParams.get('status') ?? '';
-  const deliveryZoneId = searchParams.get('delivery_zone_id') ?? '';
+  const city = searchParams.get('city') ?? '';
   const dateFrom = searchParams.get('date_from') ?? '';
   const dateTo = searchParams.get('date_to') ?? '';
   const page = Number(searchParams.get('page') ?? '1');
@@ -49,12 +48,11 @@ export function AdminOrdersPage() {
     sort,
   };
   if (status) filters['filter[status]'] = status;
-  if (deliveryZoneId) filters['filter[delivery_zone_id]'] = deliveryZoneId;
+  if (city) filters['filter[city]'] = city;
   if (dateFrom) filters['filter[date_from]'] = dateFrom;
   if (dateTo) filters['filter[date_to]'] = dateTo;
 
   const { data, isLoading, error } = useAdminOrders(filters);
-  const { data: zones } = useDeliveryZones();
 
   const orders = data?.data ?? [];
   const meta = data?.meta;
@@ -124,22 +122,14 @@ export function AdminOrdersPage() {
           </Select>
         </FormControl>
 
-        {/* Delivery zone filter */}
-        <FormControl size="small" sx={{ minWidth: 180 }}>
-          <InputLabel>{t('orders.city')}</InputLabel>
-          <Select
-            label={t('orders.city')}
-            value={deliveryZoneId}
-            onChange={(e) => setParam('delivery_zone_id', String(e.target.value))}
-          >
-            <MenuItem value="">{t('orders.allCities')}</MenuItem>
-            {(zones ?? []).map((zone) => (
-              <MenuItem key={zone.id} value={String(zone.id)}>
-                {zone.city}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        {/* City filter */}
+        <TextField
+          size="small"
+          label={t('orders.city')}
+          value={city}
+          onChange={(e) => setParam('city', e.target.value)}
+          sx={{ minWidth: 180 }}
+        />
 
         {/* Date from */}
         <TextField
@@ -221,7 +211,7 @@ export function AdminOrdersPage() {
                   <TableCell>
                     <OrderStatusChip status={order.status} />
                   </TableCell>
-                  <TableCell>{order.delivery_zone.city}</TableCell>
+                  <TableCell>{order.city ?? order.delivery_zone?.city ?? '—'}</TableCell>
                   <TableCell align="right">{formatCurrency(order.total)}</TableCell>
                   <TableCell align="right">{order.items.length}</TableCell>
                 </TableRow>

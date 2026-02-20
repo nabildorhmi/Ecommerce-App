@@ -15,6 +15,7 @@ class OrderResource extends JsonResource
             'id'                  => $this->id,
             'order_number'        => $this->order_number,
             'phone'               => $this->phone,
+            'city'                => $this->city,
             'status'              => $this->status->value,
             'status_label'        => $this->status->label($locale),
             'subtotal'            => $this->subtotal,
@@ -26,7 +27,7 @@ class OrderResource extends JsonResource
                 $this->status->allowedTransitionsTo()
             ),
             'delivery_zone'       => $this->whenLoaded('deliveryZone', fn () =>
-                new DeliveryZoneResource($this->deliveryZone)
+                $this->deliveryZone ? new DeliveryZoneResource($this->deliveryZone) : null
             ),
             'items'               => $this->whenLoaded('items', fn () =>
                 OrderItemResource::collection($this->items)
