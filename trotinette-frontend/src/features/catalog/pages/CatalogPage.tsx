@@ -14,10 +14,12 @@ import { ProductCard } from '../components/ProductCard';
 
 function ProductGridSkeleton() {
   return (
-    <Grid container spacing={2.5}>
+    <Grid container spacing={2}>
       {Array.from({ length: 8 }).map((_, i) => (
-        <Grid key={i} size={{ xs: 12, sm: 6, lg: 4 }}>
-          <Skeleton variant="rectangular" height={340} sx={{ borderRadius: '8px', bgcolor: '#111116' }} />
+        <Grid key={i} size={{ xs: 6, sm: 4, md: 3 }}>
+          <Skeleton variant="rectangular" sx={{ borderRadius: '8px', bgcolor: '#111116', aspectRatio: '1 / 1', mb: 1 }} />
+          <Skeleton height={18} sx={{ bgcolor: '#111116', mb: 0.5 }} />
+          <Skeleton height={16} width="50%" sx={{ bgcolor: '#111116' }} />
         </Grid>
       ))}
     </Grid>
@@ -127,9 +129,9 @@ export function CatalogPage() {
                 </Typography>
               </Box>
             ) : (
-              <Grid container spacing={2.5}>
+              <Grid container spacing={2}>
                 {products.map((product) => (
-                  <Grid key={product.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+                  <Grid key={product.id} size={{ xs: 6, sm: 4, md: 3 }}>
                     <ProductCard product={product} />
                   </Grid>
                 ))}

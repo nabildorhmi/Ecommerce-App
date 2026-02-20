@@ -34,8 +34,8 @@ export function ProductCard({ product }: ProductCardProps) {
         transition: 'all 0.25s ease',
         '&:hover': {
           borderColor: '#00C2FF',
-          transform: 'translateY(-4px)',
-          boxShadow: '0 8px 32px rgba(0,194,255,0.18)',
+          transform: 'translateY(-3px)',
+          boxShadow: '0 6px 24px rgba(0,194,255,0.18)',
           '& .card-img': {
             transform: 'scale(1.04)',
           },
@@ -47,7 +47,7 @@ export function ProductCard({ product }: ProductCardProps) {
         sx={{
           position: 'relative',
           bgcolor: 'action.hover',
-          height: 220,
+          aspectRatio: '1 / 1',
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
@@ -106,7 +106,7 @@ export function ProductCard({ product }: ProductCardProps) {
       </Box>
 
       {/* Content */}
-      <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 1.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
         {product.category && (
           <Typography
             sx={{

@@ -192,7 +192,7 @@ function FeaturedSection() {
         >
           {isLoading
             ? Array.from({ length: 4 }).map((_, i) => (
-                <Box key={i} sx={{ flexShrink: 0, width: { xs: 240, sm: 280, md: 300 } }}>
+                <Box key={i} sx={{ flexShrink: 0, width: { xs: 200, sm: 220, md: 240 } }}>
                   <Skeleton variant="rectangular" height={200} sx={{ borderRadius: '8px', mb: 1.5 }} />
                   <Skeleton height={22} sx={{ mb: 0.5 }} />
                   <Skeleton height={18} width="55%" />
@@ -217,7 +217,7 @@ function FeaturedSection() {
                     to={`/products/${product.slug}`}
                     sx={{
                       flexShrink: 0,
-                      width: { xs: 240, sm: 280, md: 300 },
+                      width: { xs: 200, sm: 220, md: 240 },
                       textDecoration: 'none',
                       display: 'flex',
                       flexDirection: 'column',
@@ -229,12 +229,12 @@ function FeaturedSection() {
                       transition: 'all 0.22s ease',
                       '&:hover': {
                         borderColor: 'primary.main',
-                        transform: 'translateY(-4px)',
-                        boxShadow: '0 8px 28px rgba(0,194,255,0.15)',
+                        transform: 'translateY(-3px)',
+                        boxShadow: '0 6px 24px rgba(0,194,255,0.15)',
                       },
                     }}
                   >
-                    <Box sx={{ position: 'relative', bgcolor: 'action.hover', height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                    <Box sx={{ position: 'relative', bgcolor: 'action.hover', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                       <Chip
                         label="Featured"
                         size="small"
