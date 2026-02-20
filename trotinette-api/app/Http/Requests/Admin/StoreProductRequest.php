@@ -29,7 +29,7 @@ class StoreProductRequest extends FormRequest
             'translations.en.name'            => 'required|string|max:255',
             'translations.en.slug'            => 'required|string|max:255',
             'translations.en.description'     => 'nullable|string',
-            'attributes'                      => 'nullable|string',
+            'attributes'                      => 'nullable|array',
             'images'                          => 'nullable|array',
             'images.*'                        => 'image|mimes:jpeg,png,webp|max:5120',
         ];
