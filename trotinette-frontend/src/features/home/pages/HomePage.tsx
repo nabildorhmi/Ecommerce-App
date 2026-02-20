@@ -42,7 +42,7 @@ function HeroBanner() {
           <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ py: { xs: 0, md: 6 } }}>
               <Typography sx={{ fontSize: '0.68rem', letterSpacing: '0.3em', color: '#00C2FF', fontWeight: 600, mb: 2, textTransform: 'uppercase', opacity: 0.9 }}>
-                ミライテック  ELECTRIC MOBILITY
+                ミライテック  MOBILITÉ ÉLECTRIQUE
               </Typography>
               <Typography
                 component="h1"
@@ -56,31 +56,22 @@ function HeroBanner() {
                   textTransform: 'uppercase',
                 }}
               >
-                THE FUTURE OF{' '}
+                L&apos;AVENIR DE LA{' '}
                 <Box component="span" sx={{ color: '#00C2FF', textShadow: '0 0 30px rgba(0,194,255,0.4)' }}>
-                  URBAN
+                  MOBILITÉ
                 </Box>
-                {' '}MOBILITY
+                {' '}URBAINE
               </Typography>
               <Typography sx={{ color: '#9CA3AF', fontSize: { xs: '0.95rem', md: '1.05rem' }, mb: 4, lineHeight: 1.7, maxWidth: 480 }}>
-                Premium electric scooters engineered for performance, range, and style. Discover the MiraiTech lineup.
+                Scooters électriques premium conçus pour la performance, l&apos;autonomie et le style.
               </Typography>
               <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                 <Button component={Link} to="/products" variant="contained" size="large" sx={{ px: 4, py: 1.5, fontSize: '0.85rem', letterSpacing: '0.08em' }}>
-                  Shop Now
+                  Acheter maintenant
                 </Button>
                 <Button component={Link} to="/products" variant="outlined" size="large" sx={{ px: 4, py: 1.5, fontSize: '0.85rem', letterSpacing: '0.08em' }}>
-                  View All Models
+                  Voir tous les modèles
                 </Button>
-              </Box>
-              {/* Stats strip */}
-              <Box sx={{ display: 'flex', gap: 4, mt: 5 }}>
-                {[{ v: '80km', l: 'Max Range' }, { v: '45km/h', l: 'Top Speed' }, { v: '500W', l: 'Motor Power' }].map(({ v, l }) => (
-                  <Box key={l}>
-                    <Typography sx={{ fontSize: { xs: '1.4rem', md: '1.7rem' }, fontWeight: 800, color: '#00C2FF', lineHeight: 1 }}>{v}</Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#9CA3AF', letterSpacing: '0.1em', textTransform: 'uppercase', mt: 0.5 }}>{l}</Typography>
-                  </Box>
-                ))}
               </Box>
             </Box>
           </Grid>

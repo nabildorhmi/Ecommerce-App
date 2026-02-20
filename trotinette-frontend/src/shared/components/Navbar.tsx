@@ -119,7 +119,7 @@ export function Navbar() {
                 '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
               }}
             >
-              ALL SCOOTERS
+              TOUS LES SCOOTERS
             </Button>
 
             {categories.length > 0 && (
@@ -139,7 +139,7 @@ export function Navbar() {
                     '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
                   }}
                 >
-                  CATEGORIES
+                  CATÉGORIES
                 </Button>
                 <Menu
                   anchorEl={catMenuAnchor}
@@ -187,7 +187,7 @@ export function Navbar() {
           {/* ── Right Actions ── */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, ml: 'auto' }}>
             {/* ── Theme Toggle ── */}
-            <Tooltip title={mode === 'dark' ? 'Light mode' : 'Dark mode'}>
+            <Tooltip title={mode === 'dark' ? 'Mode clair' : 'Mode sombre'}>
               <IconButton
                 onClick={toggleMode}
                 size="small"
@@ -355,11 +355,11 @@ export function Navbar() {
             fullWidth
             sx={{ justifyContent: 'flex-start', color: 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
           >
-            ALL SCOOTERS
+            TOUS LES SCOOTERS
           </Button>
           <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
           <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', letterSpacing: '0.1em', fontWeight: 700, px: 1, pb: 0.5, textTransform: 'uppercase' }}>
-            Categories
+            Catégories
           </Typography>
           {categories.map((cat) => (
             <Button

@@ -60,7 +60,7 @@ export function CatalogPage() {
               textTransform: 'uppercase',
             }}
           >
-            スクーター — CATALOG
+            スクーター — CATALOGUE
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
             <Typography variant="h4" sx={{ color: '#F5F7FA', fontWeight: 800, letterSpacing: '0.04em' }}>
@@ -87,7 +87,7 @@ export function CatalogPage() {
             {/* Sort bar */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3, gap: 2, alignItems: 'center' }}>
               <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', letterSpacing: '0.06em' }}>
-                Sort by
+                Trier par
               </Typography>
               <FormControl size="small" sx={{ minWidth: 160 }}>
                 <Select
@@ -103,10 +103,10 @@ export function CatalogPage() {
                     backgroundColor: '#16161C',
                   }}
                 >
-                  <MenuItem value="-created_at" sx={{ fontSize: '0.82rem' }}>Newest First</MenuItem>
-                  <MenuItem value="created_at" sx={{ fontSize: '0.82rem' }}>Oldest First</MenuItem>
-                  <MenuItem value="price" sx={{ fontSize: '0.82rem' }}>Price: Low → High</MenuItem>
-                  <MenuItem value="-price" sx={{ fontSize: '0.82rem' }}>Price: High → Low</MenuItem>
+                  <MenuItem value="-created_at" sx={{ fontSize: '0.82rem' }}>Plus récent</MenuItem>
+                  <MenuItem value="created_at" sx={{ fontSize: '0.82rem' }}>Plus ancien</MenuItem>
+                  <MenuItem value="price" sx={{ fontSize: '0.82rem' }}>Prix : Croissant</MenuItem>
+                  <MenuItem value="-price" sx={{ fontSize: '0.82rem' }}>Prix : Décroissant</MenuItem>
                 </Select>
               </FormControl>
             </Box>

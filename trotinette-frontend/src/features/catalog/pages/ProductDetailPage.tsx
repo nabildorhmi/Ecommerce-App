@@ -115,7 +115,7 @@ export function ProductDetailPage() {
                     mb: 1.5,
                   }}
                 >
-                  スペック / SPECIFICATIONS
+                  SPÉCIFICATIONS
                 </Typography>
                 <SpecsTable attributes={product.attributes} />
               </Box>

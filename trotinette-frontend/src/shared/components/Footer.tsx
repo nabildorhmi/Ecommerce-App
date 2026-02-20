@@ -47,7 +47,7 @@ export function Footer() {
               variant="body2"
               sx={{ color: '#9CA3AF', lineHeight: 1.7, maxWidth: 280, mb: 2 }}
             >
-              The future of urban mobility. Premium electric scooters engineered for performance and style.
+              L'avenir de la mobilité urbaine. Scooters électriques premium conçus pour la performance et le style.
             </Typography>
             {/* Japanese accent */}
             <Typography
@@ -74,10 +74,10 @@ export function Footer() {
                 mb: 2,
               }}
             >
-              Products
+              Produits
             </Typography>
             <Stack spacing={1}>
-              {['All Scooters', 'Urban Scooters', 'Off-Road', 'Long Range', 'Accessories'].map((item) => (
+              {['Tous les scooters', 'Scooters urbains', 'Tout-terrain', 'Longue portée', 'Accessoires'].map((item) => (
                 <Box
                   key={item}
                   component={Link}
@@ -108,10 +108,10 @@ export function Footer() {
                 mb: 2,
               }}
             >
-              Company
+              Société
             </Typography>
             <Stack spacing={1}>
-              {['About', 'Technology', 'Sustainability', 'Careers', 'Contact'].map((item) => (
+              {['À propos', 'Technologie', 'Développement durable', 'Carrières', 'Contact'].map((item) => (
                 <Box
                   key={item}
                   component="span"
@@ -139,14 +139,14 @@ export function Footer() {
                 mb: 2,
               }}
             >
-              Technology
+              Technologie
             </Typography>
             <Grid container spacing={1}>
               {[
-                { label: 'Long Range Battery', sub: 'Up to 80km' },
-                { label: 'Smart Display', sub: 'Connected app' },
-                { label: 'Regen Braking', sub: 'Energy recovery' },
-                { label: 'App Control', sub: 'iOS & Android' },
+                { label: 'Batterie longue portée', sub: "Jusqu'à 80km" },
+                { label: 'Écran connecté', sub: 'Application mobile' },
+                { label: 'Freinage récupératif', sub: "Récupération d'énergie" },
+                { label: 'Contrôle via app', sub: 'iOS & Android' },
               ].map(({ label, sub }) => (
                 <Grid key={label} size={{ xs: 6 }}>
                   <Box
@@ -174,7 +174,7 @@ export function Footer() {
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
           <Typography sx={{ fontSize: '0.75rem', color: '#9CA3AF' }}>
-            © {new Date().getFullYear()} MiraiTech. All rights reserved.
+            © {new Date().getFullYear()} MiraiTech. Tous droits réservés.
           </Typography>
           <Typography sx={{ fontFamily: 'serif', fontSize: '0.7rem', color: '#1E1E28', letterSpacing: '0.15em' }}>
             未来の移動
