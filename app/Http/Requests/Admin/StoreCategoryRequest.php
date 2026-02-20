@@ -14,13 +14,21 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'slug'                 => 'required|string|unique:categories,slug',
-            'is_active'            => 'boolean',
-            'translations'         => 'required|array',
-            'translations.fr'      => 'required|array',
-            'translations.fr.name' => 'required|string|max:255',
-            'translations.en'      => 'required|array',
-            'translations.en.name' => 'required|string|max:255',
+            'name'      => 'required|string|max:255',
+            'slug'      => 'required|string|unique:categories,slug',
+            'is_active' => 'boolean',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        // Build translations.fr from flat name so CategoryService works unchanged
+        if ($this->has('name') && ! $this->has('translations')) {
+            $this->merge([
+                'translations' => [
+                    'fr' => ['name' => $this->input('name')],
+                ],
+            ]);
+        }
     }
 }

@@ -45,14 +45,17 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category): CategoryResource
     {
         $validated = $request->validate([
-            'slug'                 => 'sometimes|string|unique:categories,slug,' . $category->id,
-            'is_active'            => 'sometimes|boolean',
-            'translations'         => 'sometimes|array',
-            'translations.fr'      => 'sometimes|array',
-            'translations.fr.name' => 'required_with:translations.fr|string|max:255',
-            'translations.en'      => 'sometimes|array',
-            'translations.en.name' => 'required_with:translations.en|string|max:255',
+            'name'      => 'sometimes|string|max:255',
+            'slug'      => 'sometimes|string|unique:categories,slug,' . $category->id,
+            'is_active' => 'sometimes|boolean',
         ]);
+
+        // Map flat name to translations.fr so CategoryService works unchanged
+        if (isset($validated['name']) && ! isset($validated['translations'])) {
+            $validated['translations'] = [
+                'fr' => ['name' => $validated['name']],
+            ];
+        }
 
         $category = $this->categoryService->updateCategory($category, $validated);
 
