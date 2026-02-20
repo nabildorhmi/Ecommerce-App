@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
-use App\Models\DeliveryZone;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
@@ -18,10 +17,8 @@ class OrderService
     public function createOrder(array $data, int $userId): Order
     {
         return DB::transaction(function () use ($data, $userId) {
-            // a. Resolve active delivery zone
-            $zone = DeliveryZone::where('id', $data['delivery_zone_id'])
-                ->where('is_active', true)
-                ->firstOrFail();
+            // a. Extract city (no delivery zone, delivery fee = 0)
+            $city = $data['city'];
 
             $productIds = array_column($data['items'], 'product_id');
 
@@ -91,13 +88,14 @@ class OrderService
             // g. Create order with server-calculated amounts
             $order = Order::create([
                 'user_id'          => $userId,
-                'delivery_zone_id' => $zone->id,
+                'delivery_zone_id' => null,
+                'city'             => $city,
                 'order_number'     => $orderNumber,
                 'phone'            => $data['phone'],
                 'status'           => OrderStatus::Pending->value,
                 'subtotal'         => $subtotal,
-                'delivery_fee'     => $zone->fee,
-                'total'            => $subtotal + $zone->fee,
+                'delivery_fee'     => 0,
+                'total'            => $subtotal,
                 'note'             => $data['note'] ?? null,
             ]);
 
@@ -116,7 +114,7 @@ class OrderService
             ]);
 
             // j. Return with eager-loaded relations
-            return $order->load(['items.product', 'deliveryZone', 'statusLogs']);
+            return $order->load(['items.product', 'statusLogs']);
         });
     }
 
@@ -146,7 +144,7 @@ class OrderService
             ]);
         });
 
-        return $order->fresh(['items.product', 'deliveryZone', 'statusLogs']);
+        return $order->fresh(['items.product', 'statusLogs']);
     }
 
     /**
@@ -156,6 +154,6 @@ class OrderService
     {
         $order->update(['note' => $note]);
 
-        return $order->fresh(['items.product', 'deliveryZone', 'statusLogs']);
+        return $order->fresh(['items.product', 'statusLogs']);
     }
 }

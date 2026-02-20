@@ -32,7 +32,7 @@ class UpdateProductRequest extends FormRequest
             'translations.en.name'            => 'required_with:translations.en|string|max:255',
             'translations.en.slug'            => 'required_with:translations.en|string|max:255',
             'translations.en.description'     => 'nullable|string',
-            'attributes'                      => 'sometimes|nullable|string',
+            'attributes'                      => 'sometimes|nullable|array',
             'images'                          => 'sometimes|nullable|array',
             'images.*'                        => 'image|mimes:jpeg,png,webp|max:5120',
             'delete_images'                   => 'sometimes|array',
