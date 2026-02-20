@@ -83,9 +83,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   const defaultValues: FormValues = {
     sku: product?.sku ?? '',
-    name: product?.translations?.fr?.name ?? '',
-    slug: product?.translations?.fr?.slug ?? '',
-    description: product?.translations?.fr?.description ?? '',
+    name: product?.name ?? '',
+    slug: product?.slug ?? '',
+    description: product?.description ?? '',
     price: product ? product.price / 100 : 0,
     stock_quantity: product?.stock_quantity ?? 0,
     category_id: product?.category_id ?? null,

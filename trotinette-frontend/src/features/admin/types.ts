@@ -18,16 +18,15 @@ export interface ProductTranslation {
 export interface AdminProduct {
   id: number;
   sku: string;
+  name: string;
+  slug: string;
+  description: string | null;
   price: number; // in centimes
   stock_quantity: number;
   is_active: boolean;
   is_featured: boolean;
   category_id: number | null;
   attributes: Record<string, string | number>;
-  translations: {
-    fr: ProductTranslation;
-    en: ProductTranslation;
-  };
   images: ProductImage[];
   created_at: string;
   updated_at: string;
@@ -35,13 +34,10 @@ export interface AdminProduct {
 
 export interface AdminCategory {
   id: number;
+  name: string;
   slug: string;
   is_active: boolean;
   product_count?: number;
-  translations: {
-    fr: { name: string };
-    en: { name: string };
-  };
   created_at: string;
   updated_at: string;
 }
@@ -68,12 +64,9 @@ export interface ProductFormData {
 }
 
 export interface CategoryFormData {
+  name: string;
   slug: string;
   is_active: boolean;
-  translations: {
-    fr: { name: string };
-    en: { name: string };
-  };
 }
 
 // API response shapes

@@ -60,7 +60,7 @@ function DeleteDialog({
         )}
         <DialogContentText>
           Etes-vous sur de vouloir supprimer{' '}
-          <strong>{category?.translations?.fr?.name ?? category?.slug}</strong>
+          <strong>{category?.name ?? category?.slug}</strong>
           {' '}? Are you sure you want to delete this category?
         </DialogContentText>
         {deleteError && (
@@ -166,8 +166,7 @@ export function AdminCategoriesPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Nom (FR) / Name (FR)</TableCell>
-              <TableCell>Nom (EN) / Name (EN)</TableCell>
+              <TableCell>Nom</TableCell>
               <TableCell>Slug</TableCell>
               <TableCell>Produits / Products</TableCell>
               <TableCell>Actif / Active</TableCell>
@@ -177,15 +176,14 @@ export function AdminCategoriesPage() {
           <TableBody>
             {categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={5} align="center">
                   Aucune categorie / No categories found
                 </TableCell>
               </TableRow>
             ) : (
               categories.map((cat) => (
                 <TableRow key={cat.id} hover>
-                  <TableCell>{cat.translations?.fr?.name ?? '—'}</TableCell>
-                  <TableCell>{cat.translations?.en?.name ?? '—'}</TableCell>
+                  <TableCell>{cat.name ?? '—'}</TableCell>
                   <TableCell>{cat.slug}</TableCell>
                   <TableCell>{cat.product_count ?? '—'}</TableCell>
                   <TableCell>

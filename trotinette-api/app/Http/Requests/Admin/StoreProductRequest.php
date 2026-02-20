@@ -39,21 +39,20 @@ class StoreProductRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         // Decode attributes JSON string if provided
-        if ($this->has('attributes') && is_string($this->attributes)) {
-            $decoded = json_decode($this->attributes, true);
+        if ($this->has('attributes') && is_string($this->input('attributes'))) {
+            $decoded = json_decode($this->input('attributes'), true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $this->merge(['attributes' => $decoded]);
             }
         }
 
-        // Map flat name/slug/description to both locales when no nested translations sent
+        // Map flat name/slug/description to fr locale when no nested translations sent
         if ($this->has('name') && ! $this->has('translations')) {
             $slug = $this->input('slug', \Illuminate\Support\Str::slug($this->input('name', '')));
             $desc = $this->input('description', '');
             $this->merge([
                 'translations' => [
                     'fr' => ['name' => $this->input('name'), 'slug' => $slug, 'description' => $desc],
-                    'en' => ['name' => $this->input('name'), 'slug' => $slug, 'description' => $desc],
                 ],
             ]);
         }

@@ -17,12 +17,9 @@ export function useAdminCategories() {
 // ---- Mutation hooks ----
 
 interface CreateCategoryInput {
+  name: string;
   slug: string;
   is_active: boolean;
-  translations: {
-    fr: { name: string };
-    en: { name: string };
-  };
 }
 
 export function useCreateCategory() {
@@ -42,12 +39,9 @@ export function useCreateCategory() {
 
 interface UpdateCategoryInput {
   id: number;
+  name?: string;
   slug?: string;
   is_active?: boolean;
-  translations?: {
-    fr?: { name?: string };
-    en?: { name?: string };
-  };
 }
 
 export function useUpdateCategory() {

@@ -105,7 +105,7 @@ function DeleteDialog({
       <DialogContent>
         <DialogContentText>
           Etes-vous sur de vouloir supprimer{' '}
-          <strong>{product?.translations?.fr?.name ?? product?.sku}</strong>
+          <strong>{product?.name ?? product?.sku}</strong>
           {' '}? Cette action est irreversible.
           <br />
           Are you sure you want to delete this product? This action cannot be undone.
@@ -224,7 +224,7 @@ export function AdminProductsPage() {
                       {thumb ? (
                         <img
                           src={thumb}
-                          alt={product.translations?.fr?.name ?? product.sku}
+                          alt={product.name ?? product.sku}
                           style={{
                             width: 48,
                             height: 48,
@@ -249,7 +249,7 @@ export function AdminProductsPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {product.translations?.fr?.name ?? '—'}
+                      {product.name ?? '—'}
                     </TableCell>
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>

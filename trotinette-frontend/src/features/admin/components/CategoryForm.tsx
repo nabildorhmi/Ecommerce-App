@@ -24,16 +24,9 @@ function slugify(value: string): string {
 
 // ---- Zod schema ----
 const schema = z.object({
+  name: z.string().min(1, 'Nom requis').max(255),
   slug: z.string().min(1, 'Slug requis').max(100),
   is_active: z.boolean(),
-  translations: z.object({
-    fr: z.object({
-      name: z.string().min(1, 'Nom FR requis').max(255),
-    }),
-    en: z.object({
-      name: z.string().min(1, 'EN name required').max(255),
-    }),
-  }),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -61,32 +54,26 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      name: category?.name ?? '',
       slug: category?.slug ?? '',
       is_active: category?.is_active ?? true,
-      translations: {
-        fr: { name: category?.translations?.fr?.name ?? '' },
-        en: { name: category?.translations?.en?.name ?? '' },
-      },
     },
   });
 
-  // Auto-generate slug from FR name
-  const frName = watch('translations.fr.name');
-  const currentSlug = watch('slug');
+  // Auto-generate slug from name
+  const nameValue = watch('name');
 
   useEffect(() => {
-    // Only auto-generate if slug looks auto-generated (matches slugify of frName)
-    // or if it's empty — don't override manual edits
-    if (!isEdit && frName) {
-      setValue('slug', slugify(frName), { shouldValidate: false });
+    if (!isEdit && nameValue) {
+      setValue('slug', slugify(nameValue), { shouldValidate: false });
     }
-  }, [frName, isEdit, setValue, currentSlug]);
+  }, [nameValue, isEdit, setValue]);
 
   const onSubmit = async (values: FormValues) => {
     if (isEdit && category) {
-      await updateMutation.mutateAsync({ id: category.id, ...values });
+      await updateMutation.mutateAsync({ id: category.id, name: values.name, slug: values.slug, is_active: values.is_active });
     } else {
-      await createMutation.mutateAsync(values);
+      await createMutation.mutateAsync({ name: values.name, slug: values.slug, is_active: values.is_active });
     }
     onSuccess();
   };
@@ -105,19 +92,10 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
       )}
 
       <TextField
-        label="Nom (FR) / Name (FR)"
-        {...register('translations.fr.name')}
-        error={Boolean(errors.translations?.fr?.name)}
-        helperText={errors.translations?.fr?.name?.message}
-        required
-        fullWidth
-      />
-
-      <TextField
-        label="Name (EN)"
-        {...register('translations.en.name')}
-        error={Boolean(errors.translations?.en?.name)}
-        helperText={errors.translations?.en?.name?.message}
+        label="Nom"
+        {...register('name')}
+        error={Boolean(errors.name)}
+        helperText={errors.name?.message}
         required
         fullWidth
       />
@@ -128,7 +106,7 @@ export function CategoryForm({ category, onSuccess }: CategoryFormProps) {
         error={Boolean(errors.slug)}
         helperText={
           errors.slug?.message ??
-          'Auto-genere depuis le nom FR / Auto-generated from FR name'
+          'Auto-genere depuis le nom'
         }
         fullWidth
       />
