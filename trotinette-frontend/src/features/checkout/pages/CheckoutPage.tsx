@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
+import { useMutation } from '@tanstack/react-query';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -18,6 +19,8 @@ import { useCartStore } from '../../cart/store';
 import { useAuthStore } from '../../auth/store';
 import { usePlaceOrder } from '../api/orders';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { RegisterForm } from '../../auth/components/RegisterForm';
+import { registerApi, type RegisterData } from '../../auth/api/auth';
 
 const checkoutSchema = z.object({
   phone: z.string().min(1, { error: 'Phone required' }).regex(/^\+?\d{6,15}$/, { error: 'Invalid phone number' }),
@@ -34,7 +37,21 @@ export function CheckoutPage() {
   const subtotalCentimes = useCartStore((s) => s.subtotalCentimes());
   const user = useAuthStore((s) => s.user);
 
+  const [registerError, setRegisterError] = useState<string | null>(null);
+
   const { mutate: placeOrder, isPending, error: orderError } = usePlaceOrder();
+
+  // Registration mutation
+  const registerMutation = useMutation({
+    mutationFn: registerApi,
+    onSuccess: (data) => {
+      useAuthStore.getState().setAuth(data.token, data.user);
+      setRegisterError(null);
+    },
+    onError: (error: any) => {
+      setRegisterError(error.response?.data?.message ?? 'Registration failed');
+    },
+  });
 
   // Redirect to catalog if cart is empty
   useEffect(() => {
@@ -46,6 +63,7 @@ export function CheckoutPage() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -55,6 +73,17 @@ export function CheckoutPage() {
       note: '',
     },
   });
+
+  // When user registers, pre-fill phone from new user data
+  useEffect(() => {
+    if (user?.phone) {
+      setValue('phone', user.phone);
+    }
+  }, [user, setValue]);
+
+  const handleRegister = async (data: RegisterData) => {
+    await registerMutation.mutateAsync(data);
+  };
 
   const totalCentimes = subtotalCentimes;
 
@@ -84,16 +113,31 @@ export function CheckoutPage() {
         {t('checkout.title')}
       </Typography>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit(onSubmit)}
-        noValidate
-      >
-        <Stack spacing={3}>
-          {/* COD notice */}
-          <Alert severity="info">
-            {t('checkout.codNotice')}
-          </Alert>
+      <Stack spacing={3}>
+        {/* Registration section for guests */}
+        {!user && (
+          <Paper variant="outlined" sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              {t('checkout.createAccount', 'Create an account')}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              {t('checkout.createAccountHint', 'Create an account to place your order')}
+            </Typography>
+            <RegisterForm onSubmit={handleRegister} error={registerError} />
+          </Paper>
+        )}
+
+        {/* Checkout form */}
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+        >
+          <Stack spacing={3}>
+            {/* COD notice */}
+            <Alert severity="info">
+              {t('checkout.codNotice')}
+            </Alert>
 
           {/* Order items (read-only) */}
           <Paper variant="outlined" sx={{ p: 2 }}>
@@ -191,13 +235,20 @@ export function CheckoutPage() {
             variant="contained"
             size="large"
             fullWidth
-            disabled={isPending}
+            disabled={isPending || !user}
             startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
           >
             {isPending ? t('checkout.placingOrder') : t('checkout.placeOrder')}
           </Button>
+
+          {!user && (
+            <Typography variant="body2" color="text.secondary" textAlign="center">
+              {t('checkout.loginOrRegister', 'Please create an account above to continue')}
+            </Typography>
+          )}
         </Stack>
       </Box>
+      </Stack>
     </Container>
   );
 }

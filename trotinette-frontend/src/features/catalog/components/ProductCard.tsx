@@ -93,14 +93,13 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
         <Box
           className="card-img"
-          component="img"
-          src={imageUrl}
-          alt={product.name}
           sx={{
             width: '100%',
             height: '100%',
-            objectFit: 'contain',
-            p: 2,
+            backgroundImage: `url(${imageUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
             transition: 'transform 0.3s ease',
           }}
         />

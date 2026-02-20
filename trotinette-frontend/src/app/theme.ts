@@ -253,17 +253,20 @@ export function createMiraiTheme(mode: PaletteMode = 'dark', direction: 'ltr' | 
     },
     MuiAlert: {
       styleOverrides: {
-        root: {
+        standardInfo: {
           backgroundColor: 'rgba(0,194,255,0.08)',
           border: `1px solid rgba(0,194,255,0.2)`,
+          color: isDark ? '#00C2FF' : '#0077A8',
         },
         standardError: {
           backgroundColor: `rgba(230,57,70,0.1)`,
           border: `1px solid rgba(230,57,70,0.3)`,
+          color: isDark ? '#E63946' : '#C62828',
         },
         standardSuccess: {
           backgroundColor: `rgba(0,230,118,0.08)`,
           border: `1px solid rgba(0,230,118,0.2)`,
+          color: isDark ? '#00E676' : '#1B5E20',
         },
       },
     },

@@ -1,4 +1,4 @@
-﻿import { useRef, useState, useEffect } from 'react';
+﻿import { useRef } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -10,7 +10,6 @@ import IconButton from '@mui/material/IconButton';
 import Chip from '@mui/material/Chip';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import BoltIcon from '@mui/icons-material/Bolt';
 import ElectricScooterIcon from '@mui/icons-material/ElectricScooter';
 import { useFeaturedProducts } from '../../catalog/api/products';
 import { useCategories } from '../../catalog/api/categories';
@@ -248,7 +247,7 @@ function FeaturedSection() {
                           sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, bgcolor: 'rgba(230,57,70,0.14)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
                         />
                       )}
-                      <Box component="img" src={imageUrl} alt={product.name} sx={{ height: '100%', width: '100%', objectFit: 'contain', p: 2 }} />
+                      <Box sx={{ height: '100%', width: '100%', backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
                     </Box>
                     <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
                       <Typography sx={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'primary.main', textTransform: 'uppercase', fontWeight: 600, mb: 0.5 }}>

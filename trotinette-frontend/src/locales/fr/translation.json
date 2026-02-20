@@ -138,6 +138,9 @@
   },
   "checkout": {
     "title": "Commande",
+    "createAccount": "Créer un compte",
+    "createAccountHint": "Créez un compte pour passer votre commande",
+    "loginOrRegister": "Veuillez créer un compte ci-dessus pour continuer",
     "deliveryCity": "Ville de livraison",
     "selectCity": "Sélectionnez une ville",
     "phone": "Numéro de téléphone",

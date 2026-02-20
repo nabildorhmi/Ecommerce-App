@@ -44,6 +44,14 @@ export const router = createBrowserRouter([
         path: '/login',
         element: <LoginPage />,
       },
+      {
+        path: '/checkout',
+        element: <CheckoutPage />,
+      },
+      {
+        path: '/orders/:orderNumber/confirmation',
+        element: <OrderConfirmationPage />,
+      },
       // Protected routes — require authentication
       {
         element: <ProtectedRoute />,
@@ -51,14 +59,6 @@ export const router = createBrowserRouter([
           {
             path: '/profile',
             element: <ProfilePage />,
-          },
-          {
-            path: '/checkout',
-            element: <CheckoutPage />,
-          },
-          {
-            path: '/orders/:orderNumber/confirmation',
-            element: <OrderConfirmationPage />,
           },
           {
             path: '/orders',
