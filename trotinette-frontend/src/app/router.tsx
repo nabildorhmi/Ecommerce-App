@@ -6,7 +6,6 @@ import { AdminProductEditPage } from '../features/admin/pages/AdminProductEditPa
 import { AdminCategoriesPage } from '../features/admin/pages/AdminCategoriesPage';
 import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage';
 import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage';
-import { AdminDeliveryZonesPage } from '../features/admin/pages/AdminDeliveryZonesPage';
 import { ProtectedRoute } from '../shared/components/ProtectedRoute';
 import { AdminRoute } from '../shared/components/AdminRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
@@ -105,10 +104,6 @@ export const router = createBrowserRouter([
           {
             path: '/admin/orders/:id',
             element: <AdminOrderDetailPage />,
-          },
-          {
-            path: '/admin/delivery-zones',
-            element: <AdminDeliveryZonesPage />,
           },
         ],
       },

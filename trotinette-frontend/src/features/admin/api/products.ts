@@ -33,22 +33,24 @@ export function useAdminProduct(id: number) {
  */
 function buildProductFormData(data: {
   sku?: string;
+  name?: string;
+  slug?: string;
+  description?: string;
   price?: number; // centimes (already converted)
   stock_quantity?: number;
   category_id?: number | null;
   is_active?: boolean;
-  translations?: {
-    fr?: { name?: string; slug?: string; description?: string };
-    en?: { name?: string; slug?: string; description?: string };
-  };
-  attributes?: Record<string, string | number>;
   is_featured?: boolean;
+  attributes?: Record<string, string | number>;
   images?: File[];
   delete_images?: number[];
 }): FormData {
   const fd = new FormData();
 
   if (data.sku !== undefined) fd.append('sku', data.sku);
+  if (data.name !== undefined) fd.append('name', data.name);
+  if (data.slug !== undefined) fd.append('slug', data.slug);
+  if (data.description !== undefined) fd.append('description', data.description);
   if (data.price !== undefined) fd.append('price', String(data.price));
   if (data.stock_quantity !== undefined)
     fd.append('stock_quantity', String(data.stock_quantity));
@@ -58,21 +60,6 @@ function buildProductFormData(data: {
     fd.append('is_active', data.is_active ? '1' : '0');
   if (data.is_featured !== undefined)
     fd.append('is_featured', data.is_featured ? '1' : '0');
-
-  // Nested translations: translations[fr][name], etc.
-  if (data.translations) {
-    const locales = ['fr', 'en'] as const;
-    for (const locale of locales) {
-      const t = data.translations[locale];
-      if (!t) continue;
-      if (t.name !== undefined)
-        fd.append(`translations[${locale}][name]`, t.name);
-      if (t.slug !== undefined)
-        fd.append(`translations[${locale}][slug]`, t.slug);
-      if (t.description !== undefined)
-        fd.append(`translations[${locale}][description]`, t.description ?? '');
-    }
-  }
 
   // Attributes as JSON string (backend decodes in PrepareForValidation)
   if (data.attributes) {
@@ -100,15 +87,14 @@ function buildProductFormData(data: {
 
 interface CreateProductInput {
   sku: string;
+  name: string;
+  slug: string;
+  description: string;
   price: number; // in MAD — we convert to centimes here
   stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
-  translations: {
-    fr: { name: string; slug: string; description: string };
-    en: { name: string; slug: string; description: string };
-  };
   attributes: Record<string, string | number>;
   images: File[];
 }
@@ -138,15 +124,14 @@ export function useCreateProduct() {
 interface UpdateProductInput {
   id: number;
   sku?: string;
+  name?: string;
+  slug?: string;
+  description?: string;
   price?: number; // in MAD — converted to centimes
   stock_quantity?: number;
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
-  translations?: {
-    fr?: { name?: string; slug?: string; description?: string };
-    en?: { name?: string; slug?: string; description?: string };
-  };
   attributes?: Record<string, string | number>;
   images?: File[];
   delete_images?: number[];

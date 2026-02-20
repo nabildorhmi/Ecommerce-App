@@ -2,14 +2,10 @@
 
 export interface ProductImage {
   id: number;
-  url: string;
-  thumbnail_url: string;
-  card_url: string;
-  full_url: string;
-  name: string;
-  size: number;
-  mime_type: string;
-  order_column: number;
+  thumbnail: string;
+  card: string;
+  full: string;
+  original: string;
 }
 
 export interface ProductTranslation {
@@ -52,15 +48,14 @@ export interface AdminCategory {
 
 export interface ProductFormData {
   sku: string;
+  name: string;
+  slug: string;
+  description: string;
   price: number; // in MAD — converted to centimes on submit
   stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
-  translations: {
-    fr: { name: string; slug: string; description: string };
-    en: { name: string; slug: string; description: string };
-  };
   attributes: {
     speed: string;
     battery: string;

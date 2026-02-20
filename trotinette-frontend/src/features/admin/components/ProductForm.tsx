@@ -33,6 +33,9 @@ function slugify(value: string): string {
 // ---- Zod schema ----
 const schema = z.object({
   sku: z.string().min(1, 'SKU requis').max(50),
+  name: z.string().min(1, 'Nom requis').max(255),
+  slug: z.string().min(1, 'Slug requis').max(255),
+  description: z.string().default(''),
   price: z.number({ error: 'Prix invalide' }).min(0),
   stock_quantity: z
     .number({ error: 'Quantite invalide' })
@@ -41,18 +44,6 @@ const schema = z.object({
   category_id: z.number({ error: 'Categorie requise' }).nullable(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
-  translations: z.object({
-    fr: z.object({
-      name: z.string().min(1, 'Nom FR requis').max(255),
-      slug: z.string().min(1, 'Slug FR requis').max(255),
-      description: z.string().default(''),
-    }),
-    en: z.object({
-      name: z.string().min(1, 'EN name required').max(255),
-      slug: z.string().min(1, 'EN slug required').max(255),
-      description: z.string().default(''),
-    }),
-  }),
   attributes: z.object({
     speed: z.string().optional().default(''),
     battery: z.string().optional().default(''),
@@ -88,28 +79,18 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   );
 
   // Track manual slug edits to prevent auto-override
-  const [frSlugManual, setFrSlugManual] = useState(false);
-  const [enSlugManual, setEnSlugManual] = useState(false);
+  const [slugManual, setSlugManual] = useState(false);
 
   const defaultValues: FormValues = {
     sku: product?.sku ?? '',
+    name: product?.translations?.fr?.name ?? '',
+    slug: product?.translations?.fr?.slug ?? '',
+    description: product?.translations?.fr?.description ?? '',
     price: product ? product.price / 100 : 0,
     stock_quantity: product?.stock_quantity ?? 0,
     category_id: product?.category_id ?? null,
     is_active: product?.is_active ?? true,
     is_featured: product?.is_featured ?? false,
-    translations: {
-      fr: {
-        name: product?.translations?.fr?.name ?? '',
-        slug: product?.translations?.fr?.slug ?? '',
-        description: product?.translations?.fr?.description ?? '',
-      },
-      en: {
-        name: product?.translations?.en?.name ?? '',
-        slug: product?.translations?.en?.slug ?? '',
-        description: product?.translations?.en?.description ?? '',
-      },
-    },
     attributes: {
       speed: String(product?.attributes?.speed ?? ''),
       battery: String(product?.attributes?.battery ?? ''),
@@ -133,24 +114,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   });
 
   // Auto-generate slug from name
-  const frName = watch('translations.fr.name');
-  const enName = watch('translations.en.name');
+  const name = watch('name');
 
   useEffect(() => {
-    if (!frSlugManual && frName) {
-      setValue('translations.fr.slug', slugify(frName), {
-        shouldValidate: false,
-      });
+    if (!slugManual && name) {
+      setValue('slug', slugify(name), { shouldValidate: false });
     }
-  }, [frName, frSlugManual, setValue]);
-
-  useEffect(() => {
-    if (!enSlugManual && enName) {
-      setValue('translations.en.slug', slugify(enName), {
-        shouldValidate: false,
-      });
-    }
-  }, [enName, enSlugManual, setValue]);
+  }, [name, slugManual, setValue]);
 
   const handleDeleteExistingImage = useCallback((mediaId: number) => {
     setExistingImages((prev) => prev.filter((img) => img.id !== mediaId));
@@ -160,23 +130,14 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const onSubmit = async (values: FormValues) => {
     const payload = {
       sku: values.sku,
+      name: values.name,
+      slug: values.slug,
+      description: values.description ?? '',
       price: values.price,
       stock_quantity: values.stock_quantity,
       category_id: values.category_id,
       is_active: values.is_active,
       is_featured: values.is_featured,
-      translations: {
-        fr: {
-          name: values.translations.fr.name,
-          slug: values.translations.fr.slug,
-          description: values.translations.fr.description ?? '',
-        },
-        en: {
-          name: values.translations.en.name,
-          slug: values.translations.en.slug,
-          description: values.translations.en.description ?? '',
-        },
-      },
       attributes: values.attributes,
       images: newImages,
       delete_images: deletedImageIds,
@@ -299,77 +260,42 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       <Divider />
 
-      {/* Section 2: French translation */}
+      {/* Section 2: Product Info */}
       <Box>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Traduction francaise / French Translation
+          Informations produit / Product Info
         </Typography>
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField
-            label="Nom (FR) / Name (FR)"
-            {...register('translations.fr.name')}
-            error={Boolean(errors.translations?.fr?.name)}
-            helperText={errors.translations?.fr?.name?.message}
+            label="Nom / Name"
+            {...register('name')}
+            error={Boolean(errors.name)}
+            helperText={errors.name?.message}
             required
           />
           <TextField
-            label="Slug (FR)"
-            {...register('translations.fr.slug', {
-              onChange: () => setFrSlugManual(true),
+            label="Slug"
+            {...register('slug', {
+              onChange: () => setSlugManual(true),
             })}
-            error={Boolean(errors.translations?.fr?.slug)}
+            error={Boolean(errors.slug)}
             helperText={
-              errors.translations?.fr?.slug?.message ??
+              errors.slug?.message ??
               'Auto-genere depuis le nom / Auto-generated from name'
             }
           />
           <TextField
-            label="Description (FR)"
+            label="Description"
             multiline
             rows={3}
-            {...register('translations.fr.description')}
+            {...register('description')}
           />
         </Box>
       </Box>
 
       <Divider />
 
-      {/* Section 3: English translation */}
-      <Box>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          English Translation
-        </Typography>
-        <Box display="flex" flexDirection="column" gap={2}>
-          <TextField
-            label="Name (EN)"
-            {...register('translations.en.name')}
-            error={Boolean(errors.translations?.en?.name)}
-            helperText={errors.translations?.en?.name?.message}
-            required
-          />
-          <TextField
-            label="Slug (EN)"
-            {...register('translations.en.slug', {
-              onChange: () => setEnSlugManual(true),
-            })}
-            error={Boolean(errors.translations?.en?.slug)}
-            helperText={
-              errors.translations?.en?.slug?.message ??
-              'Auto-generated from name'
-            }
-          />
-          <TextField
-            label="Description (EN)"
-            multiline
-            rows={3}
-            {...register('translations.en.description')}
-          />
-        </Box>
-      </Box>
-
-      <Divider />
-
-      {/* Section 4: Specifications */}
+      {/* Section 3: Specifications */}
       <Box>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           Specifications
@@ -400,7 +326,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       <Divider />
 
-      {/* Section 5: Images */}
+      {/* Section 4: Images */}
       <Box>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           Images

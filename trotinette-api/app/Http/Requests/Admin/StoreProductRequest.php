@@ -14,24 +14,25 @@ class StoreProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sku'                             => 'required|string|unique:products,sku',
-            'price'                           => 'required|integer|min:0',
-            'stock_quantity'                  => 'required|integer|min:0',
-            'category_id'                     => 'required|exists:categories,id',
-            'is_active'                       => 'boolean',
-            'is_featured'                     => 'boolean',
-            'translations'                    => 'required|array',
-            'translations.fr'                 => 'required|array',
-            'translations.fr.name'            => 'required|string|max:255',
-            'translations.fr.slug'            => 'required|string|max:255',
-            'translations.fr.description'     => 'nullable|string',
-            'translations.en'                 => 'required|array',
-            'translations.en.name'            => 'required|string|max:255',
-            'translations.en.slug'            => 'required|string|max:255',
-            'translations.en.description'     => 'nullable|string',
-            'attributes'                      => 'nullable|array',
-            'images'                          => 'nullable|array',
-            'images.*'                        => 'image|mimes:jpeg,png,webp|max:5120',
+            'sku'             => 'required|string|unique:products,sku',
+            'name'            => 'required|string|max:255',
+            'slug'            => 'required|string|max:255',
+            'description'     => 'nullable|string',
+            'price'           => 'required|integer|min:0',
+            'stock_quantity'  => 'required|integer|min:0',
+            'category_id'     => 'required|exists:categories,id',
+            'is_active'       => 'boolean',
+            'is_featured'     => 'boolean',
+            'translations'    => 'sometimes|array',
+            'translations.fr.name'        => 'sometimes|string|max:255',
+            'translations.fr.slug'        => 'sometimes|string|max:255',
+            'translations.fr.description' => 'nullable|string',
+            'translations.en.name'        => 'sometimes|string|max:255',
+            'translations.en.slug'        => 'sometimes|string|max:255',
+            'translations.en.description' => 'nullable|string',
+            'attributes'      => 'nullable|array',
+            'images'          => 'nullable|array',
+            'images.*'        => 'image|mimes:jpeg,png,webp|max:5120',
         ];
     }
 
@@ -43,6 +44,18 @@ class StoreProductRequest extends FormRequest
             if (json_last_error() === JSON_ERROR_NONE) {
                 $this->merge(['attributes' => $decoded]);
             }
+        }
+
+        // Map flat name/slug/description to both locales when no nested translations sent
+        if ($this->has('name') && ! $this->has('translations')) {
+            $slug = $this->input('slug', \Illuminate\Support\Str::slug($this->input('name', '')));
+            $desc = $this->input('description', '');
+            $this->merge([
+                'translations' => [
+                    'fr' => ['name' => $this->input('name'), 'slug' => $slug, 'description' => $desc],
+                    'en' => ['name' => $this->input('name'), 'slug' => $slug, 'description' => $desc],
+                ],
+            ]);
         }
     }
 }

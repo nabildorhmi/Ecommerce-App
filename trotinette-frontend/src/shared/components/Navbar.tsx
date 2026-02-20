@@ -20,7 +20,6 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -236,7 +235,7 @@ export function Navbar() {
                         { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits', badge: null },
                         { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories', badge: null },
                         { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes', badge: null },
-                        { to: '/admin/delivery-zones', icon: <LocalShippingIcon fontSize="small" />, label: 'Zones de livraison', badge: null },
+
                       ].map(({ to, icon, label }) => (
                         <MenuItem
                           key={to}

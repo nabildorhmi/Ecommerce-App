@@ -217,7 +217,7 @@ export function AdminProductsPage() {
               </TableRow>
             ) : (
               products.map((product) => {
-                const thumb = product.images?.[0]?.thumbnail_url;
+                const thumb = product.images?.[0]?.thumbnail;
                 return (
                   <TableRow key={product.id} hover>
                     <TableCell>
@@ -242,8 +242,8 @@ export function AdminProductsPage() {
                           alignItems="center"
                           justifyContent="center"
                         >
-                          <Typography variant="caption" color="text.disabled">
-                            No img
+                          <Typography variant="caption" color="text.disabled" textAlign="center" lineHeight={1.2}>
+                            MiraiTech
                           </Typography>
                         </Box>
                       )}
