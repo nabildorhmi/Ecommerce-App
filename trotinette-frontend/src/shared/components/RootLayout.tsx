@@ -8,7 +8,7 @@ import { Footer } from './Footer';
  */
 export function RootLayout() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', backgroundColor: '#0B0B0E' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
       <Navbar />
       <Box component="main" sx={{ flex: 1 }}>
         <Outlet />
