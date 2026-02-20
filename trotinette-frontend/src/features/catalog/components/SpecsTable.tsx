@@ -5,7 +5,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { useTranslation } from 'react-i18next';
 
 interface SpecsTableProps {
   attributes: Record<string, string | number> | null | undefined;
@@ -40,12 +39,20 @@ function formatValue(key: string, value: string | number): string {
  * Known spec keys get appropriate unit suffixes.
  */
 export function SpecsTable({ attributes }: SpecsTableProps) {
-  const { t } = useTranslation();
-
   if (!attributes) return null;
 
+  // Safety: if attributes is a JSON string (double-encoding bug), parse it
+  let parsed = attributes;
+  if (typeof attributes === 'string') {
+    try {
+      parsed = JSON.parse(attributes);
+    } catch {
+      return null;
+    }
+  }
+
   // Filter out empty values
-  const entries = Object.entries(attributes).filter(
+  const entries = Object.entries(parsed).filter(
     ([, value]) => value !== null && value !== undefined && String(value) !== ''
   );
 
@@ -57,7 +64,7 @@ export function SpecsTable({ attributes }: SpecsTableProps) {
         variant="h6"
         sx={{ px: 2, pt: 2, pb: 1 }}
       >
-        {t('product.specifications')}
+        Caractéristiques
       </Typography>
       <Table size="small">
         <TableBody>

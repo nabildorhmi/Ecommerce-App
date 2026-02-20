@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -20,7 +19,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAdminUser, useDeactivateUser } from '../api/users';
 
 export function AdminUserDetailPage() {
-  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -60,11 +58,11 @@ export function AdminUserDetailPage() {
         onClick={() => void navigate('/admin/users')}
         sx={{ mb: 3 }}
       >
-        {t('adminUserDetail.back')}
+        {"Retour aux utilisateurs"}
       </Button>
 
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        {t('adminUserDetail.title')}
+        {"Détail utilisateur"}
       </Typography>
 
       <Card variant="outlined" sx={{ mb: 3 }}>
@@ -76,50 +74,50 @@ export function AdminUserDetailPage() {
           >
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('adminUsers.name')}
+                {"Nom"}
               </Typography>
               <Typography>{user.name}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('adminUsers.email')}
+                {"E-mail"}
               </Typography>
               <Typography>{user.email}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('adminUsers.phone')}
+                {"Téléphone"}
               </Typography>
               <Typography>{user.phone ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('adminUsers.role')}
+                {"Rôle"}
               </Typography>
               <Typography>{user.role}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('profile.addressCity')}
+                {"Ville"}
               </Typography>
               <Typography>{user.address_city ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('profile.addressStreet')}
+                {"Adresse"}
               </Typography>
               <Typography>{user.address_street ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {t('adminUsers.status')}
+                {"Statut"}
               </Typography>
               <Box>
                 <Chip
                   label={
                     user.is_active
-                      ? t('adminUsers.active')
-                      : t('adminUsers.inactive')
+                      ? "Actif"
+                      : "Inactif"
                   }
                   color={user.is_active ? 'success' : 'default'}
                   size="small"
@@ -135,7 +133,7 @@ export function AdminUserDetailPage() {
                 variant="outlined"
                 onClick={() => setConfirmOpen(true)}
               >
-                {t('adminUsers.deactivate')}
+                {"Désactiver"}
               </Button>
             </Box>
           )}
@@ -144,19 +142,19 @@ export function AdminUserDetailPage() {
 
       <Paper variant="outlined" sx={{ p: 3 }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
-          {t('adminUserDetail.orderHistory')}
+          {"Historique des commandes"}
         </Typography>
         <Divider sx={{ mb: 2 }} />
         <Typography color="text.secondary">
-          {t('adminUserDetail.noOrders')}
+          {"Aucune commande pour le moment"}
         </Typography>
       </Paper>
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>{t('adminUsers.deactivate')}</DialogTitle>
+        <DialogTitle>{"Désactiver"}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('adminUsers.confirmDeactivate')} <strong>{user.name}</strong>?
+            {"Êtes-vous sûr de vouloir désactiver cet utilisateur ?"} <strong>{user.name}</strong>?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -177,7 +175,7 @@ export function AdminUserDetailPage() {
               ) : undefined
             }
           >
-            {t('adminUsers.deactivate')}
+            {"Désactiver"}
           </Button>
         </DialogActions>
       </Dialog>

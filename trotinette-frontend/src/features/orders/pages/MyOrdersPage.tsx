@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
@@ -28,7 +27,6 @@ import { formatCurrency } from '../../../shared/utils/formatCurrency';
  * Shows paginated list of orders with status badges and expandable details.
  */
 export function MyOrdersPage() {
-  const { t } = useTranslation();
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useMyOrders(page);
@@ -44,7 +42,7 @@ export function MyOrdersPage() {
   if (error) {
     return (
       <Alert severity="error" sx={{ m: 3 }}>
-        {t('common.loading')}
+        {"Chargement..."}
       </Alert>
     );
   }
@@ -55,20 +53,20 @@ export function MyOrdersPage() {
   return (
     <Box p={3} maxWidth="md" mx="auto">
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        {t('orders.myOrders')}
+        {"Mes commandes"}
       </Typography>
 
       {orders.length === 0 ? (
         <Box textAlign="center" py={8}>
           <Typography color="text.secondary" mb={2}>
-            {t('orders.noOrders')}
+            {"Vous n'avez pas encore de commande"}
           </Typography>
           <Button
             component={Link}
             to="/products"
             variant="contained"
           >
-            {t('orders.browseProducts')}
+            {"Parcourir les produits"}
           </Button>
         </Box>
       ) : (
@@ -85,7 +83,7 @@ export function MyOrdersPage() {
                   pr={1}
                 >
                   <Typography fontWeight="bold" sx={{ minWidth: 140 }}>
-                    {t('orders.orderNumber')}: {order.order_number}
+                    {"N° de commande"}: {order.order_number}
                   </Typography>
                   <OrderStatusChip status={order.status} />
                   <Typography variant="body2" color="text.secondary" sx={{ flexGrow: 1 }}>
@@ -108,9 +106,9 @@ export function MyOrdersPage() {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>{t('orders.items')}</TableCell>
-                        <TableCell align="right">{t('checkout.qty')}</TableCell>
-                        <TableCell align="right">{t('checkout.subtotal')}</TableCell>
+                        <TableCell>{"Articles"}</TableCell>
+                        <TableCell align="right">{"Qté"}</TableCell>
+                        <TableCell align="right">{"Sous-total"}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -121,7 +119,7 @@ export function MyOrdersPage() {
                               {item.product?.name ?? item.product_sku}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                              {formatCurrency(item.unit_price)} / {t('checkout.qty').toLowerCase()}
+                              {formatCurrency(item.unit_price)} / {"Qté".toLowerCase()}
                             </Typography>
                           </TableCell>
                           <TableCell align="right">{item.quantity}</TableCell>
@@ -137,13 +135,13 @@ export function MyOrdersPage() {
                 {/* Order summary */}
                 <Box mt={2} textAlign="right">
                   <Typography variant="body2" color="text.secondary">
-                    {t('checkout.subtotal')}: {formatCurrency(order.subtotal)}
+                    {"Sous-total"}: {formatCurrency(order.subtotal)}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {t('checkout.deliveryFee')} ({order.city ?? order.delivery_zone?.city ?? '—'}): {formatCurrency(order.delivery_fee)}
+                    {"Frais de livraison"} ({order.city ?? order.delivery_zone?.city ?? '—'}): {formatCurrency(order.delivery_fee)}
                   </Typography>
                   <Typography fontWeight="bold" mt={0.5}>
-                    {t('checkout.total')}: {formatCurrency(order.total)}
+                    {"Total"}: {formatCurrency(order.total)}
                   </Typography>
                 </Box>
               </AccordionDetails>

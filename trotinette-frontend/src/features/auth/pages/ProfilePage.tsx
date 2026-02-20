@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
@@ -33,7 +32,6 @@ const profileSchema = z.object({
 type ProfileFormData = z.infer<typeof profileSchema>;
 
 export function ProfilePage() {
-  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const [successOpen, setSuccessOpen] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -83,7 +81,7 @@ export function ProfilePage() {
     <Container maxWidth="sm" sx={{ py: 6 }}>
       <Paper elevation={2} sx={{ p: 4 }}>
         <Typography variant="h5" fontWeight="bold" mb={3}>
-          {t('profile.title')}
+          {"Mon profil"}
         </Typography>
 
         {serverError && (
@@ -99,7 +97,7 @@ export function ProfilePage() {
           sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
         >
           <TextField
-            label={t('profile.name')}
+            label={"Nom complet"}
             type="text"
             fullWidth
             error={Boolean(errors.name)}
@@ -108,7 +106,7 @@ export function ProfilePage() {
           />
 
           <TextField
-            label={t('profile.email')}
+            label={"Adresse e-mail"}
             type="email"
             fullWidth
             error={Boolean(errors.email)}
@@ -117,7 +115,7 @@ export function ProfilePage() {
           />
 
           <TextField
-            label={t('profile.phone')}
+            label={"Téléphone"}
             type="tel"
             fullWidth
             error={Boolean(errors.phone)}
@@ -126,7 +124,7 @@ export function ProfilePage() {
           />
 
           <TextField
-            label={t('profile.addressCity')}
+            label={"Ville"}
             type="text"
             fullWidth
             error={Boolean(errors.address_city)}
@@ -135,7 +133,7 @@ export function ProfilePage() {
           />
 
           <TextField
-            label={t('profile.addressStreet')}
+            label={"Adresse"}
             type="text"
             fullWidth
             error={Boolean(errors.address_street)}
@@ -150,7 +148,7 @@ export function ProfilePage() {
             startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
             sx={{ mt: 1 }}
           >
-            {t('profile.save')}
+            {"Enregistrer"}
           </Button>
         </Box>
       </Paper>
@@ -162,7 +160,7 @@ export function ProfilePage() {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success" onClose={() => setSuccessOpen(false)}>
-          {t('profile.saved')}
+          {"Profil enregistré avec succès"}
         </Alert>
       </Snackbar>
     </Container>

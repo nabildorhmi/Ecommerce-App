@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -31,7 +30,6 @@ const checkoutSchema = z.object({
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
 
 export function CheckoutPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const subtotalCentimes = useCartStore((s) => s.subtotalCentimes());
@@ -100,7 +98,7 @@ export function CheckoutPage() {
   const apiErrorMessage = (() => {
     if (!orderError) return null;
     const err = orderError as { response?: { data?: { message?: string } } };
-    return err.response?.data?.message ?? t('checkout.orderError', 'An error occurred placing your order');
+    return err.response?.data?.message ?? "Une erreur est survenue lors de la commande";
   })();
 
   if (items.length === 0) {
@@ -110,7 +108,7 @@ export function CheckoutPage() {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Typography variant="h4" fontWeight={700} gutterBottom>
-        {t('checkout.title')}
+        {"Commande"}
       </Typography>
 
       <Stack spacing={3}>
@@ -118,10 +116,10 @@ export function CheckoutPage() {
         {!user && (
           <Paper variant="outlined" sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              {t('checkout.createAccount', 'Create an account')}
+              {"Créer un compte"}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              {t('checkout.createAccountHint', 'Create an account to place your order')}
+              {"Créez un compte pour passer votre commande"}
             </Typography>
             <RegisterForm onSubmit={handleRegister} error={registerError} />
           </Paper>
@@ -136,13 +134,13 @@ export function CheckoutPage() {
           <Stack spacing={3}>
             {/* COD notice */}
             <Alert severity="info">
-              {t('checkout.codNotice')}
+              {"Paiement à la livraison"}
             </Alert>
 
           {/* Order items (read-only) */}
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Typography variant="h6" fontWeight={600} gutterBottom>
-              {t('checkout.orderSummary')}
+              {"Récapitulatif de commande"}
             </Typography>
             <Stack spacing={1} divider={<Divider />}>
               {items.map((item) => (
@@ -157,7 +155,7 @@ export function CheckoutPage() {
                       {item.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {t('checkout.qty', 'Qty')}: {item.quantity} &times; {formatCurrency(item.price)}
+                      {"Qté"}: {item.quantity} &times; {formatCurrency(item.price)}
                     </Typography>
                   </Box>
                   <Typography variant="body2" fontWeight={600}>
@@ -170,7 +168,7 @@ export function CheckoutPage() {
 
           {/* Delivery city */}
           <TextField
-            label={t('checkout.deliveryCity', 'City')}
+            label={"Ville de livraison"}
             fullWidth
             required
             error={Boolean(errors.city)}
@@ -180,7 +178,7 @@ export function CheckoutPage() {
 
           {/* Phone number */}
           <TextField
-            label={t('checkout.phone')}
+            label={"Numéro de téléphone"}
             type="tel"
             fullWidth
             error={Boolean(errors.phone)}
@@ -192,18 +190,18 @@ export function CheckoutPage() {
           <Paper variant="outlined" sx={{ p: 2 }}>
             <Stack spacing={1}>
               <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2">{t('checkout.subtotal')}</Typography>
+                <Typography variant="body2">{"Sous-total"}</Typography>
                 <Typography variant="body2">{formatCurrency(subtotalCentimes)}</Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body2">{t('checkout.deliveryFee')}</Typography>
+                <Typography variant="body2">{"Frais de livraison"}</Typography>
                 <Typography variant="body2" color="success.main">
-                  {t('checkout.freeDelivery', 'Free')}
+                  {"Gratuit"}
                 </Typography>
               </Stack>
               <Divider />
               <Stack direction="row" justifyContent="space-between">
-                <Typography variant="body1" fontWeight={700}>{t('checkout.total')}</Typography>
+                <Typography variant="body1" fontWeight={700}>{"Total"}</Typography>
                 <Typography variant="body1" fontWeight={700} color="primary">
                   {formatCurrency(totalCentimes)}
                 </Typography>
@@ -213,8 +211,8 @@ export function CheckoutPage() {
 
           {/* Optional note */}
           <TextField
-            label={t('checkout.note')}
-            placeholder={t('checkout.notePlaceholder')}
+            label={"Note (optionnel)"}
+            placeholder={"Instructions de livraison, code d'accès..."}
             multiline
             rows={3}
             fullWidth
@@ -238,12 +236,12 @@ export function CheckoutPage() {
             disabled={isPending || !user}
             startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
           >
-            {isPending ? t('checkout.placingOrder') : t('checkout.placeOrder')}
+            {isPending ? "Envoi en cours..." : "Confirmer la commande"}
           </Button>
 
           {!user && (
             <Typography variant="body2" color="text.secondary" textAlign="center">
-              {t('checkout.loginOrRegister', 'Please create an account above to continue')}
+              {"Veuillez créer un compte ci-dessus pour continuer"}
             </Typography>
           )}
         </Stack>

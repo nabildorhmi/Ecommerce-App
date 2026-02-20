@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
@@ -36,13 +35,12 @@ function DeactivateDialog({
   onConfirm,
   isDeactivating,
 }: DeactivateDialogProps) {
-  const { t } = useTranslation();
   return (
     <Dialog open={Boolean(user)} onClose={onClose}>
-      <DialogTitle>{t('adminUsers.deactivate')}</DialogTitle>
+      <DialogTitle>{"Désactiver"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {t('adminUsers.confirmDeactivate')}
+          {"Êtes-vous sûr de vouloir désactiver cet utilisateur ?"}
           {user && (
             <>
               {' '}
@@ -62,7 +60,7 @@ function DeactivateDialog({
           disabled={isDeactivating}
           startIcon={isDeactivating ? <CircularProgress size={16} /> : undefined}
         >
-          {t('adminUsers.deactivate')}
+          {"Désactiver"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -70,7 +68,6 @@ function DeactivateDialog({
 }
 
 export function AdminUsersPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
@@ -105,18 +102,18 @@ export function AdminUsersPage() {
   return (
     <Box p={3}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        {t('adminUsers.title')}
+        {"Utilisateurs"}
       </Typography>
 
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{t('adminUsers.name')}</TableCell>
-              <TableCell>{t('adminUsers.email')}</TableCell>
-              <TableCell>{t('adminUsers.phone')}</TableCell>
-              <TableCell>{t('adminUsers.role')}</TableCell>
-              <TableCell>{t('adminUsers.status')}</TableCell>
+              <TableCell>{"Nom"}</TableCell>
+              <TableCell>{"E-mail"}</TableCell>
+              <TableCell>{"Téléphone"}</TableCell>
+              <TableCell>{"Rôle"}</TableCell>
+              <TableCell>{"Statut"}</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -143,8 +140,8 @@ export function AdminUsersPage() {
                     <Chip
                       label={
                         user.is_active
-                          ? t('adminUsers.active')
-                          : t('adminUsers.inactive')
+                          ? "Actif"
+                          : "Inactif"
                       }
                       color={user.is_active ? 'success' : 'default'}
                       size="small"
@@ -161,7 +158,7 @@ export function AdminUsersPage() {
                           setDeactivateTarget(user);
                         }}
                       >
-                        {t('adminUsers.deactivate')}
+                        {"Désactiver"}
                       </Button>
                     )}
                   </TableCell>

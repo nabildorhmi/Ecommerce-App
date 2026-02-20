@@ -1,5 +1,4 @@
 import { useSearchParams, useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
@@ -30,7 +29,6 @@ const ORDER_STATUSES = ['pending', 'confirmed', 'dispatched', 'delivered', 'canc
  * Filters are stored in URL search params.
  */
 export function AdminOrdersPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -100,23 +98,23 @@ export function AdminOrdersPage() {
   return (
     <Box p={3}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        {t('orders.adminOrders')}
+        {"Gestion des commandes"}
       </Typography>
 
       {/* Filter bar */}
       <Box display="flex" gap={2} flexWrap="wrap" mb={3}>
         {/* Status filter */}
         <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>{t('orders.status.label')}</InputLabel>
+          <InputLabel>{"Statut"}</InputLabel>
           <Select
-            label={t('orders.status.label')}
+            label={"Statut"}
             value={status}
             onChange={(e) => setParam('status', e.target.value)}
           >
-            <MenuItem value="">{t('orders.allStatuses')}</MenuItem>
+            <MenuItem value="">{"Tous les statuts"}</MenuItem>
             {ORDER_STATUSES.map((s) => (
               <MenuItem key={s} value={s}>
-                {t(`orders.status.${s}`, { defaultValue: s })}
+                {s}
               </MenuItem>
             ))}
           </Select>
@@ -125,7 +123,7 @@ export function AdminOrdersPage() {
         {/* City filter */}
         <TextField
           size="small"
-          label={t('orders.city')}
+          label={"Ville"}
           value={city}
           onChange={(e) => setParam('city', e.target.value)}
           sx={{ minWidth: 180 }}
@@ -135,7 +133,7 @@ export function AdminOrdersPage() {
         <TextField
           size="small"
           type="date"
-          label={t('orders.dateFrom')}
+          label={"Date de début"}
           value={dateFrom}
           onChange={(e) => setParam('date_from', e.target.value)}
           InputLabelProps={{ shrink: true }}
@@ -145,7 +143,7 @@ export function AdminOrdersPage() {
         <TextField
           size="small"
           type="date"
-          label={t('orders.dateTo')}
+          label={"Date de fin"}
           value={dateTo}
           onChange={(e) => setParam('date_to', e.target.value)}
           InputLabelProps={{ shrink: true }}
@@ -157,29 +155,29 @@ export function AdminOrdersPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{t('orders.orderNumber')}</TableCell>
+              <TableCell>{"N° de commande"}</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={isSortActive('created_at')}
                   direction={sortDirection('created_at')}
                   onClick={() => handleSort('created_at')}
                 >
-                  {t('orders.date')}
+                  {"Date"}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>{t('orders.customer')}</TableCell>
-              <TableCell>{t('orders.status.label')}</TableCell>
-              <TableCell>{t('orders.city')}</TableCell>
+              <TableCell>{"Client"}</TableCell>
+              <TableCell>{"Statut"}</TableCell>
+              <TableCell>{"Ville"}</TableCell>
               <TableCell align="right">
                 <TableSortLabel
                   active={isSortActive('total')}
                   direction={sortDirection('total')}
                   onClick={() => handleSort('total')}
                 >
-                  {t('orders.total')}
+                  {"Total"}
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right">{t('orders.items')}</TableCell>
+              <TableCell align="right">{"Articles"}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

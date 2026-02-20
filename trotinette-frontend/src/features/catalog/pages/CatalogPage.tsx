@@ -7,7 +7,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
-import { useTranslation } from 'react-i18next';
 import { useProducts } from '../api/products';
 import { useCatalogFilters } from '../hooks/useCatalogFilters';
 import { FilterBar } from '../components/FilterBar';
@@ -30,7 +29,6 @@ function ProductGridSkeleton() {
  * Sidebar FilterBar + product grid + pagination.
  */
 export function CatalogPage() {
-  const { t } = useTranslation();
   const { filters, setFilter } = useCatalogFilters();
   const { data, isLoading } = useProducts(filters);
 
@@ -64,11 +62,11 @@ export function CatalogPage() {
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
             <Typography variant="h4" sx={{ color: '#F5F7FA', fontWeight: 800, letterSpacing: '0.04em' }}>
-              {t('catalog.title')}
+              {"Catalogue"}
             </Typography>
             {!isLoading && total > 0 && (
               <Typography variant="body2" sx={{ color: '#9CA3AF' }}>
-                {t('catalog.showing', { count: total })}
+                {`${total} produit(s) trouvé(s)`}
               </Typography>
             )}
           </Box>
@@ -125,7 +123,7 @@ export function CatalogPage() {
                   空
                 </Typography>
                 <Typography sx={{ color: '#9CA3AF', mb: 1 }}>
-                  {t('catalog.noProducts', 'No products found')}
+                  {"Aucun produit trouvé"}
                 </Typography>
               </Box>
             ) : (

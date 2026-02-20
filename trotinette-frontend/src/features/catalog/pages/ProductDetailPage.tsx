@@ -14,7 +14,6 @@ import Snackbar from '@mui/material/Snackbar';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BoltIcon from '@mui/icons-material/Bolt';
-import { useTranslation } from 'react-i18next';
 import { useProduct } from '../api/products';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import { ProductGallery } from '../components/ProductGallery';
@@ -59,7 +58,6 @@ function ProductDetailSkeleton() {
  */
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { t } = useTranslation();
   const { data: product, isLoading, isError } = useProduct(slug ?? '');
   const addItem = useCartStore((s) => s.addItem);
   const items = useCartStore((s) => s.items);
@@ -72,10 +70,10 @@ export function ProductDetailPage() {
       <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', py: 6 }}>
         <Container maxWidth="lg">
           <Alert severity="warning" sx={{ mb: 3, backgroundColor: '#1E1E28', color: '#F5F7FA' }}>
-            {t('product.notFound')}
+            {"Produit introuvable"}
           </Alert>
           <Button component={Link} to="/products" variant="outlined" startIcon={<ArrowBackIcon />}>
-            {t('product.backToCatalog')}
+            {"Retour au catalogue"}
           </Button>
         </Container>
       </Box>
@@ -224,8 +222,8 @@ export function ProductDetailPage() {
                     }}
                   >
                     {isAtMaxStock && product.in_stock
-                      ? t('cart.maxStock', 'Max stock reached')
-                      : t('product.addToCart')}
+                      ? "Stock maximum atteint"
+                      : "Ajouter au panier"}
                   </Button>
 
                   <WhatsAppButton productName={product.name} />
@@ -246,7 +244,7 @@ export function ProductDetailPage() {
         open={snackbarOpen}
         autoHideDuration={2500}
         onClose={() => setSnackbarOpen(false)}
-        message={t('cart.addedToCart')}
+        message={"Ajouté au panier"}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Box>

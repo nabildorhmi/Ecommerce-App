@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import AssignmentReturnIcon from '@mui/icons-material/AssignmentReturn';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import PhoneIcon from '@mui/icons-material/Phone';
-import { useTranslation } from 'react-i18next';
 
 // Format WhatsApp number for display: 212600000000 -> +212 6 00 00 00 00
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '212600000000';
@@ -52,8 +51,6 @@ function TrustBadge({ icon, text }: TrustBadgeProps) {
  * Content is static — no props required.
  */
 export function TrustSignals() {
-  const { t } = useTranslation();
-
   return (
     <Stack
       direction={{ xs: 'column', sm: 'row' }}
@@ -63,11 +60,11 @@ export function TrustSignals() {
     >
       <TrustBadge
         icon={<AssignmentReturnIcon />}
-        text={t('trust.returnPolicy')}
+        text="Retour sous 7 jours"
       />
       <TrustBadge
         icon={<VerifiedUserIcon />}
-        text={t('trust.officialStore')}
+        text="Boutique officielle"
       />
       <TrustBadge
         icon={<PhoneIcon />}

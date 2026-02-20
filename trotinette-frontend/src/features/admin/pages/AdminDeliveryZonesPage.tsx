@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
@@ -60,7 +59,6 @@ interface FormDialogProps {
 }
 
 function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
-  const { t } = useTranslation();
   const createMutation = useCreateDeliveryZone();
   const updateMutation = useUpdateDeliveryZone();
 
@@ -120,14 +118,14 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {isEditing
-          ? t('deliveryZones.edit')
-          : t('deliveryZones.create')}
+          ? "Modifier la zone"
+          : "Ajouter une zone"}
       </DialogTitle>
       <DialogContent>
         <Box pt={1} display="flex" flexDirection="column" gap={2}>
           <TextField
             {...register('city')}
-            label={t('deliveryZones.city')}
+            label={"Ville"}
             error={Boolean(errors.city)}
             helperText={errors.city?.message}
             size="small"
@@ -136,7 +134,7 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
           />
           <TextField
             {...register('city_ar')}
-            label={t('deliveryZones.cityAr')}
+            label={"Ville (arabe)"}
             error={Boolean(errors.city_ar)}
             helperText={errors.city_ar?.message}
             size="small"
@@ -144,7 +142,7 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
           />
           <TextField
             {...register('fee', { valueAsNumber: true })}
-            label={t('deliveryZones.fee')}
+            label={"Frais de livraison (MAD)"}
             type="number"
             inputProps={{ min: 0, step: 0.01 }}
             error={Boolean(errors.fee)}
@@ -164,7 +162,7 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
                 }
-                label={field.value ? t('deliveryZones.active') : t('deliveryZones.inactive')}
+                label={field.value ? "Active" : "Inactive"}
               />
             )}
           />
@@ -178,7 +176,7 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isPending}>
-          {t('admin.products.cancel')}
+          {"Annuler"}
         </Button>
         <Button
           variant="contained"
@@ -186,7 +184,7 @@ function FormDialog({ open, zone, onClose, onSuccess }: FormDialogProps) {
           disabled={isPending}
           startIcon={isPending ? <CircularProgress size={16} /> : undefined}
         >
-          {t('admin.products.save')}
+          {"Enregistrer"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -210,14 +208,13 @@ function DeleteDialog({
   isDeleting,
   deleteError,
 }: DeleteDialogProps) {
-  const { t } = useTranslation();
 
   return (
     <Dialog open={Boolean(zone)} onClose={onClose}>
-      <DialogTitle>{t('deliveryZones.delete')}</DialogTitle>
+      <DialogTitle>{"Supprimer la zone"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          {t('deliveryZones.confirmDelete')}{' '}
+          {"Êtes-vous sûr de vouloir supprimer la zone"}{' '}
           <strong>{zone?.city}</strong>?
         </DialogContentText>
         {deleteError && (
@@ -229,7 +226,7 @@ function DeleteDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isDeleting}>
-          {t('admin.products.cancel')}
+          {"Annuler"}
         </Button>
         <Button
           color="error"
@@ -238,7 +235,7 @@ function DeleteDialog({
           disabled={isDeleting}
           startIcon={isDeleting ? <CircularProgress size={16} /> : undefined}
         >
-          {t('deliveryZones.delete')}
+          {"Supprimer la zone"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -248,7 +245,6 @@ function DeleteDialog({
 // ---- Main Page ----
 
 export function AdminDeliveryZonesPage() {
-  const { t } = useTranslation();
   const { data, isLoading, error } = useAdminDeliveryZones();
   const deleteMutation = useDeleteDeliveryZone();
 
@@ -303,10 +299,10 @@ export function AdminDeliveryZonesPage() {
         mb={3}
       >
         <Typography variant="h5" fontWeight="bold">
-          {t('deliveryZones.title')}
+          {"Zones de livraison"}
         </Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
-          {t('deliveryZones.create')}
+          {"Ajouter une zone"}
         </Button>
       </Box>
 
@@ -314,10 +310,10 @@ export function AdminDeliveryZonesPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{t('deliveryZones.city')}</TableCell>
-              <TableCell>{t('deliveryZones.cityAr')}</TableCell>
-              <TableCell align="right">{t('deliveryZones.fee')}</TableCell>
-              <TableCell>{t('orders.status.label')}</TableCell>
+              <TableCell>{"Ville"}</TableCell>
+              <TableCell>{"Ville (arabe)"}</TableCell>
+              <TableCell align="right">{"Frais de livraison (MAD)"}</TableCell>
+              <TableCell>{"Statut"}</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -338,8 +334,8 @@ export function AdminDeliveryZonesPage() {
                     <Chip
                       label={
                         zone.is_active
-                          ? t('deliveryZones.active')
-                          : t('deliveryZones.inactive')
+                          ? "Active"
+                          : "Inactive"
                       }
                       color={zone.is_active ? 'success' : 'default'}
                       size="small"

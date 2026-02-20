@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import Chip from '@mui/material/Chip';
 import type { ChipProps } from '@mui/material/Chip';
 
@@ -12,6 +11,14 @@ const STATUS_COLOR_MAP: Record<string, StatusColor> = {
   cancelled: 'error',
 };
 
+const STATUS_LABEL_MAP: Record<string, string> = {
+  pending: 'En attente',
+  confirmed: 'Confirmée',
+  dispatched: 'Expédiée',
+  delivered: 'Livrée',
+  cancelled: 'Annulée',
+};
+
 interface OrderStatusChipProps {
   status: string;
 }
@@ -19,16 +26,14 @@ interface OrderStatusChipProps {
 /**
  * Renders a colored MUI Chip for an order status.
  * Color mapping: pending=warning, confirmed=info, dispatched=primary, delivered=success, cancelled=error.
- * Label is translated via i18n key: orders.status.{status}
  */
 export function OrderStatusChip({ status }: OrderStatusChipProps) {
-  const { t } = useTranslation();
-
   const color: StatusColor = STATUS_COLOR_MAP[status] ?? 'default';
+  const label = STATUS_LABEL_MAP[status] ?? status;
 
   return (
     <Chip
-      label={t(`orders.status.${status}`, { defaultValue: status })}
+      label={label}
       color={color}
       size="small"
     />

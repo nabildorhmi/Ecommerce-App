@@ -4,7 +4,6 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import { useTranslation } from 'react-i18next';
 import { ProductCard } from './ProductCard';
 import type { Product } from '../types';
 
@@ -30,8 +29,6 @@ function ProductSkeleton() {
 }
 
 export function ProductGrid({ products, loading }: ProductGridProps) {
-  const { t } = useTranslation();
-
   if (loading) {
     return (
       <Grid container spacing={2}>
@@ -53,7 +50,7 @@ export function ProductGrid({ products, loading }: ProductGridProps) {
           color: 'text.secondary',
         }}
       >
-        <Typography variant="h6">{t('catalog.noProducts')}</Typography>
+        <Typography variant="h6">Aucun produit trouvé</Typography>
       </Box>
     );
   }

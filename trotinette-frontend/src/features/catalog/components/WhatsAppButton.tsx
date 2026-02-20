@@ -1,6 +1,5 @@
 import Button from '@mui/material/Button';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { useTranslation } from 'react-i18next';
 
 // Phone number comes from env — client-visible (public phone number, acceptable)
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '212600000000';
@@ -15,8 +14,6 @@ interface WhatsAppButtonProps {
  * Opens in a new tab.
  */
 export function WhatsAppButton({ productName }: WhatsAppButtonProps) {
-  const { t } = useTranslation();
-
   const message = encodeURIComponent(
     `Bonjour, je suis intéressé(e) par : ${productName}`
   );
@@ -34,7 +31,7 @@ export function WhatsAppButton({ productName }: WhatsAppButtonProps) {
       startIcon={<WhatsAppIcon />}
       sx={{ py: 1.5 }}
     >
-      {t('product.askWhatsApp')}
+      Demander sur WhatsApp
     </Button>
   );
 }

@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { useTranslation } from 'react-i18next';
 import { useCartStore } from '../store';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import type { CartItem as CartItemType } from '../types';
@@ -15,7 +14,6 @@ interface CartItemProps {
 }
 
 export function CartItem({ item }: CartItemProps) {
-  const { t } = useTranslation();
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
@@ -76,7 +74,7 @@ export function CartItem({ item }: CartItemProps) {
           size="small"
           onClick={handleDecrement}
           disabled={item.quantity <= 1}
-          aria-label={t('cart.quantity') + ' -'}
+          aria-label={"Quantité" + ' -'}
         >
           <RemoveIcon fontSize="small" />
         </IconButton>
@@ -87,7 +85,7 @@ export function CartItem({ item }: CartItemProps) {
           size="small"
           onClick={handleIncrement}
           disabled={item.quantity >= item.stockQuantity}
-          aria-label={t('cart.quantity') + ' +'}
+          aria-label={"Quantité" + ' +'}
         >
           <AddIcon fontSize="small" />
         </IconButton>
@@ -106,7 +104,7 @@ export function CartItem({ item }: CartItemProps) {
       <IconButton
         size="small"
         onClick={handleRemove}
-        aria-label={t('cart.remove')}
+        aria-label={"Supprimer"}
         color="error"
       >
         <DeleteOutlineIcon fontSize="small" />

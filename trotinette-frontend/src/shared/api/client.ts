@@ -1,5 +1,4 @@
 import axios from 'axios';
-import i18n from 'i18next';
 import { useAuthStore } from '../../features/auth/store';
 
 export const apiClient = axios.create({
@@ -16,8 +15,7 @@ apiClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  // i18n may not be initialized yet on first render; fall back to 'fr'
-  config.headers['Accept-Language'] = i18n.language ?? 'fr';
+  config.headers['Accept-Language'] = 'fr';
   return config;
 });
 

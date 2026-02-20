@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -21,7 +20,6 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSubmit, error }: LoginFormProps) {
-  const { t } = useTranslation();
 
   const {
     register,
@@ -45,7 +43,7 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
       )}
 
       <TextField
-        label={t('auth.email')}
+        label={"Adresse e-mail"}
         type="email"
         autoComplete="email"
         fullWidth
@@ -55,7 +53,7 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
       />
 
       <TextField
-        label={t('auth.password')}
+        label={"Mot de passe"}
         type="password"
         autoComplete="current-password"
         fullWidth
@@ -71,7 +69,7 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
         disabled={isSubmitting}
         startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
       >
-        {t('auth.loginButton')}
+        {"Se connecter"}
       </Button>
     </Box>
   );

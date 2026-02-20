@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Button from '@mui/material/Button';
@@ -14,7 +13,6 @@ import Divider from '@mui/material/Divider';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import TuneIcon from '@mui/icons-material/Tune';
-import { useTranslation } from 'react-i18next';
 import { useCategories } from '../api/categories';
 import { useCatalogFilters } from '../hooks/useCatalogFilters';
 
@@ -31,7 +29,6 @@ const LABEL_STYLE = {
  * MiraiTech FilterBar — vertical sidebar filter panel.
  */
 export function FilterBar() {
-  const { t } = useTranslation();
   const { filters, setFilter, clearFilters } = useCatalogFilters();
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
@@ -100,7 +97,7 @@ export function FilterBar() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <TuneIcon sx={{ fontSize: '1rem', color: '#00C2FF' }} />
           <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: 'text.primary', textTransform: 'uppercase' }}>
-            {t('catalog.filters', 'Filters')}
+            {"Filtres"}
           </Typography>
         </Box>
         {hasActiveFilters && (
@@ -115,7 +112,7 @@ export function FilterBar() {
               '&:hover': { backgroundColor: 'rgba(230,57,70,0.08)' },
             }}
           >
-            {t('catalog.clearFilters', 'Clear')}
+            {"Effacer les filtres"}
           </Button>
         )}
       </Box>
@@ -123,10 +120,10 @@ export function FilterBar() {
       <Stack spacing={2.5}>
         {/* Search */}
         <Box>
-          <Typography sx={LABEL_STYLE}>{t('catalog.search', 'Search')}</Typography>
+          <Typography sx={LABEL_STYLE}>{"Recherche"}</Typography>
           <TextField
             size="small"
-            placeholder={t('catalog.searchPlaceholder', 'Search scooters...')}
+            placeholder={"Rechercher..."}
             value={searchInput}
             onChange={(e) => handleSearchChange(e.target.value)}
             fullWidth
@@ -147,7 +144,7 @@ export function FilterBar() {
 
         {/* Category */}
         <Box>
-          <Typography sx={LABEL_STYLE}>{t('catalog.category', 'Category')}</Typography>
+          <Typography sx={LABEL_STYLE}>{"Catégorie"}</Typography>
           <FormControl size="small" fullWidth>
             <Select
               value={filters['filter[category_id]'] ?? ''}
@@ -156,7 +153,7 @@ export function FilterBar() {
               sx={{ fontSize: '0.82rem' }}
             >
               <MenuItem value="" sx={{ fontSize: '0.82rem' }}>
-                <em style={{ fontStyle: 'normal', color: '#9CA3AF' }}>{t('catalog.allCategories', 'All Categories')}</em>
+                <em style={{ fontStyle: 'normal', color: '#9CA3AF' }}>{"Toutes les catégories"}</em>
               </MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat.id} value={String(cat.id)} sx={{ fontSize: '0.82rem' }}>
@@ -171,11 +168,11 @@ export function FilterBar() {
 
         {/* Price Range */}
         <Box>
-          <Typography sx={LABEL_STYLE}>{t('catalog.priceRange', 'Price Range')}</Typography>
+          <Typography sx={LABEL_STYLE}>{"Gamme de prix"}</Typography>
           <Stack direction="row" spacing={1}>
             <TextField
               size="small"
-              placeholder={t('catalog.min', 'Min')}
+              placeholder={"Min"}
               type="number"
               value={minPriceDisplay}
               onChange={(e) => handleMinPrice(e.target.value)}
@@ -184,7 +181,7 @@ export function FilterBar() {
             />
             <TextField
               size="small"
-              placeholder={t('catalog.max', 'Max')}
+              placeholder={"Max"}
               type="number"
               value={maxPriceDisplay}
               onChange={(e) => handleMaxPrice(e.target.value)}
@@ -207,7 +204,7 @@ export function FilterBar() {
           }
           label={
             <Typography sx={{ fontSize: '0.78rem', color: '#9CA3AF', fontWeight: 500 }}>
-              {t('catalog.inStockOnly', 'In Stock Only')}
+              {"En stock uniquement"}
             </Typography>
           }
           sx={{ mx: 0 }}

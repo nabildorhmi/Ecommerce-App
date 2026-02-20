@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -26,7 +25,6 @@ import { formatCurrency } from '../../../shared/utils/formatCurrency';
  * Shows order header, items, summary, status transition buttons, notes, and audit log.
  */
 export function AdminOrderDetailPage() {
-  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -83,7 +81,7 @@ export function AdminOrderDetailPage() {
         onClick={() => void navigate('/admin/orders')}
         sx={{ mb: 3 }}
       >
-        {t('orders.backToOrders')}
+        {"Retour aux commandes"}
       </Button>
 
       {/* ── Order Header ── */}
@@ -102,7 +100,7 @@ export function AdminOrderDetailPage() {
         >
           <Box>
             <Typography variant="caption" color="text.secondary">
-              {t('orders.date')}
+              {"Date"}
             </Typography>
             <Typography>
               {new Date(order.created_at).toLocaleString()}
@@ -112,7 +110,7 @@ export function AdminOrderDetailPage() {
             <>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  {t('orders.customer')}
+                  {"Client"}
                 </Typography>
                 <Typography
                   component={Link}
@@ -124,7 +122,7 @@ export function AdminOrderDetailPage() {
               </Box>
               <Box>
                 <Typography variant="caption" color="text.secondary">
-                  {t('adminUsers.email')}
+                  {"E-mail"}
                 </Typography>
                 <Typography>{order.user.email}</Typography>
               </Box>
@@ -132,13 +130,13 @@ export function AdminOrderDetailPage() {
           )}
           <Box>
             <Typography variant="caption" color="text.secondary">
-              {t('auth.phone')}
+              {"Téléphone"}
             </Typography>
             <Typography>{order.phone}</Typography>
           </Box>
           <Box>
             <Typography variant="caption" color="text.secondary">
-              {t('orders.city')}
+              {"Ville"}
             </Typography>
             <Typography>{order.city ?? order.delivery_zone?.city ?? '—'}</Typography>
           </Box>
@@ -148,17 +146,17 @@ export function AdminOrderDetailPage() {
       {/* ── Order Items ── */}
       <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
-          {t('orders.items')}
+          {"Articles"}
         </Typography>
         <TableContainer>
           <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>SKU</TableCell>
-                <TableCell>{t('admin.products.frenchName')}</TableCell>
-                <TableCell align="right">{t('admin.products.price')}</TableCell>
-                <TableCell align="right">{t('cart.quantity')}</TableCell>
-                <TableCell align="right">{t('checkout.subtotal')}</TableCell>
+                <TableCell>{"Nom en français"}</TableCell>
+                <TableCell align="right">{"Prix"}</TableCell>
+                <TableCell align="right">{"Quantité"}</TableCell>
+                <TableCell align="right">{"Sous-total"}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -182,13 +180,13 @@ export function AdminOrderDetailPage() {
         {/* Order Summary */}
         <Box mt={2} textAlign="right">
           <Typography variant="body2" color="text.secondary">
-            {t('checkout.subtotal')}: {formatCurrency(order.subtotal)}
+            {"Sous-total"}: {formatCurrency(order.subtotal)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {t('checkout.deliveryFee')}: {formatCurrency(order.delivery_fee)}
+            {"Frais de livraison"}: {formatCurrency(order.delivery_fee)}
           </Typography>
           <Typography fontWeight="bold" mt={0.5}>
-            {t('checkout.total')}: {formatCurrency(order.total)}
+            {"Total"}: {formatCurrency(order.total)}
           </Typography>
         </Box>
       </Paper>
@@ -197,7 +195,7 @@ export function AdminOrderDetailPage() {
       {order.allowed_transitions.length > 0 && (
         <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
           <Typography variant="h6" fontWeight="bold" mb={2}>
-            {t('orders.transitionOrder')}
+            {"Changer le statut"}
           </Typography>
 
           {/* Optional note for transition */}
@@ -207,8 +205,8 @@ export function AdminOrderDetailPage() {
                 fullWidth
                 multiline
                 rows={2}
-                label={t('orders.transitionNote')}
-                placeholder={t('orders.notePlaceholder')}
+                label={"Note (optionnel)"}
+                placeholder={"Saisir une note..."}
                 value={transitionNote}
                 onChange={(e) => setTransitionNote(e.target.value)}
                 size="small"
@@ -235,7 +233,7 @@ export function AdminOrderDetailPage() {
                         }
                         onClick={() => void handleTransition(targetStatus)}
                       >
-                        {t(`orders.status.${targetStatus}`, { defaultValue: targetStatus })} ✓
+                        {targetStatus} ✓
                       </Button>
                       <Button
                         variant="outlined"
@@ -244,7 +242,7 @@ export function AdminOrderDetailPage() {
                           setTransitionNote('');
                         }}
                       >
-                        {t('admin.products.cancel')}
+                        {"Annuler"}
                       </Button>
                     </>
                   ) : (
@@ -254,7 +252,7 @@ export function AdminOrderDetailPage() {
                       disabled={transitionMutation.isPending}
                       onClick={() => setPendingTransition(targetStatus)}
                     >
-                      {t(`orders.status.${targetStatus}`, { defaultValue: targetStatus })}
+                      {targetStatus}
                     </Button>
                   )}
                 </Box>
@@ -274,7 +272,7 @@ export function AdminOrderDetailPage() {
       {/* ── Order Notes ── */}
       <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
-          {t('orders.orderNotes')}
+          {"Notes"}
         </Typography>
 
         {order.note && (
@@ -286,14 +284,14 @@ export function AdminOrderDetailPage() {
         <Divider sx={{ my: 2 }} />
 
         <Typography variant="subtitle2" mb={1}>
-          {t('orders.addNote')}
+          {"Ajouter une note"}
         </Typography>
         <Box display="flex" gap={2} alignItems="flex-start">
           <TextField
             fullWidth
             multiline
             rows={2}
-            placeholder={t('orders.notePlaceholder')}
+            placeholder={"Saisir une note..."}
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             size="small"
@@ -306,7 +304,7 @@ export function AdminOrderDetailPage() {
               noteMutation.isPending ? <CircularProgress size={16} /> : undefined
             }
           >
-            {t('orders.submitNote')}
+            {"Enregistrer"}
           </Button>
         </Box>
 
@@ -321,16 +319,16 @@ export function AdminOrderDetailPage() {
       {order.status_logs && order.status_logs.length > 0 && (
         <Paper variant="outlined" sx={{ p: 3 }}>
           <Typography variant="h6" fontWeight="bold" mb={2}>
-            {t('orders.auditLog')}
+            {"Historique des statuts"}
           </Typography>
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('orders.date')}</TableCell>
-                  <TableCell>{t('orders.transition')}</TableCell>
-                  <TableCell>{t('orders.actor')}</TableCell>
-                  <TableCell>{t('orders.noteLabel')}</TableCell>
+                  <TableCell>{"Date"}</TableCell>
+                  <TableCell>{"Transition"}</TableCell>
+                  <TableCell>{"Acteur"}</TableCell>
+                  <TableCell>{"Note"}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

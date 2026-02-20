@@ -247,7 +247,7 @@ function FeaturedSection() {
                           sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, bgcolor: 'rgba(230,57,70,0.14)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
                         />
                       )}
-                      <Box sx={{ height: '100%', width: '100%', backgroundImage: `url(${imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+                      <Box sx={{ height: '100%', width: '100%', backgroundImage: `url("${imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
                     </Box>
                     <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
                       <Typography sx={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'primary.main', textTransform: 'uppercase', fontWeight: 600, mb: 0.5 }}>

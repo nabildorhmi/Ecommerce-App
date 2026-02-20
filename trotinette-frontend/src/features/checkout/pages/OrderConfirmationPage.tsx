@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useParams, useLocation, useNavigate, Link } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -20,7 +19,6 @@ interface LocationState {
 }
 
 export function OrderConfirmationPage() {
-  const { t } = useTranslation();
   const { orderNumber } = useParams<{ orderNumber: string }>();
   const location = useLocation();
   const navigate = useNavigate();
@@ -51,10 +49,10 @@ export function OrderConfirmationPage() {
         <Stack alignItems="center" spacing={2}>
           <CheckCircleOutlineIcon sx={{ fontSize: 72, color: 'success.main' }} />
           <Typography variant="h4" fontWeight={700} textAlign="center">
-            {t('checkout.orderSuccess')}
+            {"Commande confirmée !"}
           </Typography>
           <Typography variant="body1" color="text.secondary" textAlign="center">
-            {t('checkout.orderConfirmation')}
+            {"Votre commande a bien été enregistrée. Nous vous contacterons pour confirmer la livraison."}
           </Typography>
         </Stack>
 
@@ -64,7 +62,7 @@ export function OrderConfirmationPage() {
           sx={{ p: 3, width: '100%', textAlign: 'center', bgcolor: 'primary.50' }}
         >
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            {t('checkout.orderNumber')}
+            {"Numéro de commande"}
           </Typography>
           <Typography variant="h5" fontWeight={700} color="primary">
             {orderNumber ?? order.order_number}
@@ -74,7 +72,7 @@ export function OrderConfirmationPage() {
         {/* Order summary */}
         <Paper variant="outlined" sx={{ p: 2, width: '100%' }}>
           <Typography variant="h6" fontWeight={600} gutterBottom>
-            {t('checkout.orderSummary')}
+            {"Récapitulatif de commande"}
           </Typography>
 
           <Stack spacing={1} divider={<Divider />}>
@@ -90,7 +88,7 @@ export function OrderConfirmationPage() {
                     {item.product_sku}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {t('checkout.qty', 'Qty')}: {item.quantity} &times; {formatCurrency(item.unit_price)}
+                    {"Qté"}: {item.quantity} &times; {formatCurrency(item.unit_price)}
                   </Typography>
                 </Box>
                 <Typography variant="body2" fontWeight={600}>
@@ -104,18 +102,18 @@ export function OrderConfirmationPage() {
 
           <Stack spacing={0.5}>
             <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body2">{t('checkout.subtotal')}</Typography>
+              <Typography variant="body2">{"Sous-total"}</Typography>
               <Typography variant="body2">{formatCurrency(order.subtotal)}</Typography>
             </Stack>
             <Stack direction="row" justifyContent="space-between">
               <Typography variant="body2">
-                {t('checkout.deliveryFee')} ({order.city ?? order.delivery_zone?.city ?? '—'})
+                {"Frais de livraison"} ({order.city ?? order.delivery_zone?.city ?? '—'})
               </Typography>
               <Typography variant="body2">{formatCurrency(order.delivery_fee)}</Typography>
             </Stack>
             <Divider />
             <Stack direction="row" justifyContent="space-between">
-              <Typography variant="body1" fontWeight={700}>{t('checkout.total')}</Typography>
+              <Typography variant="body1" fontWeight={700}>{"Total"}</Typography>
               <Typography variant="body1" fontWeight={700} color="primary">
                 {formatCurrency(order.total)}
               </Typography>
@@ -126,7 +124,7 @@ export function OrderConfirmationPage() {
         {/* Shop contact */}
         <Paper variant="outlined" sx={{ p: 2, width: '100%' }}>
           <Typography variant="h6" fontWeight={600} gutterBottom>
-            {t('checkout.shopContact')}
+            {"Contacter la boutique"}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Button
@@ -152,7 +150,7 @@ export function OrderConfirmationPage() {
             variant="outlined"
             fullWidth
           >
-            {t('checkout.viewOrders')}
+            {"Voir mes commandes"}
           </Button>
           <Button
             component={Link}
@@ -160,7 +158,7 @@ export function OrderConfirmationPage() {
             variant="contained"
             fullWidth
           >
-            {t('checkout.continueShopping')}
+            {"Continuer mes achats"}
           </Button>
         </Stack>
       </Stack>

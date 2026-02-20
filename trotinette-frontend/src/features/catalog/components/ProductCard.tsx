@@ -56,7 +56,7 @@ export function ProductCard({ product }: ProductCardProps) {
       >
         {product.is_featured && (
           <Chip
-            label="Featured"
+            label="Vedette"
             size="small"
             sx={{
               position: 'absolute',
@@ -75,7 +75,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
         {!product.in_stock && (
           <Chip
-            label="Out of Stock"
+            label="Rupture de stock"
             size="small"
             sx={{
               position: 'absolute',
@@ -96,7 +96,7 @@ export function ProductCard({ product }: ProductCardProps) {
           sx={{
             width: '100%',
             height: '100%',
-            backgroundImage: `url(${imageUrl})`,
+            backgroundImage: `url("${imageUrl}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -183,7 +183,7 @@ export function ProductCard({ product }: ProductCardProps) {
               }}
             />
             <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 500 }}>
-              {product.in_stock ? 'In Stock' : 'Out of Stock'}
+              {product.in_stock ? 'En stock' : 'Épuisé'}
             </Typography>
           </Box>
         </Box>

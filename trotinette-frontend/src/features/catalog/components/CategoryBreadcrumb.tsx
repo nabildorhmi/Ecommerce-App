@@ -2,7 +2,6 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router';
-import { useTranslation } from 'react-i18next';
 
 interface CategoryBreadcrumbProps {
   category: { id: number; slug: string; name: string } | null | undefined;
@@ -14,8 +13,6 @@ interface CategoryBreadcrumbProps {
  * Category link navigates back to the catalog filtered by that category.
  */
 export function CategoryBreadcrumb({ category }: CategoryBreadcrumbProps) {
-  const { t } = useTranslation();
-
   return (
     <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
       <MuiLink
@@ -24,7 +21,7 @@ export function CategoryBreadcrumb({ category }: CategoryBreadcrumbProps) {
         color="inherit"
         underline="hover"
       >
-        {t('nav.home')}
+        Accueil
       </MuiLink>
 
       {category ? (
@@ -37,7 +34,7 @@ export function CategoryBreadcrumb({ category }: CategoryBreadcrumbProps) {
           {category.name}
         </MuiLink>
       ) : (
-        <Typography color="text.secondary">{t('nav.catalog')}</Typography>
+        <Typography color="text.secondary">Catalogue</Typography>
       )}
     </Breadcrumbs>
   );

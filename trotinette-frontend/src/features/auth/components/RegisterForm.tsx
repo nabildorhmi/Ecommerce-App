@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -37,7 +36,6 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
-  const { t } = useTranslation();
 
   const {
     register,
@@ -61,7 +59,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
       )}
 
       <TextField
-        label={t('auth.name')}
+        label={"Nom complet"}
         type="text"
         autoComplete="name"
         fullWidth
@@ -71,7 +69,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
       />
 
       <TextField
-        label={t('auth.email')}
+        label={"Adresse e-mail"}
         type="email"
         autoComplete="email"
         fullWidth
@@ -81,7 +79,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
       />
 
       <TextField
-        label={t('auth.phone')}
+        label={"Téléphone"}
         type="tel"
         autoComplete="tel"
         fullWidth
@@ -91,7 +89,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
       />
 
       <TextField
-        label={t('auth.password')}
+        label={"Mot de passe"}
         type="password"
         autoComplete="new-password"
         fullWidth
@@ -101,7 +99,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
       />
 
       <TextField
-        label={t('auth.confirmPassword')}
+        label={"Confirmer le mot de passe"}
         type="password"
         autoComplete="new-password"
         fullWidth
@@ -117,7 +115,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         disabled={isSubmitting}
         startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
       >
-        {t('auth.registerButton')}
+        {"S'inscrire"}
       </Button>
     </Box>
   );

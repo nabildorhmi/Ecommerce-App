@@ -7,7 +7,6 @@ import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useCartStore } from '../store';
 import { CartItem } from './CartItem';
@@ -19,7 +18,6 @@ interface CartDrawerProps {
 }
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const items = useCartStore((s) => s.items);
   const totalItems = useCartStore((s) => s.totalItems());
@@ -50,14 +48,14 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         }}
       >
         <Typography variant="h6" fontWeight={700}>
-          {t('cart.title')}{' '}
+          {"Panier"}{' '}
           {totalItems > 0 && (
             <Typography component="span" variant="body2" color="text.secondary">
-              ({t('cart.itemCount', { count: totalItems })})
+              ({`${totalItems} article(s)`})
             </Typography>
           )}
         </Typography>
-        <IconButton onClick={onClose} aria-label={t('common.close', 'Close')}>
+        <IconButton onClick={onClose} aria-label="Fermer">
           <CloseIcon />
         </IconButton>
       </Box>
@@ -67,7 +65,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {items.length === 0 ? (
           <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ py: 8 }}>
             <ShoppingCartOutlinedIcon sx={{ fontSize: 64, color: 'text.disabled' }} />
-            <Typography color="text.secondary">{t('cart.empty')}</Typography>
+            <Typography color="text.secondary">{"Votre panier est vide"}</Typography>
           </Stack>
         ) : (
           <Box>
@@ -83,7 +81,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         <Stack spacing={1.5}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="body1" fontWeight={600}>
-              {t('cart.subtotal')}
+              {"Sous-total"}
             </Typography>
             <Typography variant="body1" fontWeight={700} color="primary">
               {formatCurrency(subtotalCentimes)}
@@ -97,7 +95,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             onClick={handleCheckout}
             disabled={items.length === 0}
           >
-            {t('cart.checkout')}
+            {"Passer la commande"}
           </Button>
         </Stack>
       </Box>

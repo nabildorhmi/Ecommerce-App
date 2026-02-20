@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
@@ -14,7 +13,6 @@ import { loginApi, registerApi } from '../api/auth';
 import { useAuthStore } from '../store';
 
 export function LoginPage() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tab, setTab] = useState(0);
   const [loginError, setLoginError] = useState<string | null>(null);
@@ -41,7 +39,7 @@ export function LoginPage() {
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? t('auth.loginError');
+          ?.message ?? "Identifiants incorrects";
       setLoginError(message);
     },
   });
@@ -55,7 +53,7 @@ export function LoginPage() {
     onError: (err: unknown) => {
       const message =
         (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? t('auth.registerError');
+          ?.message ?? "Erreur lors de l'inscription";
       setRegisterError(message);
     },
   });
@@ -80,7 +78,7 @@ export function LoginPage() {
     <Container maxWidth="sm" sx={{ py: 8 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-          {tab === 0 ? t('auth.login') : t('auth.register')}
+          {tab === 0 ? "Connexion" : "Inscription"}
         </Typography>
 
         <Tabs
@@ -93,8 +91,8 @@ export function LoginPage() {
           centered
           sx={{ mb: 3 }}
         >
-          <Tab label={t('auth.login')} />
-          <Tab label={t('auth.register')} />
+          <Tab label={"Connexion"} />
+          <Tab label={"Inscription"} />
         </Tabs>
 
         <Box>

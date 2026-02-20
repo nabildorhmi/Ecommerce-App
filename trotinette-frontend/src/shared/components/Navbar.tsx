@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router';
-import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -30,7 +29,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import { useAuthStore } from '../../features/auth/store';
-import { LanguageSwitcher } from './LanguageSwitcher';
 import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
 import { useCategories } from '../../features/catalog/api/categories';
@@ -42,7 +40,6 @@ import miraiLogo from '../../assets/miraiTech-Logo.png';
  * MiraiTech Navbar — sticky, transparent/dark blur, dynamic categories.
  */
 export function Navbar() {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
@@ -123,7 +120,7 @@ export function Navbar() {
                 '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
               }}
             >
-              {t('nav.allScooters', 'ALL SCOOTERS')}
+              ALL SCOOTERS
             </Button>
 
             {categories.length > 0 && (
@@ -143,7 +140,7 @@ export function Navbar() {
                     '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.04)' },
                   }}
                 >
-                  {t('nav.categories', 'CATEGORIES')}
+                  CATEGORIES
                 </Button>
                 <Menu
                   anchorEl={catMenuAnchor}
@@ -203,8 +200,6 @@ export function Navbar() {
               </IconButton>
             </Tooltip>
 
-            <LanguageSwitcher />
-
             <CartBadge onToggle={() => setDrawerOpen(true)} />
 
             {user ? (
@@ -213,7 +208,7 @@ export function Navbar() {
                   <>
                     <IconButton
                       onClick={(e) => setAdminMenuAnchor(e.currentTarget)}
-                      aria-label={t('nav.admin')}
+                      aria-label="Administration"
                       size="small"
                       sx={{ color: 'text.secondary', '&:hover': { color: '#00C2FF' } }}
                     >
@@ -238,10 +233,10 @@ export function Navbar() {
                       }}
                     >
                       {[
-                        { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: t('admin.products.title'), badge: null },
-                        { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: t('admin.categories.title', 'Categories'), badge: null },
-                        { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: t('orders.ordersNav'), badge: null },
-                        { to: '/admin/delivery-zones', icon: <LocalShippingIcon fontSize="small" />, label: t('deliveryZones.title'), badge: null },
+                        { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits', badge: null },
+                        { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories', badge: null },
+                        { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes', badge: null },
+                        { to: '/admin/delivery-zones', icon: <LocalShippingIcon fontSize="small" />, label: 'Zones de livraison', badge: null },
                       ].map(({ to, icon, label }) => (
                         <MenuItem
                           key={to}
@@ -290,12 +285,12 @@ export function Navbar() {
                   <MenuItem component={Link} to="/profile" onClick={closeUserMenu}
                     sx={{ fontSize: '0.85rem', py: 1, borderLeft: '2px solid transparent', color: 'text.primary', '&:hover': { color: '#00C2FF', backgroundColor: 'rgba(0,194,255,0.08)', borderLeftColor: '#00C2FF' } }}>
                     <ListItemIcon sx={{ color: '#00C2FF', minWidth: 32 }}><PersonOutlineIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>{t('nav.account')}</ListItemText>
+                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>Mon compte</ListItemText>
                   </MenuItem>
                   <MenuItem component={Link} to="/orders" onClick={closeUserMenu}
                     sx={{ fontSize: '0.85rem', py: 1, borderLeft: '2px solid transparent', color: 'text.primary', '&:hover': { color: '#00C2FF', backgroundColor: 'rgba(0,194,255,0.08)', borderLeftColor: '#00C2FF' } }}>
                     <ListItemIcon sx={{ color: '#00C2FF', minWidth: 32 }}><ReceiptLongIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>{t('orders.myOrders')}</ListItemText>
+                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>Mes commandes</ListItemText>
                   </MenuItem>
                   <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
                   <MenuItem
@@ -303,7 +298,7 @@ export function Navbar() {
                     sx={{ fontSize: '0.85rem', py: 1, color: '#E63946', '&:hover': { backgroundColor: 'rgba(230,57,70,0.08)' } }}
                   >
                     <ListItemIcon sx={{ color: '#E63946', minWidth: 32 }}><LogoutIcon fontSize="small" /></ListItemIcon>
-                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem', color: '#E63946' }}>{t('nav.logout')}</ListItemText>
+                    <ListItemText primaryTypographyProps={{ fontSize: '0.85rem', color: '#E63946' }}>Déconnexion</ListItemText>
                   </MenuItem>
                 </Menu>
               </>
@@ -315,7 +310,7 @@ export function Navbar() {
                 size="small"
                 sx={{ ml: 0.5, fontSize: '0.72rem', letterSpacing: '0.08em', py: 0.5, px: 1.5 }}
               >
-                {t('nav.login')}
+                Connexion
               </Button>
             )}
 
