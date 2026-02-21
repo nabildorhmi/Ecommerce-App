@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { Link } from 'react-router';
 import { useCategories } from '../../features/catalog/api/categories';
+import miraiLogo from '../../assets/miraiTech-Logo.png';
 
 /**
  * MiraiTech Footer — dark, minimal, Japanese-inspired.
@@ -28,23 +29,13 @@ export function Footer() {
         <Grid container spacing={4} sx={{ mb: 5 }}>
           {/* Brand Column */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '4px',
-                  background: 'linear-gradient(135deg, #00C2FF 0%, #0099CC 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Typography sx={{ fontWeight: 900, fontSize: 13, color: '#0B0B0E', lineHeight: 1 }}>M</Typography>
-              </Box>
-              <Typography sx={{ fontWeight: 800, letterSpacing: '0.12em', color: '#F5F7FA', fontSize: '1rem' }}>
-                MIRAI<Box component="span" sx={{ color: '#00C2FF' }}>TECH</Box>
-              </Typography>
+                component="img"
+                src={miraiLogo}
+                alt="MiraiTech"
+                sx={{ height: 35, width: 'auto' }}
+              />
             </Box>
             <Typography
               variant="body2"

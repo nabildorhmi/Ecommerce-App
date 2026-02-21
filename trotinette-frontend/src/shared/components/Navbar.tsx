@@ -22,6 +22,7 @@ import Paper from '@mui/material/Paper';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
+import Avatar from '@mui/material/Avatar';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -88,7 +89,7 @@ export function Navbar() {
       const res = await apiClient.get('/products', {
         params: { 'filter[search]': searchQuery.trim(), per_page: 6 },
       });
-      return res.data as { data: Array<{ id: number; name: string; slug: string; price: number }> };
+      return res.data as { data: Array<{ id: number; name: string; slug: string; price: number; images?: { thumbnail: string }[] }> };
     },
     enabled: searchQuery.trim().length > 1,
     staleTime: 30_000,
@@ -288,9 +289,16 @@ export function Navbar() {
                           sx={{
                             py: 0.75,
                             px: 1.5,
+                            gap: 1.5,
                             '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)' },
                           }}
                         >
+                          <Avatar
+                            src={product.images?.[0]?.thumbnail}
+                            alt={product.name}
+                            variant="rounded"
+                            sx={{ width: 36, height: 36, flexShrink: 0, bgcolor: 'rgba(255,255,255,0.06)' }}
+                          />
                           <ListItemText
                             primary={product.name}
                             primaryTypographyProps={{ fontSize: '0.83rem', fontWeight: 500, noWrap: true }}
@@ -501,8 +509,14 @@ export function Navbar() {
                   <ListItemButton
                     key={product.id}
                     onClick={() => handleSuggestionClick(product.slug)}
-                    sx={{ py: 0.75, px: 1.5, '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)' } }}
+                    sx={{ py: 0.75, px: 1.5, gap: 1.5, '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)' } }}
                   >
+                    <Avatar
+                      src={product.images?.[0]?.thumbnail}
+                      alt={product.name}
+                      variant="rounded"
+                      sx={{ width: 32, height: 32, flexShrink: 0, bgcolor: 'rgba(255,255,255,0.06)' }}
+                    />
                     <ListItemText
                       primary={product.name}
                       primaryTypographyProps={{ fontSize: '0.83rem', fontWeight: 500 }}

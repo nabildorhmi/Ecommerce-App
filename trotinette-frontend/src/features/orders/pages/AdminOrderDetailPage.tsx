@@ -15,10 +15,22 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAdminOrder, useTransitionOrder, useAddOrderNote } from '../api/orders';
 import { OrderStatusChip } from '../components/OrderStatusChip';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
+
+/** French labels for status transition buttons */
+const STATUS_LABELS: Record<string, string> = {
+  confirmed:  'Confirmer',
+  dispatched: 'Expédier',
+  delivered:  'Marquer livré',
+  cancelled:  'Annuler',
+};
 
 /**
  * Admin order detail page.
@@ -36,7 +48,7 @@ export function AdminOrderDetailPage() {
 
   const [noteText, setNoteText] = useState('');
   const [transitionNote, setTransitionNote] = useState('');
-  const [pendingTransition, setPendingTransition] = useState<string | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<string | null>(null);
 
   const order = data?.data;
 
@@ -46,7 +58,7 @@ export function AdminOrderDetailPage() {
       status,
       note: transitionNote || undefined,
     });
-    setPendingTransition(null);
+    setConfirmDialog(null);
     setTransitionNote('');
   };
 
@@ -198,64 +210,19 @@ export function AdminOrderDetailPage() {
             {"Changer le statut"}
           </Typography>
 
-          {/* Optional note for transition */}
-          {pendingTransition && (
-            <Box mb={2}>
-              <TextField
-                fullWidth
-                multiline
-                rows={2}
-                label={"Note (optionnel)"}
-                placeholder={"Saisir une note..."}
-                value={transitionNote}
-                onChange={(e) => setTransitionNote(e.target.value)}
-                size="small"
-              />
-            </Box>
-          )}
-
           <Box display="flex" gap={1} flexWrap="wrap">
             {order.allowed_transitions.map((targetStatus) => {
               const isCancel = targetStatus === 'cancelled';
-              const isThisTransition = pendingTransition === targetStatus;
               return (
-                <Box key={targetStatus} display="flex" gap={1}>
-                  {isThisTransition ? (
-                    <>
-                      <Button
-                        variant="contained"
-                        color={isCancel ? 'error' : 'primary'}
-                        disabled={transitionMutation.isPending}
-                        startIcon={
-                          transitionMutation.isPending ? (
-                            <CircularProgress size={16} />
-                          ) : undefined
-                        }
-                        onClick={() => void handleTransition(targetStatus)}
-                      >
-                        {targetStatus} ✓
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={() => {
-                          setPendingTransition(null);
-                          setTransitionNote('');
-                        }}
-                      >
-                        {"Annuler"}
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      color={isCancel ? 'error' : 'primary'}
-                      disabled={transitionMutation.isPending}
-                      onClick={() => setPendingTransition(targetStatus)}
-                    >
-                      {targetStatus}
-                    </Button>
-                  )}
-                </Box>
+                <Button
+                  key={targetStatus}
+                  variant="outlined"
+                  color={isCancel ? 'error' : 'primary'}
+                  disabled={transitionMutation.isPending}
+                  onClick={() => setConfirmDialog(targetStatus)}
+                >
+                  {STATUS_LABELS[targetStatus] ?? targetStatus}
+                </Button>
               );
             })}
           </Box>
@@ -263,11 +230,56 @@ export function AdminOrderDetailPage() {
           {transitionMutation.error && (
             <Alert severity="error" sx={{ mt: 2 }}>
               {(transitionMutation.error as { response?: { data?: { message?: string } } })
-                ?.response?.data?.message ?? 'Transition failed'}
+                ?.response?.data?.message ?? 'Transition échouée'}
             </Alert>
           )}
         </Paper>
       )}
+
+      {/* ── Confirmation Dialog ── */}
+      <Dialog
+        open={Boolean(confirmDialog)}
+        onClose={() => { setConfirmDialog(null); setTransitionNote(''); }}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Confirmer l'action</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Typography variant="body2" color="text.secondary" mb={2}>
+            {confirmDialog === 'cancelled'
+              ? 'Êtes-vous sûr de vouloir annuler cette commande ?'
+              : `Passer le statut à « ${STATUS_LABELS[confirmDialog ?? ''] ?? confirmDialog} » ?`}
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={2}
+            label="Note (optionnel)"
+            placeholder="Saisir une note..."
+            value={transitionNote}
+            onChange={(e) => setTransitionNote(e.target.value)}
+            size="small"
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => { setConfirmDialog(null); setTransitionNote(''); }}
+            variant="outlined"
+            disabled={transitionMutation.isPending}
+          >
+            Annuler
+          </Button>
+          <Button
+            onClick={() => confirmDialog && void handleTransition(confirmDialog)}
+            variant="contained"
+            color={confirmDialog === 'cancelled' ? 'error' : 'primary'}
+            disabled={transitionMutation.isPending}
+            startIcon={transitionMutation.isPending ? <CircularProgress size={16} /> : undefined}
+          >
+            Confirmer
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* ── Order Notes ── */}
       <Paper variant="outlined" sx={{ p: 3, mb: 3 }}>
