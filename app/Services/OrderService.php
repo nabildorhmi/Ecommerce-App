@@ -3,9 +3,17 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Mail\NewOrderAdmin;
+use App\Mail\NewOrderCustomer;
+use App\Mail\OrderCancelled;
+use App\Mail\OrderConfirmed;
+use App\Mail\OrderDelivered;
+use App\Mail\OrderDispatched;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class OrderService
@@ -16,7 +24,7 @@ class OrderService
      */
     public function createOrder(array $data, int $userId): Order
     {
-        return DB::transaction(function () use ($data, $userId) {
+        $order = DB::transaction(function () use ($data, $userId) {
             // a. Extract city (no delivery zone, delivery fee = 0)
             $city = $data['city'];
 
@@ -114,8 +122,23 @@ class OrderService
             ]);
 
             // j. Return with eager-loaded relations
-            return $order->load(['items.product', 'statusLogs']);
+            return $order->load(['items.product', 'statusLogs', 'user']);
         });
+
+        // k. Send emails AFTER successful DB transaction
+        if ($order->user && $order->user->email) {
+            Mail::to($order->user->email)->send(new NewOrderCustomer($order));
+        }
+
+        // l. Notify all admin users about the new order
+        $admins = User::role(['admin', 'global_admin'])->get();
+        foreach ($admins as $admin) {
+            if ($admin->email) {
+                Mail::to($admin->email)->send(new NewOrderAdmin($order));
+            }
+        }
+
+        return $order;
     }
 
     /**
@@ -144,7 +167,24 @@ class OrderService
             ]);
         });
 
-        return $order->fresh(['items.product', 'statusLogs']);
+        $order = $order->fresh(['items.product', 'statusLogs', 'user']);
+
+        // Dispatch queued email to the customer AFTER successful DB transaction
+        if ($order->user && $order->user->email) {
+            $mail = match ($newStatus) {
+                OrderStatus::Confirmed  => new OrderConfirmed($order),
+                OrderStatus::Dispatched => new OrderDispatched($order),
+                OrderStatus::Delivered  => new OrderDelivered($order),
+                OrderStatus::Cancelled  => new OrderCancelled($order, $note),
+                default                 => null,
+            };
+
+            if ($mail) {
+                Mail::to($order->user->email)->send($mail);
+            }
+        }
+
+        return $order;
     }
 
     /**
