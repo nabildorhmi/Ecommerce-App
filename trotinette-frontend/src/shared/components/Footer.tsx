@@ -5,11 +5,14 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { Link } from 'react-router';
+import { useCategories } from '../../features/catalog/api/categories';
 
 /**
  * MiraiTech Footer — dark, minimal, Japanese-inspired.
  */
 export function Footer() {
+  const { data } = useCategories();
+  const categories = data?.data ?? [];
   return (
     <Box
       component="footer"
@@ -24,7 +27,7 @@ export function Footer() {
       <Container maxWidth="xl">
         <Grid container spacing={4} sx={{ mb: 5 }}>
           {/* Brand Column */}
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 2 }}>
               <Box
                 sx={{
@@ -69,7 +72,7 @@ export function Footer() {
           </Grid>
 
           {/* Products Column */}
-          <Grid size={{ xs: 6, md: 2 }}>
+          <Grid size={{ xs: 6, md: 3 }}>
             <Typography
               sx={{
                 fontSize: '0.68rem',
@@ -83,11 +86,24 @@ export function Footer() {
               Produits
             </Typography>
             <Stack spacing={1}>
-              {['Tous les scooters', 'Scooters urbains', 'Tout-terrain', 'Longue portée', 'Accessoires'].map((item) => (
+              <Box
+                component={Link}
+                to="/products"
+                sx={{
+                  fontSize: '0.82rem',
+                  color: '#9CA3AF',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  '&:hover': { color: '#F5F7FA' },
+                }}
+              >
+                Tous les produits
+              </Box>
+              {categories.map((cat) => (
                 <Box
-                  key={item}
+                  key={cat.id}
                   component={Link}
-                  to="/products"
+                  to={`/products?filter[category_id]=${cat.id}`}
                   sx={{
                     fontSize: '0.82rem',
                     color: '#9CA3AF',
@@ -96,14 +112,14 @@ export function Footer() {
                     '&:hover': { color: '#F5F7FA' },
                   }}
                 >
-                  {item}
+                  {cat.name}
                 </Box>
               ))}
             </Stack>
           </Grid>
 
           {/* Company Column */}
-          <Grid size={{ xs: 6, md: 2 }}>
+          <Grid size={{ xs: 6, md: 3 }}>
             <Typography
               sx={{
                 fontSize: '0.68rem',
@@ -170,48 +186,6 @@ export function Footer() {
                 Mentions legales
               </Box>
             </Stack>
-          </Grid>
-
-          {/* Technology highlight */}
-          <Grid size={{ xs: 12, md: 4 }}>
-            <Typography
-              sx={{
-                fontSize: '0.68rem',
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                color: '#00C2FF',
-                textTransform: 'uppercase',
-                mb: 2,
-              }}
-            >
-              Technologie
-            </Typography>
-            <Grid container spacing={1}>
-              {[
-                { label: 'Batterie longue portée', sub: "Jusqu'à 80km" },
-                { label: 'Écran connecté', sub: 'Application mobile' },
-                { label: 'Freinage récupératif', sub: "Récupération d'énergie" },
-                { label: 'Contrôle via app', sub: 'iOS & Android' },
-              ].map(({ label, sub }) => (
-                <Grid key={label} size={{ xs: 6 }}>
-                  <Box
-                    sx={{
-                      p: 1.5,
-                      borderRadius: '6px',
-                      border: '1px solid #1E1E28',
-                      backgroundColor: '#111116',
-                    }}
-                  >
-                    <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#F5F7FA', mb: 0.25 }}>
-                      {label}
-                    </Typography>
-                    <Typography sx={{ fontSize: '0.65rem', color: '#9CA3AF' }}>
-                      {sub}
-                    </Typography>
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
           </Grid>
         </Grid>
 
