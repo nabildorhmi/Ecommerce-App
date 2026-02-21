@@ -56,9 +56,7 @@ export interface UpdateProfileData {
   address_street?: string | null;
 }
 
-export interface UpdateProfileResponse {
-  data: User;
-}
+export type UpdateProfileResponse = User;
 
 export async function updateProfileApi(
   data: UpdateProfileData

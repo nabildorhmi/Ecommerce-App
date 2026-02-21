@@ -60,8 +60,10 @@ export function ProfilePage() {
 
   const updateMutation = useMutation({
     mutationFn: updateProfileApi,
-    onSuccess: ({ data: updatedUser }) => {
-      useAuthStore.getState().updateUser(updatedUser);
+    onSuccess: (updatedUser) => {
+      if (updatedUser?.id) {
+        useAuthStore.getState().updateUser(updatedUser);
+      }
       setSuccessOpen(true);
       setServerError(null);
     },
