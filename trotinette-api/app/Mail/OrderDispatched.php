@@ -8,7 +8,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderConfirmed extends Mailable
+class OrderDispatched extends Mailable
 {
     use SerializesModels;
 
@@ -25,7 +25,7 @@ class OrderConfirmed extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Votre commande a été confirmée - {$this->order->order_number}",
+            subject: "Votre commande est en route - {$this->order->order_number}",
         );
     }
 
@@ -35,7 +35,7 @@ class OrderConfirmed extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.order-confirmed',
+            markdown: 'emails.order-dispatched',
             with: [
                 'order' => $this->order,
             ],

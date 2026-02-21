@@ -1,13 +1,13 @@
 <x-mail::message>
-# Confirmation de commande
+# Votre commande est en route
 
 Bonjour {{ $order->user->name }},
 
-Nous avons bien reçu votre commande **{{ $order->order_number }}**. Votre commande est actuellement en attente de confirmation.
+Votre commande **{{ $order->order_number }}** a été expédiée et est en cours de livraison.
 
 ## Détails de la commande
 
-**Statut:** En attente
+**Statut:** En cours de livraison
 **Téléphone:** {{ $order->phone }}
 **Ville:** {{ $order->city }}
 
@@ -19,15 +19,9 @@ Nous avons bien reçu votre commande **{{ $order->order_number }}**. Votre comma
 @endforeach
 </x-mail::table>
 
-**Sous-total:** {{ number_format($order->subtotal / 100, 2) }} MAD
-**Frais de livraison:** {{ number_format($order->delivery_fee / 100, 2) }} MAD
 **Total:** {{ number_format($order->total / 100, 2) }} MAD
 
-@if($order->note)
-**Note:** {{ $order->note }}
-@endif
-
-Nous vous contacterons bientôt pour confirmer votre commande.
+Notre livreur prendra contact avec vous prochainement pour convenir de l'heure de livraison.
 
 Merci pour votre confiance,<br>
 {{ config('app.name') }}
