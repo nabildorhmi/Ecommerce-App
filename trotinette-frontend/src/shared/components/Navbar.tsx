@@ -16,6 +16,8 @@ import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
+import InputBase from '@mui/material/InputBase';
+import SearchIcon from '@mui/icons-material/Search';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -67,6 +69,8 @@ export function Navbar() {
   const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
   const [adminMenuAnchor, setAdminMenuAnchor] = useState<null | HTMLElement>(null);
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   const handleLogout = () => {
     clearAuth();
@@ -76,6 +80,16 @@ export function Navbar() {
   const closeUserMenu = () => setUserMenuAnchor(null);
   const closeAdminMenu = () => setAdminMenuAnchor(null);
   const closeCatMenu = () => setCatMenuAnchor(null);
+
+  const handleSearch = () => {
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      void navigate(`/products?filter[search]=${encodeURIComponent(trimmed)}`);
+      setSearchQuery('');
+      setMobileSearchOpen(false);
+      setMobileOpen(false);
+    }
+  };
 
   const isActive = (path: string) => location.pathname.startsWith(path);
 
@@ -183,6 +197,39 @@ export function Navbar() {
                 </Menu>
               </>
             )}
+
+            {/* Desktop search */}
+            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+              <Box
+                component="form"
+                onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSearch(); }}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  bgcolor: 'rgba(255,255,255,0.06)',
+                  borderRadius: '6px',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  px: 1.5,
+                  py: 0.25,
+                  transition: 'border-color 0.2s',
+                  '&:focus-within': { borderColor: 'primary.main' },
+                }}
+              >
+                <SearchIcon sx={{ fontSize: '1rem', color: 'text.secondary', mr: 1 }} />
+                <InputBase
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  sx={{
+                    fontSize: '0.8rem',
+                    color: 'text.primary',
+                    width: 160,
+                    '& input::placeholder': { color: 'text.secondary', opacity: 1 },
+                  }}
+                />
+              </Box>
+            </Box>
           </Box>
 
           {/* ── Right Actions ── */}
@@ -358,6 +405,21 @@ export function Navbar() {
         </Box>
         <Divider sx={{ borderColor: 'divider' }} />
         <Stack sx={{ p: 2, gap: 0.5 }}>
+          {/* Mobile search */}
+          <Box
+            component="form"
+            onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSearch(); }}
+            sx={{ display: 'flex', alignItems: 'center', bgcolor: 'action.hover', borderRadius: '6px', px: 1.5, py: 0.5, mb: 1 }}
+          >
+            <SearchIcon sx={{ fontSize: '1rem', color: 'text.secondary', mr: 1 }} />
+            <InputBase
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{ fontSize: '0.85rem', color: 'text.primary', flex: 1 }}
+            />
+          </Box>
+
           <Button
             component={Link} to="/products"
             onClick={() => setMobileOpen(false)}
