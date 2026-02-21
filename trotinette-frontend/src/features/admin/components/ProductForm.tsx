@@ -88,7 +88,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     description: product?.description ?? '',
     price: product ? product.price / 100 : 0,
     stock_quantity: product?.stock_quantity ?? 0,
-    category_id: product?.category_id ?? null,
+    category_id: product?.category_id ?? product?.category?.id ?? null,
     is_active: product?.is_active ?? true,
     is_featured: product?.is_featured ?? false,
     attributes: {
@@ -203,7 +203,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                 <InputLabel>Categorie / Category</InputLabel>
                 <Select
                   label="Categorie / Category"
-                  value={field.value ?? ''}
+                  value={field.value != null ? String(field.value) : ''}
                   onChange={(e) => {
                     const val = String(e.target.value);
                     field.onChange(val === '' ? null : Number(val));

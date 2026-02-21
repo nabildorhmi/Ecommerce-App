@@ -25,7 +25,8 @@ export interface AdminProduct {
   stock_quantity: number;
   is_active: boolean;
   is_featured: boolean;
-  category_id: number | null;
+  category_id: number | null;       // may be absent in API response
+  category?: { id: number; name: string; slug: string; is_active: boolean } | null;
   attributes: Record<string, string | number>;
   images: ProductImage[];
   created_at: string;
