@@ -36,8 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/orders',         [OrderController::class, 'store']);
     Route::get('/orders/{order}',  [OrderController::class, 'show']);
 
-    // Admin-only routes
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
+    // Admin-only routes (both admin and global_admin can access)
+    Route::middleware('role:admin|global_admin')->prefix('admin')->group(function () {
         Route::get('/ping', fn() => response()->json(['status' => 'admin ok']));
 
         // Product CRUD
@@ -61,6 +61,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users',                          [AdminUserController::class, 'index']);
         Route::get('/users/{user}',                   [AdminUserController::class, 'show']);
         Route::patch('/users/{user}/deactivate',      [AdminUserController::class, 'deactivate']);
+        Route::patch('/users/{user}/role',            [AdminUserController::class, 'updateRole']);
+        Route::patch('/users/{user}/activate',        [AdminUserController::class, 'activate']);
 
         // Delivery zone CRUD
         Route::get('/delivery-zones',                           [AdminDeliveryZoneController::class, 'index']);
