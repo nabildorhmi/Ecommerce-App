@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
@@ -21,11 +20,9 @@ import { usePlaceOrder } from '../api/orders';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import { RegisterForm } from '../../auth/components/RegisterForm';
 import { registerApi, type RegisterData } from '../../auth/api/auth';
-import { MOROCCAN_CITIES } from '../../../shared/constants/moroccanCities';
 
 const checkoutSchema = z.object({
   phone: z.string().min(1, { error: 'Phone required' }).regex(/^\+?\d{6,15}$/, { error: 'Invalid phone number' }),
-  city: z.string().min(1, { error: 'City required' }).max(100, { error: 'City must be 100 characters or less' }),
   note: z.string().max(500, { error: 'Note must be 500 characters or less' }).optional(),
 });
 
@@ -38,7 +35,6 @@ export function CheckoutPage() {
   const user = useAuthStore((s) => s.user);
 
   const [registerError, setRegisterError] = useState<string | null>(null);
-
   const { mutate: placeOrder, isPending, error: orderError } = usePlaceOrder();
 
   // Registration mutation
@@ -64,13 +60,11 @@ export function CheckoutPage() {
     register,
     handleSubmit,
     setValue,
-    control,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       phone: user?.phone ?? '',
-      city: '',
       note: '',
     },
   });
@@ -91,7 +85,7 @@ export function CheckoutPage() {
   const onSubmit = (data: CheckoutFormData) => {
     placeOrder({
       phone: data.phone,
-      city: data.city,
+      city: user?.address_city ?? '',
       items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
       note: data.note || undefined,
     });
@@ -115,14 +109,14 @@ export function CheckoutPage() {
       </Typography>
 
       <Stack spacing={3}>
-        {/* Registration section for guests */}
+        {/* Guest info section */}
         {!user && (
           <Paper variant="outlined" sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              {"Créer un compte"}
+              {"Entrez vos informations"}
             </Typography>
             <Typography variant="body2" color="text.secondary" mb={2}>
-              {"Créez un compte pour passer votre commande"}
+              {"Veuillez renseigner vos informations pour passer votre commande"}
             </Typography>
             <RegisterForm onSubmit={handleRegister} error={registerError} />
           </Paper>
@@ -139,6 +133,17 @@ export function CheckoutPage() {
             <Alert severity="info">
               {"Paiement à la livraison"}
             </Alert>
+
+          {/* Delivery city (read-only, from profile) */}
+          {user?.address_city && (
+            <TextField
+              label={"Ville de livraison"}
+              value={user.address_city}
+              fullWidth
+              disabled
+              InputProps={{ readOnly: true }}
+            />
+          )}
 
           {/* Order items (read-only) */}
           <Paper variant="outlined" sx={{ p: 2 }}>
@@ -168,40 +173,6 @@ export function CheckoutPage() {
               ))}
             </Stack>
           </Paper>
-
-          {/* Country (fixed to Morocco) */}
-          <TextField
-            label="Pays"
-            value="Maroc"
-            fullWidth
-            disabled
-            InputProps={{ readOnly: true }}
-          />
-
-          {/* Delivery city */}
-          <Controller
-            name="city"
-            control={control}
-            render={({ field: { onChange, value, ref } }) => (
-              <Autocomplete
-                options={MOROCCAN_CITIES}
-                value={value || null}
-                onChange={(_e, newValue) => onChange(newValue ?? '')}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Ville de livraison"
-                    required
-                    error={Boolean(errors.city)}
-                    helperText={errors.city?.message}
-                    inputRef={ref}
-                  />
-                )}
-                noOptionsText="Aucune ville trouvée"
-                fullWidth
-              />
-            )}
-          />
 
           {/* Phone number */}
           <TextField
@@ -268,7 +239,7 @@ export function CheckoutPage() {
 
           {!user && (
             <Typography variant="body2" color="text.secondary" textAlign="center">
-              {"Veuillez créer un compte ci-dessus pour continuer"}
+              {"Veuillez renseigner vos informations ci-dessus pour continuer"}
             </Typography>
           )}
         </Stack>

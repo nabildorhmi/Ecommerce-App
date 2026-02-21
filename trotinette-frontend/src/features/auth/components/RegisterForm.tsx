@@ -1,11 +1,17 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import { MOROCCAN_CITIES } from '../../../shared/constants/moroccanCities';
 
 const registerSchema = z
   .object({
@@ -18,6 +24,7 @@ const registerSchema = z
       .string()
       .min(8, 'Minimum 8 chiffres / Minimum 8 digits')
       .max(20),
+    address_city: z.string().min(1, 'Ville requise / City required'),
     password: z.string().min(8, 'Minimum 8 caracteres / Minimum 8 characters'),
     password_confirmation: z
       .string()
@@ -40,6 +47,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -86,6 +94,38 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.phone)}
         helperText={errors.phone?.message}
         {...register('phone')}
+      />
+
+      {/* Pays */}
+      <FormControl fullWidth>
+        <InputLabel>Pays</InputLabel>
+        <Select label="Pays" value="Maroc" readOnly>
+          <MenuItem value="Maroc">Maroc</MenuItem>
+        </Select>
+      </FormControl>
+
+      {/* Ville */}
+      <Controller
+        name="address_city"
+        control={control}
+        render={({ field }) => (
+          <FormControl fullWidth required error={Boolean(errors.address_city)}>
+            <InputLabel>Ville</InputLabel>
+            <Select
+              {...field}
+              label="Ville"
+              MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
+            >
+              <MenuItem value="" disabled>
+                <em>Choisir une ville</em>
+              </MenuItem>
+              {MOROCCAN_CITIES.map((city) => (
+                <MenuItem key={city} value={city}>{city}</MenuItem>
+              ))}
+            </Select>
+            {errors.address_city && <FormHelperText>{errors.address_city.message}</FormHelperText>}
+          </FormControl>
+        )}
       />
 
       <TextField

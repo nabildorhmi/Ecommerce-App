@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import AppBar from '@mui/material/AppBar';
@@ -17,6 +17,11 @@ import Drawer from '@mui/material/Drawer';
 import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
+import Popper from '@mui/material/Popper';
+import Paper from '@mui/material/Paper';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -70,7 +75,26 @@ export function Navbar() {
   const [adminMenuAnchor, setAdminMenuAnchor] = useState<null | HTMLElement>(null);
   const [catMenuAnchor, setCatMenuAnchor] = useState<null | HTMLElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  const [searchFocused, setSearchFocused] = useState(false);
+  const [searchAnchorEl, setSearchAnchorEl] = useState<HTMLDivElement | null>(null);
+  const handleSearchBoxRef = useCallback((el: HTMLDivElement | null) => {
+    setSearchAnchorEl(el);
+  }, []);
+
+  // Search suggestions query
+  const { data: suggestionsData } = useQuery({
+    queryKey: ['products', 'search-suggestions', searchQuery],
+    queryFn: async () => {
+      const res = await apiClient.get('/products', {
+        params: { 'filter[search]': searchQuery.trim(), per_page: 6 },
+      });
+      return res.data as { data: Array<{ id: number; name: string; slug: string; price: number }> };
+    },
+    enabled: searchQuery.trim().length > 1,
+    staleTime: 30_000,
+  });
+  const suggestions = suggestionsData?.data ?? [];
+  const suggestionsOpen = searchFocused && searchQuery.trim().length > 1 && suggestions.length > 0;
 
   const handleLogout = () => {
     clearAuth();
@@ -86,9 +110,16 @@ export function Navbar() {
     if (trimmed) {
       void navigate(`/products?filter[search]=${encodeURIComponent(trimmed)}`);
       setSearchQuery('');
-      setMobileSearchOpen(false);
+      setSearchFocused(false);
       setMobileOpen(false);
     }
+  };
+
+  const handleSuggestionClick = (slug: string) => {
+    void navigate(`/products/${slug}`);
+    setSearchQuery('');
+    setSearchFocused(false);
+    setMobileOpen(false);
   };
 
   const isActive = (path: string) => location.pathname.startsWith(path);
@@ -199,37 +230,78 @@ export function Navbar() {
             )}
 
             {/* Desktop search */}
-            <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
-              <Box
-                component="form"
-                onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSearch(); }}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  bgcolor: 'rgba(255,255,255,0.06)',
-                  borderRadius: '6px',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  px: 1.5,
-                  py: 0.25,
-                  transition: 'border-color 0.2s',
-                  '&:focus-within': { borderColor: 'primary.main' },
-                }}
-              >
-                <SearchIcon sx={{ fontSize: '1rem', color: 'text.secondary', mr: 1 }} />
-                <InputBase
-                  placeholder="Rechercher..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+            <ClickAwayListener onClickAway={() => setSearchFocused(false)}>
+              <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <Box
+                  ref={handleSearchBoxRef}
+                  component="form"
+                  onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSearch(); }}
                   sx={{
-                    fontSize: '0.8rem',
-                    color: 'text.primary',
-                    width: 160,
-                    '& input::placeholder': { color: 'text.secondary', opacity: 1 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    bgcolor: 'rgba(255,255,255,0.06)',
+                    borderRadius: '6px',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    px: 1.5,
+                    py: 0.25,
+                    transition: 'border-color 0.2s',
+                    '&:focus-within': { borderColor: 'primary.main' },
                   }}
-                />
+                >
+                  <SearchIcon sx={{ fontSize: '1rem', color: 'text.secondary', mr: 1 }} />
+                  <InputBase
+                    placeholder="Rechercher..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setSearchFocused(true)}
+                    sx={{
+                      fontSize: '0.8rem',
+                      color: 'text.primary',
+                      width: 160,
+                      '& input::placeholder': { color: 'text.secondary', opacity: 1 },
+                    }}
+                  />
+                </Box>
+                <Popper
+                  open={suggestionsOpen}
+                  anchorEl={searchAnchorEl}
+                  placement="bottom-start"
+                  style={{ zIndex: 1300, minWidth: 240 }}
+                >
+                  <Paper
+                    elevation={8}
+                    sx={{
+                      mt: 0.5,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      backgroundColor: 'background.paper',
+                      overflow: 'hidden',
+                      minWidth: 240,
+                    }}
+                  >
+                    <List dense disablePadding>
+                      {suggestions.map((product) => (
+                        <ListItemButton
+                          key={product.id}
+                          onClick={() => handleSuggestionClick(product.slug)}
+                          sx={{
+                            py: 0.75,
+                            px: 1.5,
+                            '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)' },
+                          }}
+                        >
+                          <ListItemText
+                            primary={product.name}
+                            primaryTypographyProps={{ fontSize: '0.83rem', fontWeight: 500, noWrap: true }}
+                          />
+                        </ListItemButton>
+                      ))}
+                    </List>
+                  </Paper>
+                </Popper>
               </Box>
-            </Box>
+            </ClickAwayListener>
           </Box>
 
           {/* ── Right Actions ── */}
@@ -409,7 +481,7 @@ export function Navbar() {
           <Box
             component="form"
             onSubmit={(e: React.FormEvent) => { e.preventDefault(); handleSearch(); }}
-            sx={{ display: 'flex', alignItems: 'center', bgcolor: 'action.hover', borderRadius: '6px', px: 1.5, py: 0.5, mb: 1 }}
+            sx={{ display: 'flex', alignItems: 'center', bgcolor: 'action.hover', borderRadius: '6px', px: 1.5, py: 0.5, mb: suggestions.length > 0 && searchQuery.trim().length > 1 ? 0 : 1 }}
           >
             <SearchIcon sx={{ fontSize: '1rem', color: 'text.secondary', mr: 1 }} />
             <InputBase
@@ -419,6 +491,27 @@ export function Navbar() {
               sx={{ fontSize: '0.85rem', color: 'text.primary', flex: 1 }}
             />
           </Box>
+          {suggestions.length > 0 && searchQuery.trim().length > 1 && (
+            <Paper
+              variant="outlined"
+              sx={{ mb: 1, borderColor: 'divider', backgroundColor: 'background.paper', overflow: 'hidden' }}
+            >
+              <List dense disablePadding>
+                {suggestions.map((product) => (
+                  <ListItemButton
+                    key={product.id}
+                    onClick={() => handleSuggestionClick(product.slug)}
+                    sx={{ py: 0.75, px: 1.5, '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)' } }}
+                  >
+                    <ListItemText
+                      primary={product.name}
+                      primaryTypographyProps={{ fontSize: '0.83rem', fontWeight: 500 }}
+                    />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Paper>
+          )}
 
           <Button
             component={Link} to="/products"

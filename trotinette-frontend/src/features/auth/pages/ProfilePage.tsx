@@ -7,7 +7,11 @@ import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import FormHelperText from '@mui/material/FormHelperText';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
@@ -126,13 +130,37 @@ export function ProfilePage() {
             {...register('phone')}
           />
 
-          <TextField
-            label={"Ville"}
-            type="text"
-            fullWidth
-            error={Boolean(errors.address_city)}
-            helperText={errors.address_city?.message}
-            {...register('address_city')}
+          {/* Pays */}
+          <FormControl fullWidth>
+            <InputLabel>Pays</InputLabel>
+            <Select label="Pays" value="Maroc" readOnly>
+              <MenuItem value="Maroc">Maroc</MenuItem>
+            </Select>
+          </FormControl>
+
+          {/* Ville */}
+          <Controller
+            name="address_city"
+            control={control}
+            render={({ field }) => (
+              <FormControl fullWidth error={Boolean(errors.address_city)}>
+                <InputLabel>Ville</InputLabel>
+                <Select
+                  {...field}
+                  value={field.value ?? ''}
+                  label="Ville"
+                  MenuProps={{ PaperProps: { style: { maxHeight: 320 } } }}
+                >
+                  <MenuItem value="">
+                    <em>Aucune ville sélectionnée</em>
+                  </MenuItem>
+                  {MOROCCAN_CITIES.map((city) => (
+                    <MenuItem key={city} value={city}>{city}</MenuItem>
+                  ))}
+                </Select>
+                {errors.address_city && <FormHelperText>{errors.address_city.message}</FormHelperText>}
+              </FormControl>
+            )}
           />
 
           <TextField

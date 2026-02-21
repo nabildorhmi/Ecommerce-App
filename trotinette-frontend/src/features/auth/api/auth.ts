@@ -27,6 +27,7 @@ export interface RegisterData {
   password: string;
   password_confirmation: string;
   phone: string;
+  address_city?: string;
 }
 
 export interface RegisterResponse {

@@ -293,7 +293,7 @@ export const MOROCCAN_CITIES = [
   'Soualem',
   'Souk El Arbaa',
   'Souk Sebt Oulad Nemma',
-  'Souq Larb'a al Gharb',
+  "Souq Larb'a al Gharb",
   'Sour El Ghozlane',
   'Sraghna',
   'Stehat',
