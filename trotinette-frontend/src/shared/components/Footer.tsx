@@ -49,6 +49,12 @@ export function Footer() {
             >
               L'avenir de la mobilité urbaine. Scooters électriques premium conçus pour la performance et le style.
             </Typography>
+            <Typography
+              variant="body2"
+              sx={{ color: '#9CA3AF', fontSize: '0.82rem', lineHeight: 1.7, maxWidth: 280, mb: 2 }}
+            >
+              123 Bd Mohammed V, Casablanca, Maroc
+            </Typography>
             {/* Japanese accent */}
             <Typography
               sx={{
@@ -111,19 +117,58 @@ export function Footer() {
               Société
             </Typography>
             <Stack spacing={1}>
-              {['À propos', 'Technologie', 'Développement durable', 'Carrières', 'Contact'].map((item) => (
-                <Box
-                  key={item}
-                  component="span"
-                  sx={{
-                    fontSize: '0.82rem',
-                    color: '#9CA3AF',
-                    cursor: 'default',
-                  }}
-                >
-                  {item}
-                </Box>
-              ))}
+              <Box
+                component={Link}
+                to="/a-propos"
+                sx={{
+                  fontSize: '0.82rem',
+                  color: '#9CA3AF',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  '&:hover': { color: '#F5F7FA' },
+                }}
+              >
+                A propos
+              </Box>
+              <Box
+                component={Link}
+                to="/contact"
+                sx={{
+                  fontSize: '0.82rem',
+                  color: '#9CA3AF',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  '&:hover': { color: '#F5F7FA' },
+                }}
+              >
+                Contact
+              </Box>
+              <Box
+                component={Link}
+                to="/cgv"
+                sx={{
+                  fontSize: '0.82rem',
+                  color: '#9CA3AF',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  '&:hover': { color: '#F5F7FA' },
+                }}
+              >
+                Conditions generales de vente
+              </Box>
+              <Box
+                component={Link}
+                to="/mentions-legales"
+                sx={{
+                  fontSize: '0.82rem',
+                  color: '#9CA3AF',
+                  textDecoration: 'none',
+                  transition: 'color 0.2s',
+                  '&:hover': { color: '#F5F7FA' },
+                }}
+              >
+                Mentions legales
+              </Box>
             </Stack>
           </Grid>
 

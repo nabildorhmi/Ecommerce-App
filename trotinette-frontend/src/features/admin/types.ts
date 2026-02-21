@@ -85,7 +85,7 @@ export interface AdminUser {
   name: string;
   email: string;
   phone: string | null;
-  role: 'admin' | 'customer';
+  role: 'admin' | 'customer' | 'global_admin';
   is_active: boolean;
   address_city: string | null;
   address_street: string | null;

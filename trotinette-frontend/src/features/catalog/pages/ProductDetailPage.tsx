@@ -19,7 +19,6 @@ import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import { ProductGallery } from '../components/ProductGallery';
 import { SpecsTable } from '../components/SpecsTable';
 import { StockBadge } from '../components/StockBadge';
-import { WhatsAppButton } from '../components/WhatsAppButton';
 import { TrustSignals } from '../components/TrustSignals';
 import { CategoryBreadcrumb } from '../components/CategoryBreadcrumb';
 import { useCartStore } from '../../cart/store';
@@ -225,8 +224,6 @@ export function ProductDetailPage() {
                       ? "Stock maximum atteint"
                       : "Ajouter au panier"}
                   </Button>
-
-                  <WhatsAppButton productName={product.name} />
                 </Stack>
               </Stack>
             </Box>

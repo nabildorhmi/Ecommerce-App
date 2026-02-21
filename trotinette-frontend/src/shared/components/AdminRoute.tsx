@@ -12,7 +12,7 @@ export function AdminRoute() {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== 'admin') {
+  if (user.role !== 'admin' && user.role !== 'global_admin') {
     return <Navigate to="/products" replace />;
   }
 

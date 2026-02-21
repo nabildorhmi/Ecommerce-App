@@ -27,6 +27,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import PeopleIcon from '@mui/icons-material/People';
 import { useAuthStore } from '../../features/auth/store';
 import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
@@ -55,7 +56,7 @@ export function Navbar() {
       const res = await apiClient.get('/admin/orders', { params: { 'filter[status]': 'pending', per_page: 1 } });
       return res.data.meta?.total ?? 0;
     },
-    enabled: user?.role === 'admin',
+    enabled: user?.role === 'admin' || user?.role === 'global_admin',
     refetchInterval: 30_000,
     staleTime: 15_000,
   });
@@ -203,7 +204,7 @@ export function Navbar() {
 
             {user ? (
               <>
-                {user.role === 'admin' && (
+                {(user.role === 'admin' || user.role === 'global_admin') && (
                   <>
                     <IconButton
                       onClick={(e) => setAdminMenuAnchor(e.currentTarget)}
@@ -231,29 +232,37 @@ export function Navbar() {
                         },
                       }}
                     >
-                      {[
-                        { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits', badge: null },
-                        { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories', badge: null },
-                        { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes', badge: null },
+                      {(() => {
+                        const menuItems = [
+                          { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits' },
+                          { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories' },
+                          { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes' },
+                        ];
 
-                      ].map(({ to, icon, label }) => (
-                        <MenuItem
-                          key={to}
-                          component={Link}
-                          to={to}
-                          onClick={closeAdminMenu}
-                          sx={{
-                            fontSize: '0.85rem',
-                            py: 1,
-                            borderLeft: '2px solid transparent',
-                            color: 'text.primary',
-                            '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)', color: '#00C2FF', borderLeftColor: '#00C2FF' },
-                          }}
-                        >
-                          <ListItemIcon sx={{ color: '#00C2FF', minWidth: 32 }}>{icon}</ListItemIcon>
-                          <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>{label}</ListItemText>
-                        </MenuItem>
-                      ))}
+                        // Add Utilisateurs menu item only for global_admin
+                        if (user.role === 'global_admin') {
+                          menuItems.push({ to: '/admin/users', icon: <PeopleIcon fontSize="small" />, label: 'Utilisateurs' });
+                        }
+
+                        return menuItems.map(({ to, icon, label }) => (
+                          <MenuItem
+                            key={to}
+                            component={Link}
+                            to={to}
+                            onClick={closeAdminMenu}
+                            sx={{
+                              fontSize: '0.85rem',
+                              py: 1,
+                              borderLeft: '2px solid transparent',
+                              color: 'text.primary',
+                              '&:hover': { backgroundColor: 'rgba(0,194,255,0.08)', color: '#00C2FF', borderLeftColor: '#00C2FF' },
+                            }}
+                          >
+                            <ListItemIcon sx={{ color: '#00C2FF', minWidth: 32 }}>{icon}</ListItemIcon>
+                            <ListItemText primaryTypographyProps={{ fontSize: '0.85rem' }}>{label}</ListItemText>
+                          </MenuItem>
+                        ));
+                      })()}
                     </Menu>
                   </>
                 )}

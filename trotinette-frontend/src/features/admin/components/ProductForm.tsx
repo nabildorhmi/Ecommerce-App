@@ -214,7 +214,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                   </MenuItem>
                   {categories.map((cat) => (
                     <MenuItem key={cat.id} value={String(cat.id)}>
-                      {cat.translations?.fr?.name ?? cat.slug}
+                      {cat.name}
                     </MenuItem>
                   ))}
                 </Select>

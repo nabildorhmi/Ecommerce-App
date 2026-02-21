@@ -19,7 +19,11 @@ import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Pagination from '@mui/material/Pagination';
-import { useAdminUsers, useDeactivateUser } from '../api/users';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser } from '../api/users';
+import { useAuthStore } from '../../auth/store';
 import type { AdminUser } from '../types';
 
 interface DeactivateDialogProps {
@@ -69,11 +73,14 @@ function DeactivateDialog({
 
 export function AdminUsersPage() {
   const navigate = useNavigate();
+  const currentUser = useAuthStore((s) => s.user);
   const [page, setPage] = useState(1);
   const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
 
   const { data, isLoading, error } = useAdminUsers(page);
   const deactivateMutation = useDeactivateUser();
+  const updateRoleMutation = useUpdateUserRole();
+  const activateMutation = useActivateUser();
 
   const users: AdminUser[] = data?.data ?? [];
   const totalPages = data?.meta?.last_page ?? 1;
@@ -81,6 +88,14 @@ export function AdminUsersPage() {
   const handleDeactivate = async (id: number) => {
     await deactivateMutation.mutateAsync(id);
     setDeactivateTarget(null);
+  };
+
+  const handleRoleChange = async (userId: number, newRole: string) => {
+    await updateRoleMutation.mutateAsync({ id: userId, role: newRole });
+  };
+
+  const handleActivate = async (id: number) => {
+    await activateMutation.mutateAsync(id);
   };
 
   if (isLoading) {
@@ -135,7 +150,22 @@ export function AdminUsersPage() {
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{user.phone ?? '—'}</TableCell>
-                  <TableCell>{user.role}</TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    {currentUser?.role === 'global_admin' && user.role !== 'global_admin' ? (
+                      <FormControl size="small" variant="standard">
+                        <Select
+                          value={user.role}
+                          onChange={(e) => void handleRoleChange(user.id, e.target.value)}
+                          sx={{ fontSize: '0.875rem' }}
+                        >
+                          <MenuItem value="admin">admin</MenuItem>
+                          <MenuItem value="customer">customer</MenuItem>
+                        </Select>
+                      </FormControl>
+                    ) : (
+                      <Typography variant="body2">{user.role}</Typography>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={
@@ -147,20 +177,29 @@ export function AdminUsersPage() {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="right">
-                    {user.is_active && user.role !== 'admin' && (
-                      <Button
-                        size="small"
-                        color="error"
-                        variant="outlined"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeactivateTarget(user);
-                        }}
-                      >
-                        {"Désactiver"}
-                      </Button>
-                    )}
+                  <TableCell align="right" onClick={(e) => e.stopPropagation()}>
+                    <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                      {!user.is_active && currentUser?.role === 'global_admin' && (
+                        <Button
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                          onClick={() => void handleActivate(user.id)}
+                        >
+                          Activer
+                        </Button>
+                      )}
+                      {user.is_active && currentUser?.role === 'global_admin' && user.role !== 'global_admin' && (
+                        <Button
+                          size="small"
+                          color="error"
+                          variant="outlined"
+                          onClick={() => setDeactivateTarget(user)}
+                        >
+                          {"Désactiver"}
+                        </Button>
+                      )}
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))

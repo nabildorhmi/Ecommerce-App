@@ -2,6 +2,7 @@ import { Outlet } from 'react-router';
 import Box from '@mui/material/Box';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { WhatsAppFab } from './WhatsAppFab';
 
 /**
  * RootLayout — wraps all routes with Navbar + Footer.
@@ -14,6 +15,7 @@ export function RootLayout() {
         <Outlet />
       </Box>
       <Footer />
+      <WhatsAppFab />
     </Box>
   );
 }

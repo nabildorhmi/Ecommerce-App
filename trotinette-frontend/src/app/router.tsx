@@ -17,6 +17,10 @@ import { AdminOrdersPage } from '../features/orders/pages/AdminOrdersPage';
 import { AdminOrderDetailPage } from '../features/orders/pages/AdminOrderDetailPage';
 import { RootLayout } from '../shared/components/RootLayout';
 import { HomePage } from '../features/home/pages/HomePage';
+import { AboutPage } from '../features/info/pages/AboutPage';
+import { ContactPage } from '../features/info/pages/ContactPage';
+import { CgvPage } from '../features/info/pages/CgvPage';
+import { MentionsLegalesPage } from '../features/info/pages/MentionsLegalesPage';
 
 // Admin home — redirect to product list (primary admin landing)
 const AdminHomePage = () => <Navigate to="/admin/products" replace />;
@@ -50,6 +54,22 @@ export const router = createBrowserRouter([
       {
         path: '/orders/:orderNumber/confirmation',
         element: <OrderConfirmationPage />,
+      },
+      {
+        path: '/a-propos',
+        element: <AboutPage />,
+      },
+      {
+        path: '/contact',
+        element: <ContactPage />,
+      },
+      {
+        path: '/cgv',
+        element: <CgvPage />,
+      },
+      {
+        path: '/mentions-legales',
+        element: <MentionsLegalesPage />,
       },
       // Protected routes — require authentication
       {
