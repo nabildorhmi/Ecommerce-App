@@ -21,5 +21,17 @@ class AdminSeeder extends Seeder
         );
 
         $admin->assignRole('admin');
+
+        $globalAdmin = User::firstOrCreate(
+            ['email' => 'globaladmin@trotinette.test'],
+            [
+                'name'     => 'Global Admin',
+                'password' => Hash::make('password'),
+                'phone'    => '+33600000001',
+                'is_active' => true,
+            ]
+        );
+
+        $globalAdmin->assignRole('global_admin');
     }
 }
