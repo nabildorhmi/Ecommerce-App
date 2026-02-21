@@ -166,7 +166,7 @@ export function Navbar() {
                 '&:hover': { color: '#F5F7FA', backgroundColor: 'rgba(255,255,255,0.04)' },
               }}
             >
-              TOUS LES SCOOTERS
+              TOUS LES PRODUITS
             </Button>
 
             {categories.length > 0 && (
@@ -533,7 +533,7 @@ export function Navbar() {
             fullWidth
             sx={{ justifyContent: 'flex-start', color: 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
           >
-            TOUS LES SCOOTERS
+            TOUS LES PRODUITS
           </Button>
           <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
           <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', letterSpacing: '0.1em', fontWeight: 700, px: 1, pb: 0.5, textTransform: 'uppercase' }}>
