@@ -14,6 +14,7 @@ import ElectricScooterIcon from '@mui/icons-material/ElectricScooter';
 import { useFeaturedProducts } from '../../catalog/api/products';
 import { useCategories } from '../../catalog/api/categories';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import type { Product } from '../../catalog/types';
 
 //  Hero Banner 
 function HeroBanner() {
@@ -140,136 +141,187 @@ function CategoriesStrip() {
   );
 }
 
-//  Featured Products Carousel 
-function FeaturedSection() {
-  const { data, isLoading } = useFeaturedProducts();
+//  Category Featured Row Sub-component
+interface CategoryFeaturedRowProps {
+  categoryName: string;
+  products: Product[];
+}
+
+function CategoryFeaturedRow({ categoryName, products }: CategoryFeaturedRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const products = data?.data ?? [];
 
   const scroll = (dir: 'left' | 'right') => {
     scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
   };
 
   return (
-    <Box component="section" sx={{ bgcolor: 'background.default', py: { xs: 5, md: 7 } }}>
-      <Container maxWidth="xl">
-        {/* Section header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ width: 4, height: 28, background: 'linear-gradient(to bottom, #00C2FF, #0099CC)', borderRadius: 2 }} />
-            <Box>
-              <Typography sx={{ fontSize: '0.62rem', letterSpacing: '0.25em', color: 'primary.main', fontWeight: 600, textTransform: 'uppercase', mb: 0.25 }}>
-                精選モデル  HANDPICKED
-              </Typography>
-              <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.3rem', md: '1.6rem' }, color: 'text.primary', letterSpacing: '-0.01em', lineHeight: 1 }}>
-                NOS SCOOTERS EN VEDETTE
-              </Typography>
-            </Box>
-          </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <IconButton onClick={() => scroll('left')} size="small" sx={{ border: '1px solid', borderColor: 'divider', color: 'text.secondary', '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0,194,255,0.07)' } }}>
-              <KeyboardArrowLeftIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={() => scroll('right')} size="small" sx={{ border: '1px solid', borderColor: 'divider', color: 'text.secondary', '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0,194,255,0.07)' } }}>
-              <KeyboardArrowRightIcon fontSize="small" />
-            </IconButton>
+    <Box sx={{ mb: 6 }}>
+      {/* Section header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ width: 4, height: 28, background: 'linear-gradient(to bottom, #00C2FF, #0099CC)', borderRadius: 2 }} />
+          <Box>
+            <Typography sx={{ fontSize: '0.62rem', letterSpacing: '0.25em', color: 'primary.main', fontWeight: 600, textTransform: 'uppercase', mb: 0.25 }}>
+              精選モデル  HANDPICKED
+            </Typography>
+            <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.3rem', md: '1.6rem' }, color: 'text.primary', letterSpacing: '-0.01em', lineHeight: 1 }}>
+              NOS {categoryName.toUpperCase()} EN VEDETTE
+            </Typography>
           </Box>
         </Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <IconButton onClick={() => scroll('left')} size="small" sx={{ border: '1px solid', borderColor: 'divider', color: 'text.secondary', '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0,194,255,0.07)' } }}>
+            <KeyboardArrowLeftIcon fontSize="small" />
+          </IconButton>
+          <IconButton onClick={() => scroll('right')} size="small" sx={{ border: '1px solid', borderColor: 'divider', color: 'text.secondary', '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0,194,255,0.07)' } }}>
+            <KeyboardArrowRightIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      </Box>
 
-        {/* Scrollable product cards */}
-        <Box
-          ref={scrollRef}
-          sx={{ display: 'flex', gap: 2, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' }, pb: 1 }}
-        >
-          {isLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
+      {/* Scrollable product cards */}
+      <Box
+        ref={scrollRef}
+        sx={{ display: 'flex', gap: 2, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' }, pb: 1 }}
+      >
+        {products.map((product) => {
+          const PLACEHOLDER = 'https://placehold.co/600x400/111116/00C2FF?text=MiraiTech';
+          const imageUrl = product.images.length > 0 ? product.images[0].card : PLACEHOLDER;
+          return (
+            <Box
+              key={product.id}
+              component={Link}
+              to={`/products/${product.slug}`}
+              sx={{
+                flexShrink: 0,
+                width: { xs: 200, sm: 220, md: 240 },
+                textDecoration: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                transition: 'all 0.22s ease',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  transform: 'translateY(-3px)',
+                  boxShadow: '0 6px 24px rgba(0,194,255,0.15)',
+                },
+              }}
+            >
+              <Box sx={{ position: 'relative', bgcolor: 'action.hover', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <Chip
+                  label="Featured"
+                  size="small"
+                  sx={{ position: 'absolute', top: 8, left: 8, zIndex: 1, bgcolor: 'rgba(0,194,255,0.14)', color: '#00C2FF', border: '1px solid rgba(0,194,255,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
+                />
+                {!product.in_stock && (
+                  <Chip
+                    label="Rupture"
+                    size="small"
+                    sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, bgcolor: 'rgba(230,57,70,0.14)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
+                  />
+                )}
+                <Box sx={{ height: '100%', width: '100%', backgroundImage: `url("${imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
+              </Box>
+              <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <Typography sx={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'primary.main', textTransform: 'uppercase', fontWeight: 600, mb: 0.5 }}>
+                  {product.category?.name ?? 'Scooter'}
+                </Typography>
+                <Typography sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.9rem', mb: 1, flex: 1, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
+                  {product.name}
+                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'primary.main', letterSpacing: '-0.02em' }}>
+                    {formatCurrency(product.price)}
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: product.in_stock ? '#00C853' : '#E63946', boxShadow: product.in_stock ? '0 0 6px #00C853' : 'none' }} />
+                    <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', fontWeight: 500 }}>
+                      {product.in_stock ? 'En stock' : 'Épuisé'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+          );
+        })}
+      </Box>
+    </Box>
+  );
+}
+
+//  Featured Products Carousel
+function FeaturedSection() {
+  const { data, isLoading } = useFeaturedProducts();
+  const products = data?.data ?? [];
+
+  // Group products by category
+  const categoryGroups = products.reduce((acc, product) => {
+    const categoryId = product.category?.id ?? 0;
+    const categoryName = product.category?.name ?? 'Autres';
+
+    if (!acc.has(categoryId)) {
+      acc.set(categoryId, { categoryName, products: [] });
+    }
+    acc.get(categoryId)!.products.push(product);
+
+    return acc;
+  }, new Map<number, { categoryName: string; products: Product[] }>());
+
+  return (
+    <Box component="section" sx={{ bgcolor: 'background.default', py: { xs: 5, md: 7 } }}>
+      <Container maxWidth="xl">
+        {isLoading ? (
+          // Loading skeleton
+          <Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+              <Skeleton width={4} height={28} />
+              <Box sx={{ flex: 1 }}>
+                <Skeleton width={200} height={16} sx={{ mb: 0.5 }} />
+                <Skeleton width={300} height={28} />
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 2, pb: 1 }}>
+              {Array.from({ length: 4 }).map((_, i) => (
                 <Box key={i} sx={{ flexShrink: 0, width: { xs: 200, sm: 220, md: 240 } }}>
                   <Skeleton variant="rectangular" height={200} sx={{ borderRadius: '8px', mb: 1.5 }} />
                   <Skeleton height={22} sx={{ mb: 0.5 }} />
                   <Skeleton height={18} width="55%" />
                 </Box>
-              ))
-            : products.length === 0
-            ? (
-              <Box sx={{ py: 6, textAlign: 'center', width: '100%' }}>
-                <ElectricScooterIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem' }}>
-                  No featured products yet. Toggle products in the admin panel.
-                </Typography>
-              </Box>
-            )
-            : products.map((product) => {
-                const PLACEHOLDER = 'https://placehold.co/600x400/111116/00C2FF?text=MiraiTech';
-                const imageUrl = product.images.length > 0 ? product.images[0].card : PLACEHOLDER;
-                return (
-                  <Box
-                    key={product.id}
-                    component={Link}
-                    to={`/products/${product.slug}`}
-                    sx={{
-                      flexShrink: 0,
-                      width: { xs: 200, sm: 220, md: 240 },
-                      textDecoration: 'none',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      bgcolor: 'background.paper',
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      borderRadius: '8px',
-                      overflow: 'hidden',
-                      transition: 'all 0.22s ease',
-                      '&:hover': {
-                        borderColor: 'primary.main',
-                        transform: 'translateY(-3px)',
-                        boxShadow: '0 6px 24px rgba(0,194,255,0.15)',
-                      },
-                    }}
-                  >
-                    <Box sx={{ position: 'relative', bgcolor: 'action.hover', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                      <Chip
-                        label="Featured"
-                        size="small"
-                        sx={{ position: 'absolute', top: 8, left: 8, zIndex: 1, bgcolor: 'rgba(0,194,255,0.14)', color: '#00C2FF', border: '1px solid rgba(0,194,255,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
-                      />
-                      {!product.in_stock && (
-                        <Chip
-                          label="Rupture"
-                          size="small"
-                          sx={{ position: 'absolute', top: 8, right: 8, zIndex: 1, bgcolor: 'rgba(230,57,70,0.14)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 20 }}
-                        />
-                      )}
-                      <Box sx={{ height: '100%', width: '100%', backgroundImage: `url("${imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' }} />
-                    </Box>
-                    <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      <Typography sx={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'primary.main', textTransform: 'uppercase', fontWeight: 600, mb: 0.5 }}>
-                        {product.category?.name ?? 'Scooter'}
-                      </Typography>
-                      <Typography sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.9rem', mb: 1, flex: 1, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
-                        {product.name}
-                      </Typography>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: '1.1rem', color: 'primary.main', letterSpacing: '-0.02em' }}>
-                          {formatCurrency(product.price)}
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                          <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: product.in_stock ? '#00C853' : '#E63946', boxShadow: product.in_stock ? '0 0 6px #00C853' : 'none' }} />
-                          <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', fontWeight: 500 }}>
-                            {product.in_stock ? 'En stock' : 'Épuisé'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Box>
-                  </Box>
-                );
-              })}
-        </Box>
-
-        {products.length > 0 && (
-          <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Button component={Link} to="/products" variant="outlined" sx={{ px: 5, py: 1.25, fontSize: '0.78rem', letterSpacing: '0.1em' }}>
-              VOIR TOUS LES MODÈLES
-            </Button>
+              ))}
+            </Box>
           </Box>
+        ) : products.length === 0 ? (
+          // Empty state
+          <Box sx={{ py: 6, textAlign: 'center', width: '100%' }}>
+            <ElectricScooterIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+            <Typography sx={{ color: 'text.secondary', fontSize: '0.9rem' }}>
+              No featured products yet. Toggle products in the admin panel.
+            </Typography>
+          </Box>
+        ) : (
+          // Category groups
+          <>
+            {Array.from(categoryGroups.values()).map(({ categoryName, products: categoryProducts }) => (
+              categoryProducts.length > 0 && (
+                <CategoryFeaturedRow
+                  key={categoryName}
+                  categoryName={categoryName}
+                  products={categoryProducts}
+                />
+              )
+            ))}
+
+            {/* Single button at the bottom */}
+            <Box sx={{ textAlign: 'center', mt: 0 }}>
+              <Button component={Link} to="/products" variant="outlined" sx={{ px: 5, py: 1.25, fontSize: '0.78rem', letterSpacing: '0.1em' }}>
+                VOIR TOUS LES MODÈLES
+              </Button>
+            </Box>
+          </>
         )}
       </Container>
     </Box>
