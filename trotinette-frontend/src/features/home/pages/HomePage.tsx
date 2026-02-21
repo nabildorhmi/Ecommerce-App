@@ -143,11 +143,12 @@ function CategoriesStrip() {
 
 //  Category Featured Row Sub-component
 interface CategoryFeaturedRowProps {
+  categoryId: number;
   categoryName: string;
   products: Product[];
 }
 
-function CategoryFeaturedRow({ categoryName, products }: CategoryFeaturedRowProps) {
+function CategoryFeaturedRow({ categoryId, categoryName, products }: CategoryFeaturedRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: 'left' | 'right') => {
@@ -249,6 +250,18 @@ function CategoryFeaturedRow({ categoryName, products }: CategoryFeaturedRowProp
           );
         })}
       </Box>
+
+      {/* Per-category button */}
+      <Box sx={{ textAlign: 'center', mt: 3 }}>
+        <Button
+          component={Link}
+          to={`/products?filter[category_id]=${categoryId}`}
+          variant="outlined"
+          sx={{ px: 5, py: 1.25, fontSize: '0.78rem', letterSpacing: '0.1em' }}
+        >
+          VOIR TOUS LES MODELES
+        </Button>
+      </Box>
     </Box>
   );
 }
@@ -305,22 +318,16 @@ function FeaturedSection() {
         ) : (
           // Category groups
           <>
-            {Array.from(categoryGroups.values()).map(({ categoryName, products: categoryProducts }) => (
+            {Array.from(categoryGroups.entries()).map(([categoryId, { categoryName, products: categoryProducts }]) => (
               categoryProducts.length > 0 && (
                 <CategoryFeaturedRow
-                  key={categoryName}
+                  key={categoryId}
+                  categoryId={categoryId}
                   categoryName={categoryName}
                   products={categoryProducts}
                 />
               )
             ))}
-
-            {/* Single button at the bottom */}
-            <Box sx={{ textAlign: 'center', mt: 0 }}>
-              <Button component={Link} to="/products" variant="outlined" sx={{ px: 5, py: 1.25, fontSize: '0.78rem', letterSpacing: '0.1em' }}>
-                VOIR TOUS LES MODÈLES
-              </Button>
-            </Box>
           </>
         )}
       </Container>

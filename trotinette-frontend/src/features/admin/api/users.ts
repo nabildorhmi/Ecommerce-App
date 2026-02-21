@@ -70,3 +70,17 @@ export function useActivateUser() {
     },
   });
 }
+
+export function useCreateUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { name: string; email: string; phone?: string; password: string; role: string }) => {
+      const res = await apiClient.post('/admin/users', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    },
+  });
+}

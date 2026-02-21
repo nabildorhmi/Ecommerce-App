@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -26,6 +27,34 @@ class UserController extends Controller
             'data'          => new UserResource($user),
             'order_history' => [],
         ]);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        // Only global_admin can create users
+        if (!auth()->user()->hasRole('global_admin')) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
+            'phone'    => 'nullable|string|max:20',
+            'password' => 'required|string|min:8',
+            'role'     => 'required|in:admin,customer',
+        ]);
+
+        $user = User::create([
+            'name'      => $validated['name'],
+            'email'     => $validated['email'],
+            'phone'     => $validated['phone'] ?? null,
+            'password'  => Hash::make($validated['password']),
+            'is_active' => true,
+        ]);
+
+        $user->assignRole($validated['role']);
+
+        return response()->json(new UserResource($user->load('roles')), 201);
     }
 
     public function deactivate(User $user): JsonResponse

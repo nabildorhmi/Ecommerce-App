@@ -22,7 +22,9 @@ import Pagination from '@mui/material/Pagination';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser } from '../api/users';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
+import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser, useCreateUser } from '../api/users';
 import { useAuthStore } from '../../auth/store';
 import type { AdminUser } from '../types';
 
@@ -76,11 +78,14 @@ export function AdminUsersPage() {
   const currentUser = useAuthStore((s) => s.user);
   const [page, setPage] = useState(1);
   const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', email: '', phone: '', password: '', role: 'customer' });
 
   const { data, isLoading, error } = useAdminUsers(page);
   const deactivateMutation = useDeactivateUser();
   const updateRoleMutation = useUpdateUserRole();
   const activateMutation = useActivateUser();
+  const createMutation = useCreateUser();
 
   const users: AdminUser[] = data?.data ?? [];
   const totalPages = data?.meta?.last_page ?? 1;
@@ -96,6 +101,12 @@ export function AdminUsersPage() {
 
   const handleActivate = async (id: number) => {
     await activateMutation.mutateAsync(id);
+  };
+
+  const handleCreateUser = async () => {
+    await createMutation.mutateAsync(createForm);
+    setCreateOpen(false);
+    setCreateForm({ name: '', email: '', phone: '', password: '', role: 'customer' });
   };
 
   if (isLoading) {
@@ -116,9 +127,16 @@ export function AdminUsersPage() {
 
   return (
     <Box p={3}>
-      <Typography variant="h5" fontWeight="bold" mb={3}>
-        {"Utilisateurs"}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5" fontWeight="bold">
+          Utilisateurs
+        </Typography>
+        {currentUser?.role === 'global_admin' && (
+          <Button variant="contained" onClick={() => setCreateOpen(true)}>
+            Ajouter un utilisateur
+          </Button>
+        )}
+      </Box>
 
       <TableContainer component={Paper}>
         <Table size="small">
@@ -225,6 +243,29 @@ export function AdminUsersPage() {
         onConfirm={(id) => void handleDeactivate(id)}
         isDeactivating={deactivateMutation.isPending}
       />
+
+      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Ajouter un utilisateur</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
+          <TextField label="Nom" value={createForm.name} onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))} fullWidth size="small" required />
+          <TextField label="E-mail" type="email" value={createForm.email} onChange={(e) => setCreateForm((f) => ({ ...f, email: e.target.value }))} fullWidth size="small" required />
+          <TextField label="Telephone" value={createForm.phone} onChange={(e) => setCreateForm((f) => ({ ...f, phone: e.target.value }))} fullWidth size="small" />
+          <TextField label="Mot de passe" type="password" value={createForm.password} onChange={(e) => setCreateForm((f) => ({ ...f, password: e.target.value }))} fullWidth size="small" required />
+          <FormControl size="small" fullWidth>
+            <InputLabel>Role</InputLabel>
+            <Select label="Role" value={createForm.role} onChange={(e) => setCreateForm((f) => ({ ...f, role: e.target.value }))}>
+              <MenuItem value="customer">Customer</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateOpen(false)}>Annuler</Button>
+          <Button variant="contained" onClick={() => void handleCreateUser()} disabled={createMutation.isPending || !createForm.name || !createForm.email || !createForm.password}>
+            {createMutation.isPending ? <CircularProgress size={20} /> : 'Creer'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

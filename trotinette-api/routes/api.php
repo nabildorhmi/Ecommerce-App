@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // User management
         Route::get('/users',                          [AdminUserController::class, 'index']);
+        Route::post('/users',                         [AdminUserController::class, 'store']);
         Route::get('/users/{user}',                   [AdminUserController::class, 'show']);
         Route::patch('/users/{user}/deactivate',      [AdminUserController::class, 'deactivate']);
         Route::patch('/users/{user}/role',            [AdminUserController::class, 'updateRole']);
