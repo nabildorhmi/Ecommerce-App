@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 Phase: 4 of 5 (Cart, Checkout & Orders)
 Plan: 4 of 4 in current phase — 04-04 COMPLETE. Phase 4 fully done.
 Status: Phase 4 complete — full order lifecycle implemented (backend + frontend). Next: Phase 5 (I18N-02, remaining features).
-Last activity: 2026-02-21 - Completed quick task 4: Global admin role, WhatsApp FAB, footer info pages, store address
+Last activity: 2026-02-21 - Completed quick task 5: Footer cleanup, dynamic category links, per-category featured homepage sections
 
 Progress: [█████████░] 90%
 
