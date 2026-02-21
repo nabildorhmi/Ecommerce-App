@@ -125,9 +125,10 @@ None.
 | 1 | Remove delivery zones table (city text input), inline registration at checkout, light mode UI fixes, product card image as bg, admin pending orders badge | 2026-02-20 | 3a30b62 | [1-remove-delivery-zones-table-city-text-in](./quick/1-remove-delivery-zones-table-city-text-in/) |
 | 2 | Remove i18n infrastructure (French-only app), fix attributes double-encoding, fix product card images | 2026-02-20 | 451f35a, eae31ad | [2-remove-i18n-french-only-fix-specs-displa](./quick/2-remove-i18n-french-only-fix-specs-displa/) |
 | 4 | Add global_admin role with user/role management, WhatsApp FAB on all pages, footer info pages with store address | 2026-02-21 | 3987cc3, 1cdb9a1 | [4-add-global-admin-role-user-role-manageme](./quick/4-add-global-admin-role-user-role-manageme/) |
+| 5 | Remove footer tech section, dynamic category links in footer, per-category featured product sections on homepage | 2026-02-21 | e6b97ac, 6a9ddcb | [5-remove-footer-tech-section-dynamic-categ](./quick/5-remove-footer-tech-section-dynamic-categ/) |
 
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed quick task 4 — added global_admin role with user management (role updates, activate/deactivate), WhatsApp FAB globally on all pages, footer info pages (A propos, Contact, CGV, Mentions legales), store address in footer. Fixed ProductForm category bug.
+Stopped at: Completed quick task 5 — removed footer Technology column, added dynamic category navigation from API, refactored homepage featured sections to group by category with independent horizontal scroll per category.
 Resume file: None
