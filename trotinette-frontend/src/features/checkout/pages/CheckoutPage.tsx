@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
@@ -20,6 +21,7 @@ import { usePlaceOrder } from '../api/orders';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 import { RegisterForm } from '../../auth/components/RegisterForm';
 import { registerApi, type RegisterData } from '../../auth/api/auth';
+import { MOROCCAN_CITIES } from '../../../shared/constants/moroccanCities';
 
 const checkoutSchema = z.object({
   phone: z.string().min(1, { error: 'Phone required' }).regex(/^\+?\d{6,15}$/, { error: 'Invalid phone number' }),
@@ -62,6 +64,7 @@ export function CheckoutPage() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors },
   } = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
@@ -166,14 +169,38 @@ export function CheckoutPage() {
             </Stack>
           </Paper>
 
-          {/* Delivery city */}
+          {/* Country (fixed to Morocco) */}
           <TextField
-            label={"Ville de livraison"}
+            label="Pays"
+            value="Maroc"
             fullWidth
-            required
-            error={Boolean(errors.city)}
-            helperText={errors.city?.message}
-            {...register('city')}
+            disabled
+            InputProps={{ readOnly: true }}
+          />
+
+          {/* Delivery city */}
+          <Controller
+            name="city"
+            control={control}
+            render={({ field: { onChange, value, ref } }) => (
+              <Autocomplete
+                options={MOROCCAN_CITIES}
+                value={value || null}
+                onChange={(_e, newValue) => onChange(newValue ?? '')}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Ville de livraison"
+                    required
+                    error={Boolean(errors.city)}
+                    helperText={errors.city?.message}
+                    inputRef={ref}
+                  />
+                )}
+                noOptionsText="Aucune ville trouvée"
+                fullWidth
+              />
+            )}
           />
 
           {/* Phone number */}
