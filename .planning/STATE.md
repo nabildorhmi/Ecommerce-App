@@ -126,9 +126,10 @@ None.
 | 2 | Remove i18n infrastructure (French-only app), fix attributes double-encoding, fix product card images | 2026-02-20 | 451f35a, eae31ad | [2-remove-i18n-french-only-fix-specs-displa](./quick/2-remove-i18n-french-only-fix-specs-displa/) |
 | 4 | Add global_admin role with user/role management, WhatsApp FAB on all pages, footer info pages with store address | 2026-02-21 | 3987cc3, 1cdb9a1 | [4-add-global-admin-role-user-role-manageme](./quick/4-add-global-admin-role-user-role-manageme/) |
 | 5 | Remove footer tech section, dynamic category links in footer, per-category featured product sections on homepage | 2026-02-21 | e6b97ac, 6a9ddcb | [5-remove-footer-tech-section-dynamic-categ](./quick/5-remove-footer-tech-section-dynamic-categ/) |
+| 6 | Per-category "Voir tous" buttons on homepage, global_admin user creation dialog, navbar search bar | 2026-02-21 | 3e4fa90, dce44ff | [6-per-category-voir-tous-les-modeles-butto](./quick/6-per-category-voir-tous-les-modeles-butto/) |
 
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed quick task 5 — removed footer Technology column, added dynamic category navigation from API, refactored homepage featured sections to group by category with independent horizontal scroll per category.
+Stopped at: Completed quick task 6 — added per-category "Voir tous les modeles" buttons on homepage, global_admin user creation dialog in AdminUsersPage, and navbar search bar (desktop + mobile).
 Resume file: None
