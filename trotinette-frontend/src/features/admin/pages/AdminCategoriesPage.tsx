@@ -168,7 +168,6 @@ export function AdminCategoriesPage() {
             <TableRow>
               <TableCell>Nom</TableCell>
               <TableCell>Slug</TableCell>
-              <TableCell>Produits / Products</TableCell>
               <TableCell>Actif / Active</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
@@ -176,7 +175,7 @@ export function AdminCategoriesPage() {
           <TableBody>
             {categories.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} align="center">
+                <TableCell colSpan={4} align="center">
                   Aucune categorie / No categories found
                 </TableCell>
               </TableRow>
@@ -185,7 +184,6 @@ export function AdminCategoriesPage() {
                 <TableRow key={cat.id} hover>
                   <TableCell>{cat.name ?? '—'}</TableCell>
                   <TableCell>{cat.slug}</TableCell>
-                  <TableCell>{cat.product_count ?? '—'}</TableCell>
                   <TableCell>
                     <Chip
                       label={

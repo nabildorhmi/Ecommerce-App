@@ -613,7 +613,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           {isLoading ? 'Enregistrement...' : isEdit ? 'Mettre a jour' : 'Creer'}
         </Button>
       </Box>
-
+    
       {/* Template management dialog */}
       <TemplateDialog
         open={templateDialogOpen}
