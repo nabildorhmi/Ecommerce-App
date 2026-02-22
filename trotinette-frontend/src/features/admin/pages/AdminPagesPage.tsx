@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -43,10 +45,14 @@ export function AdminPagesPage() {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<PageFormData>({
     resolver: zodResolver(pageSchema),
   });
+
+  const contentValue = watch('content');
 
   const openEdit = (page: PageData) => {
     setEditTarget(page);
@@ -155,19 +161,16 @@ export function AdminPagesPage() {
               helperText={errors.title?.message}
               {...register('title')}
             />
-            <TextField
-              label="Contenu"
-              fullWidth
-              multiline
-              minRows={12}
-              error={Boolean(errors.content)}
-              helperText={errors.content?.message}
-              inputProps={{ style: { fontFamily: 'monospace' } }}
-              {...register('content')}
+            <ReactQuill
+              theme="snow"
+              value={contentValue || ''}
+              onChange={(val) => setValue('content', val, { shouldValidate: true })}
             />
-            <Typography variant="caption" color="text.secondary">
-              Utilisez la syntaxe Markdown pour le formatage (## pour les titres, **gras**, etc.)
-            </Typography>
+            {errors.content && (
+              <Typography variant="caption" color="error">
+                {errors.content.message}
+              </Typography>
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
