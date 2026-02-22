@@ -9,21 +9,18 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // First loaded translation (eager-loaded filtered to current locale or all locales)
-        $translation = $this->translations->first();
-
         return [
             'id'             => $this->id,
             'sku'            => $this->sku,
+            'name'           => $this->name,
+            'slug'           => $this->slug,
+            'description'    => $this->description,
             'price'          => $this->price,
             'stock_quantity' => $this->stock_quantity,
             'in_stock'       => $this->stock_quantity > 0,
             'attributes'     => $this->attributes,
             'is_active'      => $this->is_active,
             'is_featured'    => $this->is_featured,
-            'name'           => $translation?->name,
-            'description'    => $translation?->description,
-            'slug'           => $translation?->slug,
             'category'       => $this->whenLoaded('category', fn () =>
                 new CategoryResource($this->category)
             ),

@@ -23,8 +23,7 @@ class ProductController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $products = QueryBuilder::for(
-            Product::query()
-                ->with(['translations', 'media', 'category.translations'])
+            Product::query()->with(['media', 'category'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
@@ -59,7 +58,7 @@ class ProductController extends Controller
 
     public function show(Product $product): ProductResource
     {
-        $product->load(['translations', 'media', 'category.translations']);
+        $product->load(['media', 'category']);
 
         return new ProductResource($product);
     }

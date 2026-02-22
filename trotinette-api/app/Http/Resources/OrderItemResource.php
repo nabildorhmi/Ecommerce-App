@@ -9,17 +9,6 @@ class OrderItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // Get product name from translation in the current locale
-        $productName = null;
-        if ($this->relationLoaded('product') && $this->product) {
-            $locale      = $request->header('Accept-Language', 'fr');
-            $translation = $this->product->translations
-                ->where('locale', $locale)
-                ->first()
-                ?? $this->product->translations->first();
-            $productName = $translation?->name;
-        }
-
         return [
             'id'          => $this->id,
             'product_id'  => $this->product_id,
@@ -29,7 +18,7 @@ class OrderItemResource extends JsonResource
             'subtotal'    => $this->subtotal,
             'product'     => $this->whenLoaded('product', fn () => [
                 'id'   => $this->product->id,
-                'name' => $productName,
+                'name' => $this->product->name,
             ]),
         ];
     }

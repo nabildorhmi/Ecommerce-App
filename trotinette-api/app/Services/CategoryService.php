@@ -9,38 +9,22 @@ class CategoryService
 {
     public function createCategory(array $data): Category
     {
-        $category = Category::create([
+        return Category::create([
             'slug'      => $data['slug'],
+            'name'      => $data['name'],
             'is_active' => $data['is_active'] ?? true,
         ]);
-
-        foreach ($data['translations'] as $locale => $translation) {
-            $category->translations()->create([
-                'locale' => $locale,
-                'name'   => $translation['name'],
-            ]);
-        }
-
-        return $category->load('translations');
     }
 
     public function updateCategory(Category $category, array $data): Category
     {
         $category->update(array_filter([
             'slug'      => $data['slug'] ?? null,
+            'name'      => $data['name'] ?? null,
             'is_active' => $data['is_active'] ?? null,
         ], fn ($v) => $v !== null));
 
-        if (isset($data['translations'])) {
-            foreach ($data['translations'] as $locale => $translation) {
-                $category->translations()->updateOrCreate(
-                    ['locale' => $locale],
-                    ['name' => $translation['name']]
-                );
-            }
-        }
-
-        return $category->load('translations');
+        return $category;
     }
 
     public function deleteCategory(Category $category): void

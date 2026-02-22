@@ -9,15 +9,13 @@ class OrderResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $locale = $request->header('Accept-Language', 'fr');
-
         return [
             'id'                  => $this->id,
             'order_number'        => $this->order_number,
             'phone'               => $this->phone,
             'city'                => $this->city,
             'status'              => $this->status->value,
-            'status_label'        => $this->status->label($locale),
+            'status_label'        => $this->status->label(),
             'subtotal'            => $this->subtotal,
             'delivery_fee'        => $this->delivery_fee,
             'total'               => $this->total,

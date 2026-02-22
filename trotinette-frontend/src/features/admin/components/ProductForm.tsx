@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,6 +15,12 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
+import IconButton from '@mui/material/IconButton';
+import Chip from '@mui/material/Chip';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { useAdminCategories } from '../api/categories';
 import { useCreateProduct, useUpdateProduct } from '../api/products';
 import { ImageUploader } from './ImageUploader';
@@ -30,6 +36,27 @@ function slugify(value: string): string {
     .replace(/^-|-$/g, '');
 }
 
+// ---- Attribute presets ----
+const ATTRIBUTE_PRESETS: Record<string, { key: string; value: string }[]> = {
+  'Trotinettes': [
+    { key: 'motor_power', value: '' },
+    { key: 'max_speed', value: '' },
+    { key: 'battery', value: '' },
+    { key: 'range_km', value: '' },
+    { key: 'weight_kg', value: '' },
+  ],
+  'Vetements': [
+    { key: 'taille', value: '' },
+    { key: 'couleur', value: '' },
+    { key: 'matiere', value: '' },
+  ],
+  'Electronique': [
+    { key: 'marque', value: '' },
+    { key: 'garantie', value: '' },
+    { key: 'poids_kg', value: '' },
+  ],
+};
+
 // ---- Zod schema ----
 const schema = z.object({
   sku: z.string().min(1, 'SKU requis').max(50),
@@ -44,21 +71,45 @@ const schema = z.object({
   category_id: z.number({ error: 'Categorie requise' }).nullable(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
-  attributes: z.object({
-    speed: z.string().optional().default(''),
-    battery: z.string().optional().default(''),
-    range_km: z.string().optional().default(''),
-    weight: z.string().optional().default(''),
-    motor_power: z.string().optional().default(''),
-  }),
 });
 
 type FormValues = z.infer<typeof schema>;
+
+interface AttrRow {
+  key: string;
+  value: string;
+}
 
 interface ProductFormProps {
   product?: AdminProduct;
   onSuccess: () => void;
 }
+
+function attrsToRows(attrs: Record<string, string | number> | null | undefined): AttrRow[] {
+  if (!attrs || typeof attrs !== 'object') return [{ key: '', value: '' }];
+  const rows = Object.entries(attrs).map(([key, value]) => ({ key, value: String(value) }));
+  return rows.length > 0 ? rows : [{ key: '', value: '' }];
+}
+
+function rowsToAttrs(rows: AttrRow[]): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const row of rows) {
+    const k = row.key.trim();
+    if (k) result[k] = row.value;
+  }
+  return result;
+}
+
+const quillModules = {
+  toolbar: [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    [{ color: [] }, { background: [] }],
+    ['link'],
+    ['clean'],
+  ],
+};
 
 export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const isEdit = Boolean(product);
@@ -78,6 +129,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     product?.images ?? []
   );
 
+  // Dynamic attributes state
+  const [attrRows, setAttrRows] = useState<AttrRow[]>(() => attrsToRows(product?.attributes));
+
   // Track manual slug edits to prevent auto-override
   const [slugManual, setSlugManual] = useState(false);
 
@@ -91,13 +145,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     category_id: product?.category_id ?? product?.category?.id ?? null,
     is_active: product?.is_active ?? true,
     is_featured: product?.is_featured ?? false,
-    attributes: {
-      speed: String(product?.attributes?.speed ?? ''),
-      battery: String(product?.attributes?.battery ?? ''),
-      range_km: String(product?.attributes?.range_km ?? ''),
-      weight: String(product?.attributes?.weight ?? ''),
-      motor_power: String(product?.attributes?.motor_power ?? ''),
-    },
   };
 
   const {
@@ -127,6 +174,35 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     setDeletedImageIds((prev) => [...prev, mediaId]);
   }, []);
 
+  const handleAttrChange = (index: number, field: 'key' | 'value', val: string) => {
+    setAttrRows((prev) => prev.map((row, i) => (i === index ? { ...row, [field]: val } : row)));
+  };
+
+  const addAttrRow = () => {
+    setAttrRows((prev) => [...prev, { key: '', value: '' }]);
+  };
+
+  const removeAttrRow = (index: number) => {
+    setAttrRows((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const applyPreset = (presetName: string) => {
+    const preset = ATTRIBUTE_PRESETS[presetName];
+    if (!preset) return;
+    // Merge: keep existing rows with values, add preset keys that don't exist yet
+    const existingKeys = new Set(attrRows.map((r) => r.key.trim()).filter(Boolean));
+    const newRows = [...attrRows.filter((r) => r.key.trim())];
+    for (const p of preset) {
+      if (!existingKeys.has(p.key)) {
+        newRows.push({ ...p });
+      }
+    }
+    setAttrRows(newRows.length > 0 ? newRows : [{ key: '', value: '' }]);
+  };
+
+  // Memoize quill modules to prevent re-renders
+  const modules = useMemo(() => quillModules, []);
+
   const onSubmit = async (values: FormValues) => {
     const payload = {
       sku: values.sku,
@@ -138,7 +214,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       category_id: values.category_id,
       is_active: values.is_active,
       is_featured: values.is_featured,
-      attributes: values.attributes,
+      attributes: rowsToAttrs(attrRows),
       images: newImages,
       delete_images: deletedImageIds,
     };
@@ -160,14 +236,14 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       {mutationError && (
         <Alert severity="error">
           {(mutationError as { response?: { data?: { message?: string } } })
-            ?.response?.data?.message ?? 'Une erreur est survenue / An error occurred'}
+            ?.response?.data?.message ?? 'Une erreur est survenue'}
         </Alert>
       )}
 
       {/* Section 1: Basic info */}
       <Box>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Informations de base / Basic Info
+          Informations de base
         </Typography>
         <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
           <TextField
@@ -178,7 +254,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             required
           />
           <TextField
-            label="Prix (MAD) / Price (MAD)"
+            label="Prix (MAD)"
             type="number"
             inputProps={{ step: '0.01', min: '0' }}
             {...register('price', { valueAsNumber: true })}
@@ -200,9 +276,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             control={control}
             render={({ field }) => (
               <FormControl error={Boolean(errors.category_id)}>
-                <InputLabel>Categorie / Category</InputLabel>
+                <InputLabel>Categorie</InputLabel>
                 <Select
-                  label="Categorie / Category"
+                  label="Categorie"
                   value={field.value != null ? String(field.value) : ''}
                   onChange={(e) => {
                     const val = String(e.target.value);
@@ -210,7 +286,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                   }}
                 >
                   <MenuItem value="">
-                    <em>Aucune / None</em>
+                    <em>Aucune</em>
                   </MenuItem>
                   {categories.map((cat) => (
                     <MenuItem key={cat.id} value={String(cat.id)}>
@@ -234,7 +310,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
                 }
-                label="Actif / Active"
+                label="Actif"
               />
             )}
           />
@@ -251,7 +327,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                     onChange={(e) => field.onChange(e.target.checked)}
                   />
                 }
-                label="En vedette / Featured (Homepage carousel)"
+                label="En vedette (page d'accueil)"
               />
             )}
           />
@@ -263,11 +339,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       {/* Section 2: Product Info */}
       <Box>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Informations produit / Product Info
+          Informations produit
         </Typography>
         <Box display="flex" flexDirection="column" gap={2}>
           <TextField
-            label="Nom / Name"
+            label="Nom"
             {...register('name')}
             error={Boolean(errors.name)}
             helperText={errors.name?.message}
@@ -281,47 +357,104 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             error={Boolean(errors.slug)}
             helperText={
               errors.slug?.message ??
-              'Auto-genere depuis le nom / Auto-generated from name'
+              'Auto-genere depuis le nom'
             }
           />
-          <TextField
-            label="Description"
-            multiline
-            rows={3}
-            {...register('description')}
-          />
+
+          {/* WYSIWYG Description */}
+          <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Description
+            </Typography>
+            <Controller
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <Box
+                  sx={{
+                    '& .ql-container': {
+                      minHeight: 150,
+                      fontSize: '0.95rem',
+                    },
+                    '& .ql-editor': {
+                      minHeight: 150,
+                    },
+                  }}
+                >
+                  <ReactQuill
+                    theme="snow"
+                    value={field.value}
+                    onChange={field.onChange}
+                    modules={modules}
+                    placeholder="Description du produit..."
+                  />
+                </Box>
+              )}
+            />
+          </Box>
         </Box>
       </Box>
 
       <Divider />
 
-      {/* Section 3: Specifications */}
+      {/* Section 3: Dynamic Attributes */}
       <Box>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-          Specifications
-        </Typography>
-        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
-          <TextField
-            label="Vitesse max / Max speed"
-            {...register('attributes.speed')}
-          />
-          <TextField
-            label="Batterie / Battery"
-            {...register('attributes.battery')}
-          />
-          <TextField
-            label="Autonomie (km) / Range (km)"
-            {...register('attributes.range_km')}
-          />
-          <TextField
-            label="Poids / Weight"
-            {...register('attributes.weight')}
-          />
-          <TextField
-            label="Puissance moteur / Motor power"
-            {...register('attributes.motor_power')}
-          />
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <Typography variant="subtitle1" fontWeight="bold">
+            Caracteristiques
+          </Typography>
         </Box>
+
+        {/* Preset buttons */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+          {Object.keys(ATTRIBUTE_PRESETS).map((presetName) => (
+            <Chip
+              key={presetName}
+              label={presetName}
+              onClick={() => applyPreset(presetName)}
+              variant="outlined"
+              size="small"
+              sx={{ cursor: 'pointer' }}
+            />
+          ))}
+        </Box>
+
+        {attrRows.map((row, index) => (
+          <Box key={index} display="flex" gap={1} mb={1} alignItems="center">
+            <TextField
+              label="Cle"
+              size="small"
+              value={row.key}
+              onChange={(e) => handleAttrChange(index, 'key', e.target.value)}
+              sx={{ flex: 1 }}
+              placeholder="ex: couleur, taille, poids"
+            />
+            <TextField
+              label="Valeur"
+              size="small"
+              value={row.value}
+              onChange={(e) => handleAttrChange(index, 'value', e.target.value)}
+              sx={{ flex: 1 }}
+              placeholder="ex: rouge, M, 12 kg"
+            />
+            <IconButton
+              onClick={() => removeAttrRow(index)}
+              disabled={attrRows.length <= 1}
+              size="small"
+              color="error"
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        ))}
+        <Button
+          startIcon={<AddIcon />}
+          onClick={addAttrRow}
+          size="small"
+          sx={{ mt: 1 }}
+        >
+          Ajouter un attribut
+        </Button>
       </Box>
 
       <Divider />
@@ -348,8 +481,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           {isLoading
             ? 'Enregistrement...'
             : isEdit
-              ? 'Mettre a jour / Update'
-              : 'Creer / Create'}
+              ? 'Mettre a jour'
+              : 'Creer'}
         </Button>
       </Box>
     </Box>

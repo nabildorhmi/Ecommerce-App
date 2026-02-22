@@ -19,9 +19,7 @@ class CategoryController extends Controller
 
     public function index(): ResourceCollection
     {
-        $categories = Category::query()
-            ->with('translations')
-            ->get();
+        $categories = Category::all();
 
         return CategoryResource::collection($categories);
     }
@@ -37,8 +35,6 @@ class CategoryController extends Controller
 
     public function show(Category $category): CategoryResource
     {
-        $category->load('translations');
-
         return new CategoryResource($category);
     }
 
@@ -49,13 +45,6 @@ class CategoryController extends Controller
             'slug'      => 'sometimes|string|unique:categories,slug,' . $category->id,
             'is_active' => 'sometimes|boolean',
         ]);
-
-        // Map flat name to translations.fr so CategoryService works unchanged
-        if (isset($validated['name']) && ! isset($validated['translations'])) {
-            $validated['translations'] = [
-                'fr' => ['name' => $validated['name']],
-            ];
-        }
 
         $category = $this->categoryService->updateCategory($category, $validated);
 

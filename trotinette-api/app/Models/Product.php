@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -17,6 +16,9 @@ class Product extends Model implements HasMedia
 
     protected $fillable = [
         'sku',
+        'name',
+        'slug',
+        'description',
         'price',
         'stock_quantity',
         'attributes',
@@ -52,11 +54,6 @@ class Product extends Model implements HasMedia
         $this->addMediaConversion('full')
             ->fit(Fit::Contain, 1200, 900)
             ->nonQueued();
-    }
-
-    public function translations(): HasMany
-    {
-        return $this->hasMany(ProductTranslation::class);
     }
 
     public function category(): BelongsTo

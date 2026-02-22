@@ -101,7 +101,40 @@ export function ProductDetailPage() {
           <Grid size={{ xs: 12, md: 7 }}>
             <ProductGallery images={product.images} />
 
-            {/* Specs — displayed below gallery on desktop */}
+            {/* Description — displayed below gallery */}
+            {product.description && (
+              <Box sx={{ mt: 4 }}>
+                <Typography
+                  sx={{
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.12em',
+                    color: '#00C2FF',
+                    textTransform: 'uppercase',
+                    mb: 1.5,
+                  }}
+                >
+                  DESCRIPTION
+                </Typography>
+                <Box
+                  sx={{
+                    fontSize: '0.92rem',
+                    color: 'text.secondary',
+                    lineHeight: 1.8,
+                    wordBreak: 'break-word',
+                    overflowWrap: 'break-word',
+                    whiteSpace: 'pre-line',
+                    '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
+                    '& ul, & ol': { pl: 3 },
+                    '& p': { mb: 1.5 },
+                    '& a': { color: '#00C2FF' },
+                  }}
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              </Box>
+            )}
+
+            {/* Specs — displayed below description */}
             {product.attributes && Object.keys(product.attributes).length > 0 && (
               <Box sx={{ mt: 4 }}>
                 <Typography
@@ -186,19 +219,6 @@ export function ProductDetailPage() {
                 <StockBadge inStock={product.in_stock} />
 
                 <Divider />
-
-                {/* Description */}
-                {product.description && (
-                  <Typography
-                    sx={{
-                      fontSize: '0.88rem',
-                      color: 'text.secondary',
-                      lineHeight: 1.7,
-                    }}
-                  >
-                    {product.description}
-                  </Typography>
-                )}
 
                 {/* CTA Actions */}
                 <Stack spacing={1.5} sx={{ pt: 0.5 }}>

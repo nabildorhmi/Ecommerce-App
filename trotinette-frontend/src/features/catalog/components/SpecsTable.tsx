@@ -18,25 +18,10 @@ function formatKey(key: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-// Add unit suffix based on known spec key names
-function formatValue(key: string, value: string | number): string {
-  const str = String(value);
-  if (!str || str === '') return '—';
-
-  const keyLower = key.toLowerCase();
-  if (keyLower === 'speed') return `${str} km/h`;
-  if (keyLower === 'battery') return `${str} Ah`;
-  if (keyLower === 'range_km') return `${str} km`;
-  if (keyLower === 'weight') return `${str} kg`;
-  if (keyLower === 'motor_power') return `${str} W`;
-
-  return str;
-}
-
 /**
  * SpecsTable renders a two-column table of product technical attributes.
  * Keys are auto-formatted (underscore -> spaces, capitalized).
- * Known spec keys get appropriate unit suffixes.
+ * Fully generic — works with any key-value attributes.
  */
 export function SpecsTable({ attributes }: SpecsTableProps) {
   if (!attributes) return null;
@@ -77,7 +62,7 @@ export function SpecsTable({ attributes }: SpecsTableProps) {
               >
                 {formatKey(key)}
               </TableCell>
-              <TableCell>{formatValue(key, value)}</TableCell>
+              <TableCell>{String(value)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

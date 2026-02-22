@@ -139,24 +139,14 @@ export function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </Typography>
 
-        {/* Attributes preview */}
-        {product.attributes && (product.attributes.range_km || product.attributes.speed) && (
+        {/* Attributes preview — show first 3 attributes as chips */}
+        {product.attributes && Object.keys(product.attributes).length > 0 && (
           <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
-            {product.attributes.range_km && (
-              <Box sx={{ fontSize: '0.65rem', color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: '4px', border: '1px solid', borderColor: 'divider' }}>
-                {product.attributes.range_km}km
+            {Object.entries(product.attributes).slice(0, 3).map(([, value]) => (
+              <Box key={String(value)} sx={{ fontSize: '0.65rem', color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: '4px', border: '1px solid', borderColor: 'divider' }}>
+                {String(value)}
               </Box>
-            )}
-            {product.attributes.speed && (
-              <Box sx={{ fontSize: '0.65rem', color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: '4px', border: '1px solid', borderColor: 'divider' }}>
-                {product.attributes.speed}
-              </Box>
-            )}
-            {product.attributes.motor_power && (
-              <Box sx={{ fontSize: '0.65rem', color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: '4px', border: '1px solid', borderColor: 'divider' }}>
-                {product.attributes.motor_power}
-              </Box>
-            )}
+            ))}
           </Box>
         )}
 

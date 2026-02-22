@@ -19,16 +19,4 @@ class StoreCategoryRequest extends FormRequest
             'is_active' => 'boolean',
         ];
     }
-
-    protected function prepareForValidation(): void
-    {
-        // Build translations.fr from flat name so CategoryService works unchanged
-        if ($this->has('name') && ! $this->has('translations')) {
-            $this->merge([
-                'translations' => [
-                    'fr' => ['name' => $this->input('name')],
-                ],
-            ]);
-        }
-    }
 }

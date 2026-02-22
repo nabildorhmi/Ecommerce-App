@@ -8,13 +8,6 @@ export interface ProductImage {
   original: string;
 }
 
-export interface ProductTranslation {
-  locale: string;
-  name: string;
-  slug: string;
-  description: string | null;
-}
-
 export interface AdminProduct {
   id: number;
   sku: string;
@@ -53,13 +46,7 @@ export interface ProductFormData {
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
-  attributes: {
-    speed: string;
-    battery: string;
-    range_km: string;
-    weight: string;
-    motor_power: string;
-  };
+  attributes: Record<string, string>;
   images: File[];
   delete_images: number[];
 }
