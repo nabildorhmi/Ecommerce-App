@@ -9,13 +9,11 @@ class CategoryResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $translation = $this->translations->first();
-
         return [
             'id'         => $this->id,
             'slug'       => $this->slug,
+            'name'       => $this->name,
             'is_active'  => $this->is_active,
-            'name'       => $translation?->name,
             'created_at' => $this->created_at,
         ];
     }

@@ -13,7 +13,7 @@ use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // Health check — unauthenticated
-Route::get('/ping', fn() => response()->json(['status' => 'ok', 'locale' => app()->getLocale()]));
+Route::get('/ping', fn() => response()->json(['status' => 'ok']));
 
 // Auth routes — unauthenticated
 Route::post('/auth/register', [AuthController::class, 'register']);

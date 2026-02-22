@@ -10,17 +10,13 @@ class Category extends Model
 {
     protected $fillable = [
         'slug',
+        'name',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
     ];
-
-    public function translations(): HasMany
-    {
-        return $this->hasMany(CategoryTranslation::class);
-    }
 
     public function products(): HasMany
     {

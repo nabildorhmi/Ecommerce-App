@@ -11,11 +11,8 @@ class CategoryController extends Controller
 {
     public function index(): ResourceCollection
     {
-        $locale = app()->getLocale();
-
         $categories = Category::query()
             ->active()
-            ->with(['translations' => fn ($q) => $q->where('locale', $locale)])
             ->get();
 
         return CategoryResource::collection($categories);

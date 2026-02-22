@@ -14,16 +14,10 @@ class ProductController extends Controller
 {
     public function index(Request $request): ResourceCollection
     {
-        $locale = app()->getLocale();
-
         $products = QueryBuilder::for(
             Product::query()
                 ->where('is_active', true)
-                ->with([
-                    'translations' => fn ($q) => $q->where('locale', $locale),
-                    'media',
-                    'category.translations' => fn ($q) => $q->where('locale', $locale),
-                ])
+                ->with(['media', 'category'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
@@ -37,18 +31,15 @@ class ProductController extends Controller
                 AllowedFilter::callback('in_stock', fn ($query, $value) =>
                     $query->when((bool) $value, fn ($q) => $q->where('stock_quantity', '>', 0))
                 ),
-                AllowedFilter::callback('search', function ($query, $value) use ($locale) {
-                    $query->whereHas('translations', function ($q) use ($value, $locale) {
-                        $q->where('locale', $locale)
-                            ->when(
-                                strlen($value) >= 4,
-                                fn ($inner) => $inner->whereFullText(['name', 'description'], $value),
-                                fn ($inner) => $inner->where(fn ($qq) =>
-                                    $qq->where('name', 'LIKE', "%{$value}%")
-                                       ->orWhere('description', 'LIKE', "%{$value}%")
-                                )
-                            );
-                    });
+                AllowedFilter::callback('search', function ($query, $value) {
+                    $query->when(
+                        strlen($value) >= 4,
+                        fn ($q) => $q->whereFullText(['name', 'description'], $value),
+                        fn ($q) => $q->where(fn ($qq) =>
+                            $qq->where('name', 'LIKE', "%{$value}%")
+                               ->orWhere('description', 'LIKE', "%{$value}%")
+                        )
+                    );
                 }),
             ])
             ->allowedSorts(['price', 'created_at'])
@@ -61,18 +52,10 @@ class ProductController extends Controller
 
     public function show(string $slug): ProductResource
     {
-        $locale = app()->getLocale();
-
         $product = Product::query()
             ->where('is_active', true)
-            ->whereHas('translations', fn ($q) =>
-                $q->where('locale', $locale)->where('slug', $slug)
-            )
-            ->with([
-                'translations' => fn ($q) => $q->where('locale', $locale),
-                'media',
-                'category.translations' => fn ($q) => $q->where('locale', $locale),
-            ])
+            ->where('slug', $slug)
+            ->with(['media', 'category'])
             ->firstOrFail();
 
         return new ProductResource($product);
