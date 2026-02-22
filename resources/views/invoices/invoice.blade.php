@@ -41,33 +41,17 @@
             font-weight: bold;
             color: #111827;
         }
-        .order-info {
+        .invoice-meta {
+            font-size: 10pt;
+            color: #4b5563;
+            margin-top: 4px;
+        }
+        .client-info {
             margin-bottom: 15px;
-            padding: 12px;
+            padding: 10px 12px;
             border-top: 1px solid #d1d5db;
             border-bottom: 1px solid #d1d5db;
-        }
-        .order-info h3 {
-            margin-bottom: 10px;
-            color: #1f2937;
-            font-size: 11pt;
-        }
-        .order-info-grid {
-            display: table;
-            width: 100%;
-        }
-        .order-info-row {
-            display: table-row;
-        }
-        .order-info-label {
-            display: table-cell;
-            font-weight: bold;
-            padding: 3px 0;
-            width: 40%;
-        }
-        .order-info-value {
-            display: table-cell;
-            padding: 3px 0;
+            font-size: 10pt;
         }
         .items-table {
             width: 100%;
@@ -108,6 +92,9 @@
             margin-left: auto;
             width: 300px;
             margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            padding: 10px;
         }
         .totals-row {
             display: table;
@@ -115,12 +102,12 @@
             padding: 6px 0;
         }
         .totals-row.total {
-            background-color: #1f2937;
-            color: white;
             font-weight: bold;
             font-size: 11pt;
-            padding: 10px 8px;
+            padding: 8px 0;
             margin-top: 5px;
+            border-top: 1px solid #d1d5db;
+            color: #111827;
         }
         .totals-label {
             display: table-cell;
@@ -158,33 +145,14 @@
         </div>
         <div class="header-right">
             <div class="invoice-title">FACTURE</div>
+            <div class="invoice-meta">N&deg; {{ $order->order_number }}</div>
+            <div class="invoice-meta">Date: {{ $order->created_at->format('d/m/Y') }}</div>
         </div>
     </div>
 
-    <div class="order-info">
-        <h3>Informations de commande</h3>
-        <div class="order-info-grid">
-            <div class="order-info-row">
-                <div class="order-info-label">Numéro de commande:</div>
-                <div class="order-info-value">{{ $order->order_number }}</div>
-            </div>
-            <div class="order-info-row">
-                <div class="order-info-label">Date:</div>
-                <div class="order-info-value">{{ $order->created_at->format('d/m/Y') }}</div>
-            </div>
-            <div class="order-info-row">
-                <div class="order-info-label">Client:</div>
-                <div class="order-info-value">{{ $order->user->name }}</div>
-            </div>
-            <div class="order-info-row">
-                <div class="order-info-label">Téléphone:</div>
-                <div class="order-info-value">{{ $order->phone }}</div>
-            </div>
-            <div class="order-info-row">
-                <div class="order-info-label">Ville:</div>
-                <div class="order-info-value">{{ $order->city }}</div>
-            </div>
-        </div>
+    <div class="client-info">
+        <div><strong>Client:</strong> {{ $order->user->name }} &nbsp;&nbsp; <strong>Telephone:</strong> {{ $order->phone }} &nbsp;&nbsp; <strong>E-mail:</strong> {{ $order->user->email }}</div>
+        <div style="margin-top: 4px;"><strong>Ville:</strong> {{ $order->city }}@if($order->user->address_street) &nbsp;&nbsp; <strong>Adresse:</strong> {{ $order->user->address_street }}@endif</div>
     </div>
 
     <table class="items-table">
