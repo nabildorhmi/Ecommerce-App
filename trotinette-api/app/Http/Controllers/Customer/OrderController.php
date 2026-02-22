@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Services\InvoiceService;
 use App\Services\OrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,8 +14,10 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderService $orderService)
-    {
+    public function __construct(
+        private readonly OrderService $orderService,
+        private readonly InvoiceService $invoiceService
+    ) {
     }
 
     public function store(StoreOrderRequest $request): JsonResponse
@@ -45,5 +48,15 @@ class OrderController extends Controller
         $order->load(['items.product', 'deliveryZone', 'statusLogs']);
 
         return new OrderResource($order);
+    }
+
+    public function invoice(Request $request, Order $order)
+    {
+        if ($order->user_id !== $request->user()->id) {
+            abort(403, 'This order does not belong to you.');
+        }
+
+        $pdf = $this->invoiceService->generatePdf($order);
+        return $pdf->download("facture-{$order->order_number}.pdf");
     }
 }

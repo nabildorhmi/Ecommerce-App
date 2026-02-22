@@ -32,9 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     // Customer order routes
-    Route::get('/orders',          [OrderController::class, 'index']);
-    Route::post('/orders',         [OrderController::class, 'store']);
-    Route::get('/orders/{order}',  [OrderController::class, 'show']);
+    Route::get('/orders',                  [OrderController::class, 'index']);
+    Route::post('/orders',                 [OrderController::class, 'store']);
+    Route::get('/orders/{order}',          [OrderController::class, 'show']);
+    Route::get('/orders/{order}/invoice',  [OrderController::class, 'invoice']);
 
     // Admin-only routes (both admin and global_admin can access)
     Route::middleware('role:admin|global_admin')->prefix('admin')->group(function () {
@@ -76,6 +77,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Order management
         Route::get('/orders',                              [AdminOrderController::class, 'index']);
         Route::get('/orders/{order}',                     [AdminOrderController::class, 'show']);
+        Route::get('/orders/{order}/invoice',             [AdminOrderController::class, 'invoice']);
         Route::patch('/orders/{order}/status',            [AdminOrderController::class, 'transition']);
         Route::post('/orders/{order}/note',               [AdminOrderController::class, 'addNote']);
     });

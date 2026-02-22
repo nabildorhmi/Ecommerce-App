@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\AddOrderNoteRequest;
 use App\Http\Requests\Admin\TransitionOrderRequest;
 use App\Http\Resources\OrderResource;
 use App\Models\Order;
+use App\Services\InvoiceService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -16,8 +17,10 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class OrderController extends Controller
 {
-    public function __construct(private readonly OrderService $orderService)
-    {
+    public function __construct(
+        private readonly OrderService $orderService,
+        private readonly InvoiceService $invoiceService
+    ) {
     }
 
     public function index(Request $request): ResourceCollection
@@ -64,5 +67,11 @@ class OrderController extends Controller
         $order = $this->orderService->addNote($order, $request->note, $request->user()->id);
 
         return new OrderResource($order);
+    }
+
+    public function invoice(Order $order)
+    {
+        $pdf = $this->invoiceService->generatePdf($order);
+        return $pdf->download("facture-{$order->order_number}.pdf");
     }
 }
