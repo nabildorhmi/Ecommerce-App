@@ -151,7 +151,8 @@
     </div>
 
     <div class="client-info">
-        <strong>Client:</strong> {{ $order->user->name }} &nbsp;|&nbsp; <strong>Telephone:</strong> {{ $order->phone }} &nbsp;|&nbsp; <strong>Ville:</strong> {{ $order->city }}@if($order->user->address_street) &nbsp;|&nbsp; <strong>Adresse:</strong> {{ $order->user->address_street }}@endif
+        <div><strong>Client:</strong> {{ $order->user->name }} &nbsp;&nbsp; <strong>Telephone:</strong> {{ $order->phone }} &nbsp;&nbsp; <strong>E-mail:</strong> {{ $order->user->email }}</div>
+        <div style="margin-top: 4px;"><strong>Ville:</strong> {{ $order->city }}@if($order->user->address_street) &nbsp;&nbsp; <strong>Adresse:</strong> {{ $order->user->address_street }}@endif</div>
     </div>
 
     <table class="items-table">
