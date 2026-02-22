@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import MDEditor from '@uiw/react-md-editor';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -9,10 +10,6 @@ import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
-import TextField from '@mui/material/TextField';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Paper from '@mui/material/Paper';
 import EditIcon from '@mui/icons-material/Edit';
 import { usePageBySlug } from '../api/pages';
 import { useUpdatePage } from '../../admin/api/pages';
@@ -37,7 +34,6 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
-  const [editTab, setEditTab] = useState(0);
   const [successOpen, setSuccessOpen] = useState(false);
 
   if (isLoading) {
@@ -58,7 +54,6 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   const handleEdit = () => {
     setEditContent(page.content);
-    setEditTab(0);
     setIsEditing(true);
   };
 
@@ -91,36 +86,14 @@ export function DynamicPage({ slug }: DynamicPageProps) {
         </Box>
 
         {isEditing ? (
-          <Box>
-            <Paper variant="outlined" sx={{ mb: 2 }}>
-              <Tabs
-                value={editTab}
-                onChange={(_e, v: number) => setEditTab(v)}
-                sx={{ borderBottom: 1, borderColor: 'divider', px: 1 }}
-              >
-                <Tab label="Modifier" sx={{ textTransform: 'none' }} />
-                <Tab label="Apercu" sx={{ textTransform: 'none' }} />
-              </Tabs>
-              <Box sx={{ p: 2 }}>
-                {editTab === 0 ? (
-                  <TextField
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    multiline
-                    minRows={16}
-                    fullWidth
-                    placeholder="Contenu en Markdown..."
-                    inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.9rem' } }}
-                    sx={{ '& .MuiOutlinedInput-root': { p: 0 }, '& textarea': { p: 1.5 } }}
-                  />
-                ) : (
-                  <Box sx={{ minHeight: 200, ...markdownStyles }}>
-                    <ReactMarkdown>{editContent}</ReactMarkdown>
-                  </Box>
-                )}
-              </Box>
-            </Paper>
-            <Stack direction="row" spacing={2}>
+          <Box data-color-mode="light">
+            <MDEditor
+              value={editContent}
+              onChange={(val) => setEditContent(val ?? '')}
+              height={400}
+              preview="live"
+            />
+            <Stack direction="row" spacing={2} mt={2}>
               <Button
                 variant="contained"
                 onClick={handleSave}
