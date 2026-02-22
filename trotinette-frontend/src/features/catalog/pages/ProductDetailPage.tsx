@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useParams, Link } from 'react-router';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -121,14 +123,23 @@ export function ProductDetailPage() {
                     fontSize: '0.92rem',
                     color: 'text.secondary',
                     lineHeight: 1.8,
-                    overflowWrap: 'break-word',
                     '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
-                    '& ul, & ol': { pl: 3 },
+                    '& ul': { pl: 3, listStyleType: 'disc' },
+                    '& ol': { pl: 3, listStyleType: 'decimal' },
+                    '& li': { mb: 0.5, display: 'list-item' },
                     '& p': { mb: 1.5 },
+                    '& p:last-child': { mb: 0 },
                     '& a': { color: '#00C2FF' },
+                    '& strong': { color: 'text.primary', fontWeight: 700 },
+                    '& em': { fontStyle: 'italic' },
+                    '& blockquote': { borderLeft: '3px solid #00C2FF', pl: 2, ml: 0, color: 'text.disabled' },
+                    '& code': { fontFamily: 'monospace', fontSize: '0.85em', bgcolor: 'action.hover', px: 0.5, borderRadius: 0.5 },
                   }}
-                  dangerouslySetInnerHTML={{ __html: product.description }}
-                />
+                >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {product.description}
+                  </ReactMarkdown>
+                </Box>
               </Box>
             )}
 
@@ -152,12 +163,10 @@ export function ProductDetailPage() {
             )}
           </Grid>
 
-          {/* Right: Sticky product info panel */}
+          {/* Right: product info panel */}
           <Grid size={{ xs: 12, md: 5 }}>
             <Box
               sx={{
-                position: { md: 'sticky' },
-                top: { md: 90 },
                 backgroundColor: 'background.paper',
                 border: '1px solid',
                 borderColor: 'divider',

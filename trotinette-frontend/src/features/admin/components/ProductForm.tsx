@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -27,8 +27,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import SettingsIcon from '@mui/icons-material/Settings';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import MDEditor from '@uiw/react-md-editor';
 import { useAdminCategories } from '../api/categories';
 import { useCreateProduct, useUpdateProduct } from '../api/products';
 import { ImageUploader } from './ImageUploader';
@@ -88,16 +87,7 @@ function rowsToAttrs(rows: AttrRow[]): Record<string, string> {
   return result;
 }
 
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    [{ color: [] }, { background: [] }],
-    ['link'],
-    ['clean'],
-  ],
-};
+
 
 // ---- Template Management Dialog ----
 function TemplateDialog({
@@ -347,8 +337,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     setAttrRows(newRows.length > 0 ? newRows : [{ key: '', value: '' }]);
   };
 
-  const modules = useMemo(() => quillModules, []);
-
+  
   const onSubmit = async (values: FormValues) => {
     const payload = {
       sku: values.sku,
@@ -504,29 +493,21 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             helperText={errors.slug?.message ?? 'Auto-genere depuis le nom'}
           />
 
-          {/* WYSIWYG Description */}
-          <Box>
+          {/* Markdown Description */}
+          <Box data-color-mode="dark">
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Description
+              Description (Markdown)
             </Typography>
             <Controller
               name="description"
               control={control}
               render={({ field }) => (
-                <Box
-                  sx={{
-                    '& .ql-container': { minHeight: 150, fontSize: '0.95rem' },
-                    '& .ql-editor': { minHeight: 150 },
-                  }}
-                >
-                  <ReactQuill
-                    theme="snow"
-                    value={field.value}
-                    onChange={field.onChange}
-                    modules={modules}
-                    placeholder="Description du produit..."
-                  />
-                </Box>
+                <MDEditor
+                  value={field.value}
+                  onChange={(val) => field.onChange(val ?? '')}
+                  height={220}
+                  preview="edit"
+                />
               )}
             />
           </Box>
