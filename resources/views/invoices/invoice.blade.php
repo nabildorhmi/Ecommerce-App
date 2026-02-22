@@ -12,15 +12,15 @@
         }
         body {
             font-family: 'DejaVu Sans', sans-serif;
-            font-size: 11pt;
+            font-size: 10pt;
             color: #333;
             line-height: 1.6;
-            padding: 30px;
+            padding: 20px;
         }
         .header {
             display: table;
             width: 100%;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
         .header-left {
             display: table-cell;
@@ -37,20 +37,20 @@
             height: 60px;
         }
         .invoice-title {
-            font-size: 32pt;
+            font-size: 22pt;
             font-weight: bold;
-            color: #2563eb;
+            color: #111827;
         }
         .order-info {
-            margin-bottom: 30px;
-            background-color: #f3f4f6;
-            padding: 20px;
-            border-radius: 5px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-top: 1px solid #d1d5db;
+            border-bottom: 1px solid #d1d5db;
         }
         .order-info h3 {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #1f2937;
-            font-size: 14pt;
+            font-size: 11pt;
         }
         .order-info-grid {
             display: table;
@@ -62,24 +62,24 @@
         .order-info-label {
             display: table-cell;
             font-weight: bold;
-            padding: 5px 0;
+            padding: 3px 0;
             width: 40%;
         }
         .order-info-value {
             display: table-cell;
-            padding: 5px 0;
+            padding: 3px 0;
         }
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .items-table thead {
-            background-color: #2563eb;
+            background-color: #374151;
             color: white;
         }
         .items-table th {
-            padding: 12px 10px;
+            padding: 8px;
             text-align: left;
             font-weight: bold;
         }
@@ -96,7 +96,7 @@
             background-color: #f9fafb;
         }
         .items-table td {
-            padding: 10px;
+            padding: 8px;
         }
         .items-table td.text-center {
             text-align: center;
@@ -107,19 +107,19 @@
         .totals {
             margin-left: auto;
             width: 300px;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         .totals-row {
             display: table;
             width: 100%;
-            padding: 8px 0;
+            padding: 6px 0;
         }
         .totals-row.total {
-            background-color: #2563eb;
+            background-color: #1f2937;
             color: white;
             font-weight: bold;
-            font-size: 13pt;
-            padding: 12px 10px;
+            font-size: 11pt;
+            padding: 10px 8px;
             margin-top: 5px;
         }
         .totals-label {
@@ -132,19 +132,19 @@
             width: 40%;
         }
         .note {
-            background-color: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin-bottom: 30px;
+            background-color: #f3f4f6;
+            border-left: 4px solid #6b7280;
+            padding: 10px;
+            margin-bottom: 20px;
         }
         .note h4 {
-            margin-bottom: 8px;
-            color: #92400e;
+            margin-bottom: 6px;
+            color: #374151;
         }
         .footer {
             text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
+            margin-top: 25px;
+            padding-top: 15px;
             border-top: 2px solid #e5e7eb;
             color: #6b7280;
             font-size: 10pt;
