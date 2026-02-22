@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 Phase: 4 of 5 (Cart, Checkout & Orders)
 Plan: 4 of 4 in current phase — 04-04 COMPLETE. Phase 4 fully done.
 Status: Phase 4 complete — full order lifecycle implemented (backend + frontend). Next: Phase 5 (I18N-02, remaining features).
-Last activity: 2026-02-22 - Completed quick task 10: Redesign PDF invoice, editable CMS pages, change password, forgot/reset password
+Last activity: 2026-02-22 - Completed quick task 11: Inline WYSIWYG page editing, PDF invoice layout improvements
 
 Progress: [█████████░] 90%
 
@@ -129,9 +129,10 @@ None.
 | 6 | Per-category "Voir tous" buttons on homepage, global_admin user creation dialog, navbar search bar | 2026-02-21 | 3e4fa90, dce44ff | [6-per-category-voir-tous-les-modeles-butto](./quick/6-per-category-voir-tous-les-modeles-butto/) |
 | 9 | Add PDF invoice generation service using barryvdh/laravel-dompdf with logo and order items table | 2026-02-22 | f3af677 | [9-add-pdf-invoice-generation-service-using](./quick/9-add-pdf-invoice-generation-service-using/) |
 | 10 | Redesign PDF invoice (neutral palette), editable CMS pages, change password, forgot/reset password | 2026-02-22 | b53002d, aebfd39, c681864, a96507c, 87e03db | [10-redesign-pdf-invoice-template-editable-s](./quick/10-redesign-pdf-invoice-template-editable-s/) |
+| 11 | Inline WYSIWYG page editing for admins, PDF invoice layout improvements | 2026-02-22 | bd727db, d43c30b | [11-inline-page-editing-with-wysiwyg-on-stat](./quick/11-inline-page-editing-with-wysiwyg-on-stat/) |
 
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed quick task 10 — redesigned PDF invoice with neutral palette, added editable CMS pages with admin editor, change password on profile, and forgot/reset password flow.
+Stopped at: Completed quick task 11 — inline WYSIWYG editing on static pages for admin users, WYSIWYG in AdminPagesPage dialog, PDF invoice layout improvements.
 Resume file: None
