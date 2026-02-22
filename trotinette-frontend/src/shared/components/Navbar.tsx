@@ -29,6 +29,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import DescriptionIcon from '@mui/icons-material/Description';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -364,6 +365,7 @@ export function Navbar() {
                           { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits' },
                           { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories' },
                           { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes' },
+                          { to: '/admin/pages', icon: <DescriptionIcon fontSize="small" />, label: 'Pages' },
                         ];
 
                         // Add Utilisateurs menu item only for global_admin
