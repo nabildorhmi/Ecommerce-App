@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePasswordRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
@@ -10,6 +11,7 @@ use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -53,6 +55,15 @@ class AuthController extends Controller
         $request->user()->update($request->validated());
 
         return response()->json(new UserResource($request->user()->fresh()));
+    }
+
+    public function changePassword(ChangePasswordRequest $request): JsonResponse
+    {
+        $request->user()->update([
+            'password' => Hash::make($request->validated('password')),
+        ]);
+
+        return response()->json(['message' => 'Mot de passe modifie avec succes']);
     }
 
     public function logout(Request $request): JsonResponse

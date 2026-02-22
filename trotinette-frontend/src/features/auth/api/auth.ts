@@ -64,3 +64,18 @@ export async function updateProfileApi(
   const res = await apiClient.put<UpdateProfileResponse>('/user', data);
   return res.data;
 }
+
+// ---- Change password ----
+
+export interface ChangePasswordData {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export async function changePasswordApi(
+  data: ChangePasswordData
+): Promise<{ message: string }> {
+  const res = await apiClient.post<{ message: string }>('/user/password', data);
+  return res.data;
+}

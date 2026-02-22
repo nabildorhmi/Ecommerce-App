@@ -17,7 +17,7 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { updateProfileApi } from '../api/auth';
+import { updateProfileApi, changePasswordApi } from '../api/auth';
 import { useAuthStore } from '../store';
 import { MOROCCAN_CITIES } from '../../../shared/constants/moroccanCities';
 
@@ -37,10 +37,25 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+const passwordSchema = z
+  .object({
+    current_password: z.string().min(8, 'Minimum 8 caracteres'),
+    password: z.string().min(8, 'Minimum 8 caracteres'),
+    password_confirmation: z.string().min(8, 'Minimum 8 caracteres'),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: 'Les mots de passe ne correspondent pas',
+    path: ['password_confirmation'],
+  });
+
+type PasswordFormData = z.infer<typeof passwordSchema>;
+
 export function ProfilePage() {
   const user = useAuthStore((s) => s.user);
   const [successOpen, setSuccessOpen] = useState(false);
+  const [passwordSuccessOpen, setPasswordSuccessOpen] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
   const {
     register,
@@ -57,6 +72,35 @@ export function ProfilePage() {
       address_street: user?.address_street ?? '',
     },
   });
+
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPasswordForm,
+    formState: { errors: passwordErrors, isSubmitting: isPasswordSubmitting },
+  } = useForm<PasswordFormData>({
+    resolver: zodResolver(passwordSchema),
+  });
+
+  const passwordMutation = useMutation({
+    mutationFn: changePasswordApi,
+    onSuccess: () => {
+      setPasswordSuccessOpen(true);
+      setPasswordError(null);
+      resetPasswordForm();
+    },
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Une erreur est survenue';
+      setPasswordError(message);
+    },
+  });
+
+  const onPasswordSubmit = async (data: PasswordFormData) => {
+    setPasswordError(null);
+    await passwordMutation.mutateAsync(data);
+  };
 
   const updateMutation = useMutation({
     mutationFn: updateProfileApi,
@@ -186,6 +230,63 @@ export function ProfilePage() {
         </Box>
       </Paper>
 
+      {/* Change Password Section */}
+      <Paper elevation={2} sx={{ p: 4, mt: 3 }}>
+        <Typography variant="h5" fontWeight="bold" mb={3}>
+          {"Changer le mot de passe"}
+        </Typography>
+
+        {passwordError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {passwordError}
+          </Alert>
+        )}
+
+        <Box
+          component="form"
+          onSubmit={handlePasswordSubmit(onPasswordSubmit)}
+          noValidate
+          sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+        >
+          <TextField
+            label={"Mot de passe actuel"}
+            type="password"
+            fullWidth
+            error={Boolean(passwordErrors.current_password)}
+            helperText={passwordErrors.current_password?.message}
+            {...registerPassword('current_password')}
+          />
+
+          <TextField
+            label={"Nouveau mot de passe"}
+            type="password"
+            fullWidth
+            error={Boolean(passwordErrors.password)}
+            helperText={passwordErrors.password?.message}
+            {...registerPassword('password')}
+          />
+
+          <TextField
+            label={"Confirmer le nouveau mot de passe"}
+            type="password"
+            fullWidth
+            error={Boolean(passwordErrors.password_confirmation)}
+            helperText={passwordErrors.password_confirmation?.message}
+            {...registerPassword('password_confirmation')}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isPasswordSubmitting}
+            startIcon={isPasswordSubmitting ? <CircularProgress size={16} /> : undefined}
+            sx={{ mt: 1 }}
+          >
+            {"Modifier le mot de passe"}
+          </Button>
+        </Box>
+      </Paper>
+
       <Snackbar
         open={successOpen}
         autoHideDuration={3000}
@@ -194,6 +295,17 @@ export function ProfilePage() {
       >
         <Alert severity="success" onClose={() => setSuccessOpen(false)}>
           {"Profil enregistré avec succès"}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={passwordSuccessOpen}
+        autoHideDuration={3000}
+        onClose={() => setPasswordSuccessOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setPasswordSuccessOpen(false)}>
+          {"Mot de passe modifie avec succes"}
         </Alert>
       </Snackbar>
     </Container>
