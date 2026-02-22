@@ -102,7 +102,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
           <Fab
             color="primary"
             onClick={handleEdit}
-            sx={{ position: 'fixed', bottom: 24, right: 24 }}
+            sx={{ position: 'fixed', bottom: 90, right: 24, zIndex: 1001 }}
           >
             <EditIcon />
           </Fab>
