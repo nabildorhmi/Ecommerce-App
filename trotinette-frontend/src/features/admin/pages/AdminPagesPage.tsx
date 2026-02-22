@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import ReactMarkdown from 'react-markdown';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -23,6 +22,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import EditIcon from '@mui/icons-material/Edit';
 import { useAdminPages, useUpdatePage } from '../api/pages';
 import type { PageData } from '../api/pages';
@@ -40,13 +41,13 @@ export function AdminPagesPage() {
 
   const [editTarget, setEditTarget] = useState<PageData | null>(null);
   const [successOpen, setSuccessOpen] = useState(false);
+  const [previewTab, setPreviewTab] = useState(0);
 
   const {
     register,
     handleSubmit,
     reset,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<PageFormData>({
     resolver: zodResolver(pageSchema),
@@ -56,6 +57,7 @@ export function AdminPagesPage() {
 
   const openEdit = (page: PageData) => {
     setEditTarget(page);
+    setPreviewTab(0);
     reset({ title: page.title, content: page.content });
   };
 
@@ -161,16 +163,39 @@ export function AdminPagesPage() {
               helperText={errors.title?.message}
               {...register('title')}
             />
-            <ReactQuill
-              theme="snow"
-              value={contentValue || ''}
-              onChange={(val) => setValue('content', val, { shouldValidate: true })}
-            />
-            {errors.content && (
-              <Typography variant="caption" color="error">
-                {errors.content.message}
-              </Typography>
-            )}
+            <Paper variant="outlined">
+              <Tabs
+                value={previewTab}
+                onChange={(_e, v: number) => setPreviewTab(v)}
+                sx={{ borderBottom: 1, borderColor: 'divider', px: 1 }}
+              >
+                <Tab label="Modifier" sx={{ textTransform: 'none' }} />
+                <Tab label="Apercu" sx={{ textTransform: 'none' }} />
+              </Tabs>
+              <Box sx={{ p: 2 }}>
+                {previewTab === 0 ? (
+                  <TextField
+                    multiline
+                    minRows={12}
+                    fullWidth
+                    placeholder="Contenu en Markdown..."
+                    error={Boolean(errors.content)}
+                    helperText={errors.content?.message}
+                    inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.9rem' } }}
+                    sx={{ '& .MuiOutlinedInput-root': { p: 0 }, '& textarea': { p: 1.5 } }}
+                    {...register('content')}
+                  />
+                ) : (
+                  <Box sx={{
+                    minHeight: 200,
+                    '& h2': { mt: 2, mb: 1, fontWeight: 'bold', fontSize: '1.25rem' },
+                    '& p': { color: 'text.secondary', lineHeight: 1.8, mb: 2 },
+                  }}>
+                    <ReactMarkdown>{contentValue || ''}</ReactMarkdown>
+                  </Box>
+                )}
+              </Box>
+            </Paper>
           </Box>
         </DialogContent>
         <DialogActions>

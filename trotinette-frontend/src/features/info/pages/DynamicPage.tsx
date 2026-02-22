@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import ReactMarkdown from 'react-markdown';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
-import Fab from '@mui/material/Fab';
+import IconButton from '@mui/material/IconButton';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
+import TextField from '@mui/material/TextField';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Paper from '@mui/material/Paper';
 import EditIcon from '@mui/icons-material/Edit';
 import { usePageBySlug } from '../api/pages';
 import { useUpdatePage } from '../../admin/api/pages';
@@ -19,6 +22,13 @@ interface DynamicPageProps {
   slug: string;
 }
 
+const markdownStyles = {
+  '& h2': { mt: 3, mb: 1, fontWeight: 'bold', fontSize: '1.25rem' },
+  '& p': { color: 'text.secondary', lineHeight: 1.8, mb: 2 },
+  '& ul, & ol': { color: 'text.secondary', pl: 3, mb: 2 },
+  '& li': { mb: 0.5 },
+};
+
 export function DynamicPage({ slug }: DynamicPageProps) {
   const { data: page, isLoading, error } = usePageBySlug(slug);
   const updateMutation = useUpdatePage();
@@ -27,6 +37,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
+  const [editTab, setEditTab] = useState(0);
   const [successOpen, setSuccessOpen] = useState(false);
 
   if (isLoading) {
@@ -47,6 +58,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   const handleEdit = () => {
     setEditContent(page.content);
+    setEditTab(0);
     setIsEditing(true);
   };
 
@@ -67,14 +79,48 @@ export function DynamicPage({ slug }: DynamicPageProps) {
   return (
     <Container maxWidth="md">
       <Box sx={{ py: 6, minHeight: '100vh' }}>
-        <Typography variant="h3" fontWeight="bold" mb={4} color="text.primary">
-          {page.title}
-        </Typography>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
+          <Typography variant="h3" fontWeight="bold" color="text.primary">
+            {page.title}
+          </Typography>
+          {isAdmin && !isEditing && (
+            <IconButton onClick={handleEdit} title="Modifier la page" color="primary">
+              <EditIcon />
+            </IconButton>
+          )}
+        </Box>
 
         {isEditing ? (
           <Box>
-            <ReactQuill theme="snow" value={editContent} onChange={setEditContent} />
-            <Stack direction="row" spacing={2} mt={2}>
+            <Paper variant="outlined" sx={{ mb: 2 }}>
+              <Tabs
+                value={editTab}
+                onChange={(_e, v: number) => setEditTab(v)}
+                sx={{ borderBottom: 1, borderColor: 'divider', px: 1 }}
+              >
+                <Tab label="Modifier" sx={{ textTransform: 'none' }} />
+                <Tab label="Apercu" sx={{ textTransform: 'none' }} />
+              </Tabs>
+              <Box sx={{ p: 2 }}>
+                {editTab === 0 ? (
+                  <TextField
+                    value={editContent}
+                    onChange={(e) => setEditContent(e.target.value)}
+                    multiline
+                    minRows={16}
+                    fullWidth
+                    placeholder="Contenu en Markdown..."
+                    inputProps={{ style: { fontFamily: 'monospace', fontSize: '0.9rem' } }}
+                    sx={{ '& .MuiOutlinedInput-root': { p: 0 }, '& textarea': { p: 1.5 } }}
+                  />
+                ) : (
+                  <Box sx={{ minHeight: 200, ...markdownStyles }}>
+                    <ReactMarkdown>{editContent}</ReactMarkdown>
+                  </Box>
+                )}
+              </Box>
+            </Paper>
+            <Stack direction="row" spacing={2}>
               <Button
                 variant="contained"
                 onClick={handleSave}
@@ -89,23 +135,9 @@ export function DynamicPage({ slug }: DynamicPageProps) {
             </Stack>
           </Box>
         ) : (
-          <Box
-            sx={{
-              '& h2': { mt: 3, mb: 1, fontWeight: 'bold', fontSize: '1.25rem' },
-              '& p': { color: 'text.secondary', lineHeight: 1.8, mb: 2 },
-            }}
-            dangerouslySetInnerHTML={{ __html: page.content }}
-          />
-        )}
-
-        {isAdmin && !isEditing && (
-          <Fab
-            color="primary"
-            onClick={handleEdit}
-            sx={{ position: 'fixed', bottom: 90, right: 24, zIndex: 1001 }}
-          >
-            <EditIcon />
-          </Fab>
+          <Box sx={markdownStyles}>
+            <ReactMarkdown>{page.content}</ReactMarkdown>
+          </Box>
         )}
       </Box>
 
