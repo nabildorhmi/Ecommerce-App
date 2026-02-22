@@ -5,10 +5,12 @@ use App\Http\Controllers\Admin\DeliveryZoneController as AdminDeliveryZoneContro
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
 use App\Http\Controllers\Customer\OrderController;
+use App\Http\Controllers\Customer\PageController;
 use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +26,7 @@ Route::get('/products',        [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories',      [CategoryController::class, 'index']);
 Route::get('/delivery-zones',  [DeliveryZoneController::class, 'index']);
+Route::get('/pages/{page}',    [PageController::class, 'show']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -80,5 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/orders/{order}/invoice',             [AdminOrderController::class, 'invoice']);
         Route::patch('/orders/{order}/status',            [AdminOrderController::class, 'transition']);
         Route::post('/orders/{order}/note',               [AdminOrderController::class, 'addNote']);
+
+        // Page CMS
+        Route::get('/pages',           [AdminPageController::class, 'index']);
+        Route::put('/pages/{page}',    [AdminPageController::class, 'update']);
     });
 });

@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             DeliveryZoneSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
+            PageSeeder::class,
         ]);
     }
 }
