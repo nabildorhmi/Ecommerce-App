@@ -9,6 +9,8 @@ import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage
 import { ProtectedRoute } from '../shared/components/ProtectedRoute';
 import { AdminRoute } from '../shared/components/AdminRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
+import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
 import { ProfilePage } from '../features/auth/pages/ProfilePage';
 import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
 import { OrderConfirmationPage } from '../features/checkout/pages/OrderConfirmationPage';
@@ -47,6 +49,14 @@ export const router = createBrowserRouter([
       {
         path: '/login',
         element: <LoginPage />,
+      },
+      {
+        path: '/forgot-password',
+        element: <ForgotPasswordPage />,
+      },
+      {
+        path: '/reset-password',
+        element: <ResetPasswordPage />,
       },
       {
         path: '/checkout',

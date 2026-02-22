@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -6,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import Link from '@mui/material/Link';
 
 const loginSchema = z.object({
   email: z.string().email('Email invalide / Invalid email'),
@@ -61,6 +63,12 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
         helperText={errors.password?.message}
         {...register('password')}
       />
+
+      <Box textAlign="right">
+        <Link component={RouterLink} to="/forgot-password" variant="body2">
+          Mot de passe oublie ?
+        </Link>
+      </Box>
 
       <Button
         type="submit"

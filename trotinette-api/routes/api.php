@@ -11,6 +11,7 @@ use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
 use App\Http\Controllers\Customer\OrderController;
 use App\Http\Controllers\Customer\PageController;
+use App\Http\Controllers\Customer\PasswordResetController;
 use App\Http\Controllers\Customer\ProductController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,8 @@ Route::get('/ping', fn() => response()->json(['status' => 'ok']));
 // Auth routes — unauthenticated
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login',    [AuthController::class, 'login']);
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
+Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword']);
 
 // Public catalog routes — unauthenticated
 Route::get('/products',        [ProductController::class, 'index']);

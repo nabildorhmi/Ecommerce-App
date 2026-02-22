@@ -79,3 +79,28 @@ export async function changePasswordApi(
   const res = await apiClient.post<{ message: string }>('/user/password', data);
   return res.data;
 }
+
+// ---- Forgot password ----
+
+export async function forgotPasswordApi(
+  email: string
+): Promise<{ message: string }> {
+  const res = await apiClient.post<{ message: string }>('/auth/forgot-password', { email });
+  return res.data;
+}
+
+// ---- Reset password ----
+
+export interface ResetPasswordData {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export async function resetPasswordApi(
+  data: ResetPasswordData
+): Promise<{ message: string }> {
+  const res = await apiClient.post<{ message: string }>('/auth/reset-password', data);
+  return res.data;
+}
