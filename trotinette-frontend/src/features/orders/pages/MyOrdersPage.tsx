@@ -18,9 +18,11 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useMyOrders } from '../api/orders';
 import { OrderStatusChip } from '../components/OrderStatusChip';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { apiClient } from '../../../shared/api/client';
 
 /**
  * Customer order history page.
@@ -28,6 +30,24 @@ import { formatCurrency } from '../../../shared/utils/formatCurrency';
  */
 export function MyOrdersPage() {
   const [page, setPage] = useState(1);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+  const handleDownloadInvoice = async (orderId: number, orderNumber: string) => {
+    setDownloadingId(orderId);
+    try {
+      const response = await apiClient.get(`/orders/${orderId}/invoice`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `facture-${orderNumber}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const { data, isLoading, error } = useMyOrders(page);
 
@@ -144,6 +164,17 @@ export function MyOrdersPage() {
                     {"Total"}: {formatCurrency(order.total)}
                   </Typography>
                 </Box>
+
+                <Divider sx={{ my: 2 }} />
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={downloadingId === order.id ? <CircularProgress size={16} /> : <PictureAsPdfIcon />}
+                  onClick={() => void handleDownloadInvoice(order.id, order.order_number)}
+                  disabled={downloadingId === order.id}
+                >
+                  {"Télécharger la facture"}
+                </Button>
               </AccordionDetails>
             </Accordion>
           ))}

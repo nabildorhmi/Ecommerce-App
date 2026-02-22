@@ -20,7 +20,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useAdminOrder, useTransitionOrder, useAddOrderNote } from '../api/orders';
+import { apiClient } from '../../../shared/api/client';
 import { OrderStatusChip } from '../components/OrderStatusChip';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
 
@@ -49,6 +51,7 @@ export function AdminOrderDetailPage() {
   const [noteText, setNoteText] = useState('');
   const [transitionNote, setTransitionNote] = useState('');
   const [confirmDialog, setConfirmDialog] = useState<string | null>(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const order = data?.data;
 
@@ -66,6 +69,23 @@ export function AdminOrderDetailPage() {
     if (!noteText.trim()) return;
     await noteMutation.mutateAsync({ orderId, note: noteText });
     setNoteText('');
+  };
+
+  const handleDownloadInvoice = async () => {
+    setDownloadingPdf(true);
+    try {
+      const response = await apiClient.get(`/admin/orders/${orderId}/invoice`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `facture-${order?.order_number ?? orderId}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   if (isLoading) {
@@ -103,6 +123,15 @@ export function AdminOrderDetailPage() {
             {order.order_number}
           </Typography>
           <OrderStatusChip status={order.status} />
+          <Button
+            variant="outlined"
+            size="small"
+            startIcon={downloadingPdf ? <CircularProgress size={16} /> : <PictureAsPdfIcon />}
+            onClick={() => void handleDownloadInvoice()}
+            disabled={downloadingPdf}
+          >
+            {"Télécharger la facture"}
+          </Button>
         </Box>
 
         <Box
