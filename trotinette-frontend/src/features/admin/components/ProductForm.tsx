@@ -17,13 +17,22 @@ import Divider from '@mui/material/Divider';
 import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import Chip from '@mui/material/Chip';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Stack from '@mui/material/Stack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import SettingsIcon from '@mui/icons-material/Settings';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { useAdminCategories } from '../api/categories';
 import { useCreateProduct, useUpdateProduct } from '../api/products';
 import { ImageUploader } from './ImageUploader';
+import { useAttributeTemplates } from '../store/attributeTemplates';
 import type { AdminProduct } from '../types';
 
 // ---- Slugify helper ----
@@ -35,27 +44,6 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
-
-// ---- Attribute presets ----
-const ATTRIBUTE_PRESETS: Record<string, { key: string; value: string }[]> = {
-  'Trotinettes': [
-    { key: 'motor_power', value: '' },
-    { key: 'max_speed', value: '' },
-    { key: 'battery', value: '' },
-    { key: 'range_km', value: '' },
-    { key: 'weight_kg', value: '' },
-  ],
-  'Vetements': [
-    { key: 'taille', value: '' },
-    { key: 'couleur', value: '' },
-    { key: 'matiere', value: '' },
-  ],
-  'Electronique': [
-    { key: 'marque', value: '' },
-    { key: 'garantie', value: '' },
-    { key: 'poids_kg', value: '' },
-  ],
-};
 
 // ---- Zod schema ----
 const schema = z.object({
@@ -111,10 +99,170 @@ const quillModules = {
   ],
 };
 
+// ---- Template Management Dialog ----
+function TemplateDialog({
+  open,
+  onClose,
+}: {
+  open: boolean;
+  onClose: () => void;
+}) {
+  const { templates, addTemplate, removeTemplate, updateTemplate } = useAttributeTemplates();
+  const [newName, setNewName] = useState('');
+  const [newKeys, setNewKeys] = useState('');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editKeys, setEditKeys] = useState('');
+
+  const handleAdd = () => {
+    const name = newName.trim();
+    const keys = newKeys
+      .split(',')
+      .map((k) => k.trim())
+      .filter(Boolean);
+    if (!name || keys.length === 0) return;
+    addTemplate(name, keys);
+    setNewName('');
+    setNewKeys('');
+  };
+
+  const startEdit = (id: string) => {
+    const t = templates.find((t) => t.id === id);
+    if (!t) return;
+    setEditId(id);
+    setEditName(t.name);
+    setEditKeys(t.keys.join(', '));
+  };
+
+  const saveEdit = () => {
+    if (!editId) return;
+    const keys = editKeys
+      .split(',')
+      .map((k) => k.trim())
+      .filter(Boolean);
+    if (editName.trim() && keys.length > 0) {
+      updateTemplate(editId, editName.trim(), keys);
+    }
+    setEditId(null);
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Gerer les modeles de caracteristiques</DialogTitle>
+      <DialogContent>
+        {/* Existing templates */}
+        {templates.length > 0 && (
+          <Stack spacing={1.5} sx={{ mb: 3 }}>
+            {templates.map((t) => (
+              <Box
+                key={t.id}
+                sx={{
+                  p: 1.5,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 1,
+                }}
+              >
+                {editId === t.id ? (
+                  <Box display="flex" flexDirection="column" gap={1}>
+                    <TextField
+                      size="small"
+                      label="Nom"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                    <TextField
+                      size="small"
+                      label="Attributs (separes par des virgules)"
+                      value={editKeys}
+                      onChange={(e) => setEditKeys(e.target.value)}
+                    />
+                    <Box display="flex" gap={1}>
+                      <Button size="small" variant="contained" onClick={saveEdit} startIcon={<SaveIcon />}>
+                        Enregistrer
+                      </Button>
+                      <Button size="small" onClick={() => setEditId(null)}>
+                        Annuler
+                      </Button>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Box>
+                      <Typography fontWeight={600} fontSize="0.9rem">
+                        {t.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {t.keys.join(', ')}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <IconButton size="small" onClick={() => startEdit(t.id)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" color="error" onClick={() => removeTemplate(t.id)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            ))}
+          </Stack>
+        )}
+
+        {templates.length === 0 && (
+          <Typography color="text.secondary" sx={{ mb: 2 }}>
+            Aucun modele. Creez-en un ci-dessous.
+          </Typography>
+        )}
+
+        {/* Add new template */}
+        <Divider sx={{ mb: 2 }} />
+        <Typography variant="subtitle2" gutterBottom>
+          Nouveau modele
+        </Typography>
+        <Stack spacing={1.5}>
+          <TextField
+            size="small"
+            label="Nom du modele"
+            placeholder="ex: Trotinettes, Vetements, Telephones"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+          />
+          <TextField
+            size="small"
+            label="Attributs (separes par des virgules)"
+            placeholder="ex: motor_power, max_speed, battery, range_km, weight_kg"
+            value={newKeys}
+            onChange={(e) => setNewKeys(e.target.value)}
+            multiline
+            rows={2}
+          />
+          <Button
+            variant="outlined"
+            onClick={handleAdd}
+            disabled={!newName.trim() || !newKeys.trim()}
+            startIcon={<AddIcon />}
+            size="small"
+          >
+            Ajouter le modele
+          </Button>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Fermer</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+// ---- Main ProductForm ----
 export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const isEdit = Boolean(product);
   const { data: categoriesData } = useAdminCategories();
   const categories = categoriesData?.data ?? [];
+  const { templates } = useAttributeTemplates();
 
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
@@ -125,14 +273,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   // Image state
   const [newImages, setNewImages] = useState<File[]>([]);
   const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
-  const [existingImages, setExistingImages] = useState(
-    product?.images ?? []
-  );
+  const [existingImages, setExistingImages] = useState(product?.images ?? []);
 
   // Dynamic attributes state
   const [attrRows, setAttrRows] = useState<AttrRow[]>(() => attrsToRows(product?.attributes));
 
-  // Track manual slug edits to prevent auto-override
+  // Template dialog
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+
+  // Track manual slug edits
   const [slugManual, setSlugManual] = useState(false);
 
   const defaultValues: FormValues = {
@@ -160,7 +309,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     defaultValues,
   });
 
-  // Auto-generate slug from name
   const name = watch('name');
 
   useEffect(() => {
@@ -186,21 +334,19 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     setAttrRows((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const applyPreset = (presetName: string) => {
-    const preset = ATTRIBUTE_PRESETS[presetName];
-    if (!preset) return;
-    // Merge: keep existing rows with values, add preset keys that don't exist yet
+  const applyTemplate = (templateId: string) => {
+    const template = templates.find((t) => t.id === templateId);
+    if (!template) return;
     const existingKeys = new Set(attrRows.map((r) => r.key.trim()).filter(Boolean));
     const newRows = [...attrRows.filter((r) => r.key.trim())];
-    for (const p of preset) {
-      if (!existingKeys.has(p.key)) {
-        newRows.push({ ...p });
+    for (const key of template.keys) {
+      if (!existingKeys.has(key)) {
+        newRows.push({ key, value: '' });
       }
     }
     setAttrRows(newRows.length > 0 ? newRows : [{ key: '', value: '' }]);
   };
 
-  // Memoize quill modules to prevent re-renders
   const modules = useMemo(() => quillModules, []);
 
   const onSubmit = async (values: FormValues) => {
@@ -355,10 +501,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               onChange: () => setSlugManual(true),
             })}
             error={Boolean(errors.slug)}
-            helperText={
-              errors.slug?.message ??
-              'Auto-genere depuis le nom'
-            }
+            helperText={errors.slug?.message ?? 'Auto-genere depuis le nom'}
           />
 
           {/* WYSIWYG Description */}
@@ -372,13 +515,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               render={({ field }) => (
                 <Box
                   sx={{
-                    '& .ql-container': {
-                      minHeight: 150,
-                      fontSize: '0.95rem',
-                    },
-                    '& .ql-editor': {
-                      minHeight: 150,
-                    },
+                    '& .ql-container': { minHeight: 150, fontSize: '0.95rem' },
+                    '& .ql-editor': { minHeight: 150 },
                   }}
                 >
                   <ReactQuill
@@ -403,21 +541,39 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           <Typography variant="subtitle1" fontWeight="bold">
             Caracteristiques
           </Typography>
+          <Button
+            size="small"
+            startIcon={<SettingsIcon />}
+            onClick={() => setTemplateDialogOpen(true)}
+          >
+            Gerer les modeles
+          </Button>
         </Box>
 
-        {/* Preset buttons */}
-        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-          {Object.keys(ATTRIBUTE_PRESETS).map((presetName) => (
-            <Chip
-              key={presetName}
-              label={presetName}
-              onClick={() => applyPreset(presetName)}
-              variant="outlined"
-              size="small"
-              sx={{ cursor: 'pointer' }}
-            />
-          ))}
-        </Box>
+        {/* Template chips */}
+        {templates.length > 0 && (
+          <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center', mr: 0.5 }}>
+              Appliquer:
+            </Typography>
+            {templates.map((t) => (
+              <Chip
+                key={t.id}
+                label={t.name}
+                onClick={() => applyTemplate(t.id)}
+                variant="outlined"
+                size="small"
+                sx={{ cursor: 'pointer' }}
+              />
+            ))}
+          </Box>
+        )}
+
+        {templates.length === 0 && (
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Aucun modele. Cliquez sur "Gerer les modeles" pour en creer.
+          </Typography>
+        )}
 
         {attrRows.map((row, index) => (
           <Box key={index} display="flex" gap={1} mb={1} alignItems="center">
@@ -447,12 +603,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             </IconButton>
           </Box>
         ))}
-        <Button
-          startIcon={<AddIcon />}
-          onClick={addAttrRow}
-          size="small"
-          sx={{ mt: 1 }}
-        >
+        <Button startIcon={<AddIcon />} onClick={addAttrRow} size="small" sx={{ mt: 1 }}>
           Ajouter un attribut
         </Button>
       </Box>
@@ -478,13 +629,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           disabled={isLoading}
           startIcon={isLoading ? <CircularProgress size={16} /> : undefined}
         >
-          {isLoading
-            ? 'Enregistrement...'
-            : isEdit
-              ? 'Mettre a jour'
-              : 'Creer'}
+          {isLoading ? 'Enregistrement...' : isEdit ? 'Mettre a jour' : 'Creer'}
         </Button>
       </Box>
+
+      {/* Template management dialog */}
+      <TemplateDialog
+        open={templateDialogOpen}
+        onClose={() => setTemplateDialogOpen(false)}
+      />
     </Box>
   );
 }
