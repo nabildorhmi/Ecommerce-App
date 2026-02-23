@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\Variant;
 use Illuminate\Http\Request;
 
 class ProductService
@@ -15,11 +16,20 @@ class ProductService
             'slug'           => $data['slug'],
             'description'    => $data['description'] ?? null,
             'price'          => $data['price'],
-            'stock_quantity' => $data['stock_quantity'],
+            'stock_quantity' => $data['stock_quantity'] ?? 0,
             'attributes'     => $data['attributes'] ?? [],
             'category_id'    => $data['category_id'],
             'is_active'      => $data['is_active'] ?? true,
             'is_featured'    => $data['is_featured'] ?? false,
+        ]);
+
+        // Auto-create default variant (Shopify-style: every product has at least one variant)
+        $product->variants()->create([
+            'sku'        => $data['sku'],
+            'price'      => $data['price'],
+            'stock'      => $data['stock_quantity'] ?? 0,
+            'is_active'  => true,
+            'is_default' => true,
         ]);
 
         // Upload images
@@ -30,7 +40,7 @@ class ProductService
             }
         }
 
-        return $product->load(['media', 'category']);
+        return $product->load(['media', 'category', 'variants.attributeValues.attribute']);
     }
 
     public function updateProduct(Product $product, array $data, Request $request): Product
@@ -47,6 +57,36 @@ class ProductService
             'is_active'      => $data['is_active'] ?? null,
             'is_featured'    => $data['is_featured'] ?? null,
         ], fn ($v) => $v !== null));
+
+        // Sync default variant stock & price with product-level values
+        $defaultVariant = $product->variants()->where('is_default', true)->first();
+        if ($defaultVariant) {
+            $updates = [];
+            if (isset($data['stock_quantity'])) {
+                $updates['stock'] = $data['stock_quantity'];
+            }
+            if (isset($data['price'])) {
+                $updates['price'] = $data['price'];
+            }
+            if (isset($data['sku'])) {
+                // Only update default variant's SKU if it still matches the old product SKU
+                if ($defaultVariant->sku === $product->getOriginal('sku') || $defaultVariant->sku === $data['sku']) {
+                    $updates['sku'] = $data['sku'];
+                }
+            }
+            if (! empty($updates)) {
+                $defaultVariant->update($updates);
+            }
+        } else {
+            // Safety: create default variant if missing
+            $product->variants()->create([
+                'sku'        => $product->sku,
+                'price'      => $product->price,
+                'stock'      => $product->stock_quantity ?? 0,
+                'is_active'  => true,
+                'is_default' => true,
+            ]);
+        }
 
         // Delete specific images if requested
         if (!empty($data['delete_images'])) {
@@ -66,7 +106,7 @@ class ProductService
             }
         }
 
-        return $product->load(['media', 'category']);
+        return $product->load(['media', 'category', 'variants.attributeValues.attribute']);
     }
 
     public function deleteProduct(Product $product): void

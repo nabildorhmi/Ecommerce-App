@@ -17,7 +17,7 @@ class ProductController extends Controller
         $products = QueryBuilder::for(
             Product::query()
                 ->where('is_active', true)
-                ->with(['media', 'category'])
+                ->with(['media', 'category', 'variants'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
@@ -29,7 +29,9 @@ class ProductController extends Controller
                     $query->where('price', '<=', (int) $value)
                 ),
                 AllowedFilter::callback('in_stock', fn ($query, $value) =>
-                    $query->when((bool) $value, fn ($q) => $q->where('stock_quantity', '>', 0))
+                    $query->when((bool) $value, fn ($q) =>
+                        $q->whereHas('variants', fn ($vq) => $vq->where('is_active', true)->where('stock', '>', 0))
+                    )
                 ),
                 AllowedFilter::callback('search', function ($query, $value) {
                     $query->when(

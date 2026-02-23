@@ -12,7 +12,10 @@ export type OrderStatus =
 export interface OrderItem {
   id: number;
   product_id: number;
+  variant_id?: number | null;
   product_sku: string;
+  /** Human-readable variant label, e.g. "Rouge / M" */
+  variant_label?: string | null;
   unit_price: number;
   quantity: number;
   subtotal: number;

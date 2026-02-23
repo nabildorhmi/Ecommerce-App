@@ -17,9 +17,9 @@ export function CartItem({ item }: CartItemProps) {
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
-  const handleDecrement = () => updateQuantity(item.productId, item.quantity - 1);
-  const handleIncrement = () => updateQuantity(item.productId, item.quantity + 1);
-  const handleRemove = () => removeItem(item.productId);
+  const handleDecrement = () => updateQuantity(item.productId, item.quantity - 1, item.variantId);
+  const handleIncrement = () => updateQuantity(item.productId, item.quantity + 1, item.variantId);
+  const handleRemove = () => removeItem(item.productId, item.variantId);
 
   return (
     <Box
@@ -63,6 +63,11 @@ export function CartItem({ item }: CartItemProps) {
         <Typography variant="body2" fontWeight={600} noWrap title={item.name}>
           {item.name}
         </Typography>
+        {item.variantLabel && (
+          <Typography variant="caption" color="primary.main" noWrap>
+            {item.variantLabel}
+          </Typography>
+        )}
         <Typography variant="caption" color="text.secondary">
           {formatCurrency(item.price)}
         </Typography>

@@ -44,7 +44,7 @@ class OrderController extends Controller
 
     public function show(Order $order): OrderResource
     {
-        $order->load(['items.product', 'deliveryZone', 'statusLogs', 'user']);
+        $order->load(['items.product', 'items.variant.attributeValues', 'deliveryZone', 'statusLogs', 'user']);
 
         return new OrderResource($order);
     }

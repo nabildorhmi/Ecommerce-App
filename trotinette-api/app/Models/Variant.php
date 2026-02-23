@@ -15,12 +15,14 @@ class Variant extends Model
         'price',
         'stock',
         'is_active',
+        'is_default',
     ];
 
     protected $casts = [
-        'price'     => 'integer',
-        'stock'     => 'integer',
-        'is_active' => 'boolean',
+        'price'      => 'integer',
+        'stock'      => 'integer',
+        'is_active'  => 'boolean',
+        'is_default' => 'boolean',
     ];
 
     public function product(): BelongsTo

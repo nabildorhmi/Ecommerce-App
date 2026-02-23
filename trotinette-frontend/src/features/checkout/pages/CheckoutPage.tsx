@@ -137,7 +137,7 @@ export function CheckoutPage() {
     placeOrder({
       phone: user?.phone ?? '',
       city: user?.address_city ?? '',
-      items: items.map((i) => ({ product_id: i.productId, quantity: i.quantity })),
+      items: items.map((i) => ({ product_id: i.productId, variant_id: i.variantId ?? null, quantity: i.quantity })),
       note: data.note || undefined,
     });
   };

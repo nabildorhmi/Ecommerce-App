@@ -22,6 +22,7 @@ export interface AdminProduct {
   category?: { id: number; name: string; slug: string; is_active: boolean } | null;
   attributes: Record<string, string | number>;
   images: ProductImage[];
+  default_variant?: { id: number; sku: string; price: number; stock: number } | null;
   created_at: string;
   updated_at: string;
 }

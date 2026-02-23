@@ -32,7 +32,7 @@ class OrderController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $orders = Order::forUser($request->user()->id)
-            ->with(['items.product', 'deliveryZone'])
+            ->with(['items.product', 'items.variant.attributeValues', 'deliveryZone'])
             ->latest()
             ->paginate(10);
 
@@ -45,7 +45,7 @@ class OrderController extends Controller
             abort(403, 'This order does not belong to you.');
         }
 
-        $order->load(['items.product', 'deliveryZone', 'statusLogs']);
+        $order->load(['items.product', 'items.variant.attributeValues', 'deliveryZone', 'statusLogs']);
 
         return new OrderResource($order);
     }

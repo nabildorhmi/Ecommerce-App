@@ -38,6 +38,9 @@ export interface Product {
   slug: string;
   category: Category | null;
   images: ProductImage[];
+  /** Default variant — always present (holds base stock/price) */
+  default_variant?: { id: number; sku: string; price: number; stock: number } | null;
+  /** Non-default variants (only if product has attribute-based variants) */
   variants?: ProductVariantDisplay[];
   created_at: string;
 }

@@ -12,13 +12,15 @@ export interface DeliveryZone {
 export interface PlaceOrderInput {
   phone: string;
   city: string;
-  items: Array<{ product_id: number; quantity: number }>;
+  items: Array<{ product_id: number; variant_id?: number | null; quantity: number }>;
   note?: string;
 }
 
 export interface OrderConfirmationItem {
   product_id: number;
+  variant_id?: number | null;
   product_sku: string;
+  variant_label?: string | null;
   unit_price: number;
   quantity: number;
   subtotal: number;

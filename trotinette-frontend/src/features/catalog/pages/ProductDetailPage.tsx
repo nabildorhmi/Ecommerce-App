@@ -123,14 +123,30 @@ export function ProductDetailPage() {
     );
   }
 
-  const cartItem = items.find((i) => i.productId === product.id);
-  const isAtMaxStock = cartItem ? cartItem.quantity >= displayStock : false;
   const hasVariants = product.variants && product.variants.length > 0;
   const variantNotSelected = hasVariants && !selectedVariant;
+  // For cart dedup: match on productId + variantId
+  const effectiveVariantId = selectedVariant?.id ?? product.default_variant?.id;
+  const cartItem = items.find(
+    (i) => i.productId === product.id && (i.variantId ?? null) === (effectiveVariantId ?? null)
+  );
+  const isAtMaxStock = cartItem ? cartItem.quantity >= displayStock : false;
   const isAddDisabled = !displayInStock || isAtMaxStock || variantNotSelected;
 
   const handleAddToCart = () => {
-    addItem(product, product.name);
+    // If product has no attribute variants, pass the default variant
+    const variantToAdd = selectedVariant ?? (
+      !hasVariants && product.default_variant
+        ? {
+            id: product.default_variant.id,
+            sku: product.default_variant.sku,
+            price: product.default_variant.price,
+            stock: product.default_variant.stock,
+            attribute_values: [],
+          } as ProductVariantDisplay
+        : null
+    );
+    addItem(product, product.name, variantToAdd);
     setSnackbarOpen(true);
   };
 

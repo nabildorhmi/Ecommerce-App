@@ -87,6 +87,11 @@ export function OrderConfirmationPage() {
                   <Typography variant="body2" fontWeight={500}>
                     {item.product_sku}
                   </Typography>
+                  {item.variant_label && (
+                    <Typography variant="caption" color="primary.main" display="block">
+                      {item.variant_label}
+                    </Typography>
+                  )}
                   <Typography variant="caption" color="text.secondary">
                     {"Qté"}: {item.quantity} &times; {formatCurrency(item.unit_price)}
                   </Typography>

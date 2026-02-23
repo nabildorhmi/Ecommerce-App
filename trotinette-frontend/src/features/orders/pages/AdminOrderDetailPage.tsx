@@ -208,7 +208,14 @@ export function AdminOrderDetailPage() {
                       {item.product_sku}
                     </Typography>
                   </TableCell>
-                  <TableCell>{item.product?.name ?? '—'}</TableCell>
+                  <TableCell>
+                    <Typography variant="body2">{item.product?.name ?? '—'}</Typography>
+                    {item.variant_label && (
+                      <Typography variant="caption" color="primary.main">
+                        {item.variant_label}
+                      </Typography>
+                    )}
+                  </TableCell>
                   <TableCell align="right">{formatCurrency(item.unit_price)}</TableCell>
                   <TableCell align="right">{item.quantity}</TableCell>
                   <TableCell align="right">{formatCurrency(item.subtotal)}</TableCell>

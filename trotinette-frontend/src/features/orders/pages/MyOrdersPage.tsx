@@ -138,7 +138,12 @@ export function MyOrdersPage() {
                             <Typography variant="body2">
                               {item.product?.name ?? item.product_sku}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            {item.variant_label && (
+                              <Typography variant="caption" color="primary.main">
+                                {item.variant_label}
+                              </Typography>
+                            )}
+                            <Typography variant="caption" color="text.secondary" display="block">
                               {formatCurrency(item.unit_price)} / {"Qté".toLowerCase()}
                             </Typography>
                           </TableCell>

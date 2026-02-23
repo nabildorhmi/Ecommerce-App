@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $products = QueryBuilder::for(
-            Product::query()->with(['media', 'category'])
+            Product::query()->with(['media', 'category', 'variants'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
@@ -36,7 +36,9 @@ class ProductController extends Controller
                     $query->where('price', '<=', (int) $value)
                 ),
                 AllowedFilter::callback('in_stock', fn ($query, $value) =>
-                    $query->when((bool) $value, fn ($q) => $q->where('stock_quantity', '>', 0))
+                    $query->when((bool) $value, fn ($q) =>
+                        $q->whereHas('variants', fn ($vq) => $vq->where('is_active', true)->where('stock', '>', 0))
+                    )
                 ),
             ])
             ->allowedSorts(['price', 'created_at', 'sku'])

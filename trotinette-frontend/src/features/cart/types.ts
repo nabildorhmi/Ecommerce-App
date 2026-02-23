@@ -14,4 +14,10 @@ export interface CartItem {
   quantity: number;
   /** Snapshotted stock quantity — used to cap quantity in controls */
   stockQuantity: number;
+  /** Variant ID if a specific variant was selected */
+  variantId?: number;
+  /** Variant SKU override (e.g. "TROT-PRO-RED-M") */
+  variantSku?: string | null;
+  /** Human-readable variant label (e.g. "Rouge / M") */
+  variantLabel?: string;
 }
