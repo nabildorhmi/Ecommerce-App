@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router';
+import { createBrowserRouter } from 'react-router';
 import { CatalogPage } from '../features/catalog/pages/CatalogPage';
 import { ProductDetailPage } from '../features/catalog/pages/ProductDetailPage';
 import { AdminProductsPage } from '../features/admin/pages/AdminProductsPage';
@@ -6,6 +6,7 @@ import { AdminProductEditPage } from '../features/admin/pages/AdminProductEditPa
 import { AdminCategoriesPage } from '../features/admin/pages/AdminCategoriesPage';
 import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage';
 import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage';
+import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage';
 import { ProtectedRoute } from '../shared/components/ProtectedRoute';
 import { AdminRoute } from '../shared/components/AdminRoute';
 import { LoginPage } from '../features/auth/pages/LoginPage';
@@ -24,9 +25,6 @@ import { AboutPage } from '../features/info/pages/AboutPage';
 import { ContactPage } from '../features/info/pages/ContactPage';
 import { CgvPage } from '../features/info/pages/CgvPage';
 import { MentionsLegalesPage } from '../features/info/pages/MentionsLegalesPage';
-
-// Admin home — redirect to product list (primary admin landing)
-const AdminHomePage = () => <Navigate to="/admin/products" replace />;
 
 export const router = createBrowserRouter([
   {
@@ -102,7 +100,7 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/admin',
-            element: <AdminHomePage />,
+            element: <AdminDashboardPage />,
           },
           {
             path: '/admin/products',
