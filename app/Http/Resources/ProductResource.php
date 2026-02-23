@@ -37,11 +37,11 @@ class ProductResource extends JsonResource
                 $this->variants->where('is_active', true)->map(fn ($variant) => [
                     'id'             => $variant->id,
                     'sku'            => $variant->sku,
-                    'price'          => $variant->price_override ?? $this->price,
-                    'stock_quantity' => $variant->stock_quantity,
-                    'values'         => $variant->values->map(fn ($val) => [
-                        'type'  => $val->type->name,
-                        'value' => $val->value,
+                    'price'          => $variant->price ?? $this->price,
+                    'stock'          => $variant->stock,
+                    'attribute_values' => $variant->attributeValues->map(fn ($av) => [
+                        'attribute' => $av->attribute?->name,
+                        'value'     => $av->value,
                     ]),
                 ])->values()
             ),
