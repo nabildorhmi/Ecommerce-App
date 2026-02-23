@@ -127,3 +127,34 @@ export interface DashboardFilters {
   year?: number;
   status?: string;
 }
+
+export interface VariationValue {
+  id: number;
+  value: string;
+}
+
+export interface VariationType {
+  id: number;
+  name: string;
+  values: VariationValue[];
+  created_at: string;
+}
+
+export interface ProductVariantValue {
+  id: number;
+  variation_type_id: number;
+  variation_type_name: string;
+  value: string;
+}
+
+export interface ProductVariant {
+  id: number;
+  product_id: number;
+  sku: string | null;
+  price_override: number | null;
+  stock_quantity: number;
+  is_active: boolean;
+  values: ProductVariantValue[];
+  effective_price: number;
+  created_at: string;
+}
