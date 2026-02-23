@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DeliveryZoneController as AdminDeliveryZoneController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -49,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin-only routes (both admin and global_admin can access)
     Route::middleware('role:admin|global_admin')->prefix('admin')->group(function () {
         Route::get('/ping', fn() => response()->json(['status' => 'admin ok']));
+
+        // Dashboard
+        Route::get('/dashboard', AdminDashboardController::class);
 
         // Product CRUD
         Route::get('/products',                                   [AdminProductController::class, 'index']);
