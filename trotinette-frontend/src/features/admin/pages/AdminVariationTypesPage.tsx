@@ -53,12 +53,6 @@ function FormDialog({
     editTarget?.values.map((v) => v.value) ?? ['']
   );
 
-  // Reset form when editTarget changes
-  useState(() => {
-    setName(editTarget?.name ?? '');
-    setValues(editTarget?.values.map((v) => v.value) ?? ['']);
-  });
-
   const handleAddValue = () => {
     setValues([...values, '']);
   };
@@ -348,8 +342,9 @@ export function AdminVariationTypesPage() {
         </Table>
       </TableContainer>
 
-      {/* Create / Edit Dialog */}
+      {/* Create / Edit Dialog — key forces remount so useState re-initializes */}
       <FormDialog
+        key={editTarget ? `edit-${editTarget.id}` : 'create'}
         open={formOpen}
         editTarget={editTarget}
         onClose={() => {
