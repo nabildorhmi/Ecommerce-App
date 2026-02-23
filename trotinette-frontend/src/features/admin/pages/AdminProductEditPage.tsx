@@ -7,6 +7,7 @@ import Alert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAdminProduct } from '../api/products';
 import { ProductForm } from '../components/ProductForm';
+import { ProductVariantsSection } from '../components/ProductVariantsSection';
 import type { AdminProduct } from '../types';
 
 export function AdminProductEditPage() {
@@ -58,7 +59,13 @@ export function AdminProductEditPage() {
       )}
 
       {(isCreate || (!isLoading && !error && product)) && (
-        <ProductForm product={product} onSuccess={handleSuccess} />
+        <>
+          <ProductForm product={product} onSuccess={handleSuccess} />
+
+          {!isCreate && productId > 0 && (
+            <ProductVariantsSection productId={productId} />
+          )}
+        </>
       )}
     </Box>
   );
