@@ -52,9 +52,9 @@ class DashboardService
             ->groupBy('status')
             ->get()
             ->map(function ($item) {
-                $status = OrderStatus::from($item->status);
+                $status = $item->status instanceof OrderStatus ? $item->status : OrderStatus::from($item->status);
                 return [
-                    'status' => $item->status,
+                    'status' => $status->value,
                     'label' => $status->label(),
                     'count' => $item->count,
                 ];
@@ -62,14 +62,14 @@ class DashboardService
             ->toArray();
 
         // Total revenue (only delivered orders)
-        $revenueQuery = Order::query()->where('status', OrderStatus::DELIVERED->value);
+        $revenueQuery = Order::query()->where('status', OrderStatus::Delivered->value);
         $revenueFiltersWithoutStatus = array_diff_key($filters, ['status' => '']);
         $this->applyFilters($revenueQuery, $revenueFiltersWithoutStatus);
         $totalRevenue = $revenueQuery->sum('total');
 
         // Average order value (delivered only)
         $deliveredCount = Order::query()
-            ->where('status', OrderStatus::DELIVERED->value);
+            ->where('status', OrderStatus::Delivered->value);
         $this->applyFilters($deliveredCount, $revenueFiltersWithoutStatus);
         $deliveredCount = $deliveredCount->count();
 
@@ -77,12 +77,13 @@ class DashboardService
 
         // Best selling products
         $productQuery = OrderItem::query()
-            ->join('orders', 'order_items.order_id', '=', 'orders.id');
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->join('products', 'order_items.product_id', '=', 'products.id');
         $this->applyFilters($productQuery, $revenueFiltersWithoutStatus);
 
         $bestSellingProducts = $productQuery
-            ->select('order_items.product_id', 'order_items.product_name', DB::raw('SUM(order_items.quantity) as total_quantity'))
-            ->groupBy('order_items.product_id', 'order_items.product_name')
+            ->select('order_items.product_id', 'products.name as product_name', DB::raw('SUM(order_items.quantity) as total_quantity'))
+            ->groupBy('order_items.product_id', 'products.name')
             ->orderByDesc('total_quantity')
             ->limit(5)
             ->get()
@@ -98,7 +99,7 @@ class DashboardService
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->where('orders.status', OrderStatus::DELIVERED->value);
+            ->where('orders.status', OrderStatus::Delivered->value);
         $this->applyFilters($categoryQuery, $revenueFiltersWithoutStatus);
 
         $bestSellingCategories = $categoryQuery
@@ -160,7 +161,7 @@ class DashboardService
         $stats = $query
             ->select(
                 DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
-                DB::raw('SUM(CASE WHEN status = "' . OrderStatus::DELIVERED->value . '" THEN total ELSE 0 END) as revenue'),
+                DB::raw('SUM(CASE WHEN status = "' . OrderStatus::Delivered->value . '" THEN total ELSE 0 END) as revenue'),
                 DB::raw('COUNT(*) as order_count')
             )
             ->groupBy('month')
@@ -181,7 +182,7 @@ class DashboardService
         $stats = Order::query()
             ->select(
                 DB::raw('YEAR(created_at) as year'),
-                DB::raw('SUM(CASE WHEN status = "' . OrderStatus::DELIVERED->value . '" THEN total ELSE 0 END) as revenue'),
+                DB::raw('SUM(CASE WHEN status = "' . OrderStatus::Delivered->value . '" THEN total ELSE 0 END) as revenue'),
                 DB::raw('COUNT(*) as order_count')
             )
             ->groupBy('year')
