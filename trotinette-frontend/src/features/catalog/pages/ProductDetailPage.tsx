@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useParams, Link } from 'react-router';
@@ -24,6 +24,7 @@ import { StockBadge } from '../components/StockBadge';
 import { TrustSignals } from '../components/TrustSignals';
 import { CategoryBreadcrumb } from '../components/CategoryBreadcrumb';
 import { useCartStore } from '../../cart/store';
+import type { ProductVariantDisplay } from '../types';
 
 function ProductDetailSkeleton() {
   return (
@@ -64,6 +65,44 @@ export function ProductDetailPage() {
   const items = useCartStore((s) => s.items);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
+  // Variant selection state
+  const [selectedVariantValues, setSelectedVariantValues] = useState<Record<string, string>>({});
+
+  // Extract unique variation types from variants
+  const variationTypes = useMemo(() => {
+    if (!product?.variants || product.variants.length === 0) return [];
+    const typesMap = new Map<string, Set<string>>();
+    product.variants.forEach((variant) => {
+      variant.values.forEach((val) => {
+        if (!typesMap.has(val.type)) {
+          typesMap.set(val.type, new Set());
+        }
+        typesMap.get(val.type)!.add(val.value);
+      });
+    });
+    return Array.from(typesMap.entries()).map(([type, values]) => ({
+      type,
+      values: Array.from(values),
+    }));
+  }, [product?.variants]);
+
+  // Find matching variant based on selected values
+  const selectedVariant = useMemo<ProductVariantDisplay | null>(() => {
+    if (!product?.variants || variationTypes.length === 0) return null;
+    if (Object.keys(selectedVariantValues).length !== variationTypes.length) return null;
+
+    return (
+      product.variants.find((variant) => {
+        return variant.values.every((val) => selectedVariantValues[val.type] === val.value);
+      }) ?? null
+    );
+  }, [product?.variants, selectedVariantValues, variationTypes]);
+
+  // Determine displayed price and stock
+  const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
+  const displayStock = selectedVariant?.stock_quantity ?? product?.stock_quantity ?? 0;
+  const displayInStock = displayStock > 0;
+
   if (isLoading) return <ProductDetailSkeleton />;
 
   if (isError || !product) {
@@ -82,8 +121,10 @@ export function ProductDetailPage() {
   }
 
   const cartItem = items.find((i) => i.productId === product.id);
-  const isAtMaxStock = cartItem ? cartItem.quantity >= product.stock_quantity : false;
-  const isAddDisabled = !product.in_stock || isAtMaxStock;
+  const isAtMaxStock = cartItem ? cartItem.quantity >= displayStock : false;
+  const hasVariants = product.variants && product.variants.length > 0;
+  const variantNotSelected = hasVariants && !selectedVariant;
+  const isAddDisabled = !displayInStock || isAtMaxStock || variantNotSelected;
 
   const handleAddToCart = () => {
     addItem(product, product.name);
@@ -218,12 +259,67 @@ export function ProductDetailPage() {
                       textShadow: '0 0 20px rgba(0,194,255,0.4)',
                     }}
                   >
-                    {formatCurrency(product.price)}
+                    {formatCurrency(displayPrice)}
                   </Typography>
                 </Box>
 
+                {/* Variant selectors */}
+                {variationTypes.length > 0 && (
+                  <>
+                    {variationTypes.map(({ type, values }) => (
+                      <Box key={type}>
+                        <Typography
+                          sx={{
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.08em',
+                            color: 'text.secondary',
+                            textTransform: 'uppercase',
+                            mb: 1,
+                          }}
+                        >
+                          {type}
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          {values.map((value) => {
+                            const isSelected = selectedVariantValues[type] === value;
+                            return (
+                              <Chip
+                                key={value}
+                                label={value}
+                                onClick={() =>
+                                  setSelectedVariantValues((prev) => ({
+                                    ...prev,
+                                    [type]: value,
+                                  }))
+                                }
+                                sx={{
+                                  borderColor: isSelected ? '#00C2FF' : 'divider',
+                                  backgroundColor: isSelected
+                                    ? 'rgba(0,194,255,0.12)'
+                                    : 'transparent',
+                                  color: isSelected ? '#00C2FF' : 'text.secondary',
+                                  fontWeight: isSelected ? 700 : 500,
+                                  fontSize: '0.8rem',
+                                  cursor: 'pointer',
+                                  '&:hover': {
+                                    backgroundColor: isSelected
+                                      ? 'rgba(0,194,255,0.18)'
+                                      : 'rgba(255,255,255,0.04)',
+                                  },
+                                }}
+                                variant="outlined"
+                              />
+                            );
+                          })}
+                        </Box>
+                      </Box>
+                    ))}
+                  </>
+                )}
+
                 {/* Stock status */}
-                <StockBadge inStock={product.in_stock} />
+                <StockBadge inStock={displayInStock} />
 
                 <Divider />
 
@@ -247,7 +343,9 @@ export function ProductDetailPage() {
                         : '0 0 24px rgba(0,194,255,0.35)',
                     }}
                   >
-                    {isAtMaxStock && product.in_stock
+                    {variantNotSelected
+                      ? "Sélectionner une variante"
+                      : isAtMaxStock && displayInStock
                       ? "Stock maximum atteint"
                       : "Ajouter au panier"}
                   </Button>

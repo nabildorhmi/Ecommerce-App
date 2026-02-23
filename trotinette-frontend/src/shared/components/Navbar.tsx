@@ -37,6 +37,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import PeopleIcon from '@mui/icons-material/People';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import TuneIcon from '@mui/icons-material/Tune';
 import { useAuthStore } from '../../features/auth/store';
 import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
@@ -362,8 +364,10 @@ export function Navbar() {
                     >
                       {(() => {
                         const menuItems = [
+                          { to: '/admin', icon: <DashboardIcon fontSize="small" />, label: 'Tableau de bord' },
                           { to: '/admin/products', icon: <AssignmentIcon fontSize="small" />, label: 'Produits' },
                           { to: '/admin/categories', icon: <AssignmentIcon fontSize="small" />, label: 'Catégories' },
+                          { to: '/admin/variation-types', icon: <TuneIcon fontSize="small" />, label: 'Types de variations' },
                           { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes' },
                           { to: '/admin/pages', icon: <DescriptionIcon fontSize="small" />, label: 'Pages' },
                         ];

@@ -16,6 +16,14 @@ export interface Category {
   created_at: string;
 }
 
+export interface ProductVariantDisplay {
+  id: number;
+  sku: string | null;
+  price: number; // integer in centimes
+  stock_quantity: number;
+  values: { type: string; value: string }[];
+}
+
 export interface Product {
   id: number;
   sku: string;
@@ -30,6 +38,7 @@ export interface Product {
   slug: string;
   category: Category | null;
   images: ProductImage[];
+  variants?: ProductVariantDisplay[];
   created_at: string;
 }
 
