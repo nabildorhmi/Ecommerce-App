@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
+use App\Http\Controllers\Admin\VariationTypeController as AdminVariationTypeController;
+use App\Http\Controllers\Admin\ProductVariantController as AdminProductVariantController;
 use App\Http\Controllers\Customer\AuthController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
@@ -91,5 +93,17 @@ Route::middleware('auth:sanctum')->group(function () {
         // Page CMS
         Route::get('/pages',           [AdminPageController::class, 'index']);
         Route::put('/pages/{page}',    [AdminPageController::class, 'update']);
+
+        // Variation types
+        Route::get('/variation-types',                        [AdminVariationTypeController::class, 'index']);
+        Route::post('/variation-types',                       [AdminVariationTypeController::class, 'store']);
+        Route::put('/variation-types/{variation_type}',       [AdminVariationTypeController::class, 'update']);
+        Route::delete('/variation-types/{variation_type}',    [AdminVariationTypeController::class, 'destroy']);
+
+        // Product variants (nested)
+        Route::get('/products/{product}/variants',             [AdminProductVariantController::class, 'index']);
+        Route::post('/products/{product}/variants',            [AdminProductVariantController::class, 'store']);
+        Route::put('/products/{product}/variants/{variant}',   [AdminProductVariantController::class, 'update']);
+        Route::delete('/products/{product}/variants/{variant}',[AdminProductVariantController::class, 'destroy']);
     });
 });
