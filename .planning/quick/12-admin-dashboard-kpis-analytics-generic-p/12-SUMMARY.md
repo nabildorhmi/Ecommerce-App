@@ -20,13 +20,21 @@ key_files:
     - trotinette-api/app/Http/Controllers/Admin/VariationTypeController.php
     - trotinette-api/app/Http/Controllers/Admin/ProductVariantController.php
     - trotinette-frontend/src/features/admin/pages/AdminDashboardPage.tsx
+    - trotinette-frontend/src/features/admin/pages/AdminVariationTypesPage.tsx
+    - trotinette-frontend/src/features/admin/components/ProductVariantsSection.tsx
     - trotinette-frontend/src/features/admin/api/dashboard.ts
     - trotinette-frontend/src/features/admin/api/variations.ts
   modified:
     - trotinette-api/app/Models/Product.php
+    - trotinette-api/app/Http/Controllers/Customer/ProductController.php
+    - trotinette-api/app/Http/Resources/ProductResource.php
     - trotinette-api/routes/api.php
     - trotinette-frontend/src/app/router.tsx
     - trotinette-frontend/src/features/admin/types.ts
+    - trotinette-frontend/src/features/admin/pages/AdminProductEditPage.tsx
+    - trotinette-frontend/src/features/catalog/types.ts
+    - trotinette-frontend/src/features/catalog/pages/ProductDetailPage.tsx
+    - trotinette-frontend/src/shared/components/Navbar.tsx
 decisions:
   - "Generic variation system with dynamic types instead of hardcoded color/size fields — allows any variation dimension"
   - "Server-side SQL aggregation for all dashboard KPIs — no PHP loops, handles large datasets efficiently"
@@ -34,12 +42,12 @@ decisions:
   - "Box with CSS Grid for dashboard layout instead of MUI Grid — MUI v7 Grid API deprecation required simpler approach"
   - "Product variants with optional price override and SKU — flexibility for variant-specific pricing"
   - "Variation types cascade delete to values, but protect if values are used in product_variant_values — prevents orphaned product variants"
+  - "Chip-based variant selectors on storefront — simple, clear UI for customers to select variant combinations"
 metrics:
-  duration: "11 minutes"
-  tasks_completed: 4
-  tasks_partial: 2
+  duration: "28 minutes"
+  tasks_completed: 6
   completed_date: "2026-02-23"
-status: partial
+status: complete
 ---
 
 # Quick Task 12: Admin Dashboard KPIs + Generic Product Variations
@@ -48,15 +56,13 @@ status: partial
 
 ## Completion Status
 
-**Completed (4/6 tasks):**
+**Completed (6/6 tasks):**
 1. Product variations database schema and models
 2. Product variations backend API (CRUD for types and variants)
 3. Dashboard backend service and API
 4. Dashboard frontend page with KPIs and charts
-
-**Partial (2/6 tasks):**
-5. Product variations frontend — API hooks created, UI pages not implemented
-6. Navbar integration + storefront variant display — not started
+5. Product variations frontend UI (variation types page + product variant management)
+6. Navbar integration + storefront variant display
 
 ## What Was Built
 
@@ -131,61 +137,47 @@ status: partial
 - **Files modified:** AdminDashboardPage.tsx
 - **Commit:** b2892c1
 
-## What's Left (Tasks 5 & 6)
+## Tasks 5 & 6 Implementation
 
-### Task 5: Variation Types UI + Product Variant Management
+### Task 5: Variation Types UI + Product Variant Management (Completed)
 
 **Admin Variation Types Page (`/admin/variation-types`):**
-- Dialog-based CRUD (like AdminCategoriesPage pattern)
-- Table listing variation types
-- Values shown as Chips
-- Dialog fields: name (TextField), values (dynamic list with add/delete per value)
-- Edit/delete with confirmation
+- ✅ Dialog-based CRUD (AdminCategoriesPage pattern)
+- ✅ Table listing variation types with values as Chips
+- ✅ Dialog with name TextField and dynamic values list with add/remove
+- ✅ Edit/delete with confirmation dialogs
 
 **Admin Product Edit Page Update:**
-- Add "Variantes du produit" section (only when editing existing product, id > 0)
-- Table showing existing variants: value labels joined, SKU, Price (effective_price), Stock, Active chip, Actions
-- "Ajouter une variante" button opens dialog:
-  - For each variation type: Select to pick one value
-  - SKU: TextField (optional)
-  - Price override: TextField type="number" in MAD (convert to centimes * 100)
-  - Stock: TextField type="number" (required)
-  - Active: Switch (default true)
-- Edit/delete variant dialogs
+- ✅ ProductVariantsSection component added below ProductForm
+- ✅ Only shown when editing existing product (id > 0)
+- ✅ Table showing variants: value labels joined, SKU, Price (effective_price formatted), Stock, Active chip, Actions
+- ✅ "Ajouter une variante" dialog with:
+  - Select for each variation type to pick one value
+  - SKU TextField (optional)
+  - Price override TextField in MAD (converts to centimes * 100 on submit)
+  - Stock TextField (required)
+  - Active Switch (default true)
+- ✅ Edit/delete variant dialogs with proper mutation handling
 
-### Task 6: Navbar + Storefront Variant Display
+### Task 6: Navbar + Storefront Variant Display (Completed)
 
-**Navbar (RootLayout.tsx):**
-- Add "Tableau de bord" link to `/admin` (first in admin dropdown, before products)
-- Add "Types de variations" link to `/admin/variation-types` (after Pages)
+**Navbar Updates:**
+- ✅ Added "Tableau de bord" link to `/admin` (first in admin dropdown)
+- ✅ Added "Types de variations" link to `/admin/variation-types` (after Categories, before Orders)
+- ✅ Added DashboardIcon and TuneIcon imports
 
 **Backend Customer API:**
-- Update customer ProductController `show()` to eager-load `variants.values.type`
-- Update customer ProductResource to include variants (filter is_active=true only):
-  ```php
-  'variants' => $this->whenLoaded('variants', fn() =>
-      $this->variants->where('is_active', true)->map(fn($v) => [
-          'id' => $v->id,
-          'sku' => $v->sku,
-          'price' => $v->price_override ?? $this->price,
-          'stock_quantity' => $v->stock_quantity,
-          'values' => $v->values->map(fn($val) => [
-              'type' => $val->type->name,
-              'value' => $val->value,
-          ]),
-      ])->values()
-  ),
-  ```
+- ✅ Updated customer ProductController `show()` to eager-load `variants.values.type`
+- ✅ Updated customer ProductResource to include active variants with properly structured values
 
 **Frontend Storefront (ProductDetailPage):**
-- Add `ProductVariantDisplay` interface to catalog/types.ts
-- Add `variants?: ProductVariantDisplay[]` to Product type
-- If product has variants, show variant selector section above "Add to Cart":
-  - For each unique variation type: Chips or ToggleButtonGroup for selecting value
-  - On selection change: find matching variant, update displayed price
-  - Show variant stock, disable Add to Cart if stock=0
-- Store selected variant values in component state
-- Pass variant info to cart on "Add to Cart" (optional, prices already snapshotted)
+- ✅ Added `ProductVariantDisplay` interface to catalog/types.ts
+- ✅ Added `variants?: ProductVariantDisplay[]` to Product type
+- ✅ Variant selector section with Chip UI for each variation type
+- ✅ Dynamic price update based on selected variant
+- ✅ Dynamic stock display based on selected variant
+- ✅ Disabled "Add to Cart" if variant not selected or out of stock
+- ✅ Button text changes to "Sélectionner une variante" when variant required but not selected
 
 ## Verification Checklist
 
@@ -196,20 +188,20 @@ status: partial
 - [x] Variation types CRUD API routes registered
 - [x] Product variants CRUD API routes registered (nested under products)
 - [x] Frontend builds without TypeScript errors
-- [ ] Variation types CRUD works end-to-end (API + frontend UI)
-- [ ] Product edit page shows variant management section
-- [ ] Storefront product page shows variant selectors
-- [ ] Admin navbar has dashboard and variation types links
+- [x] Variation types CRUD works end-to-end (API + frontend UI)
+- [x] Product edit page shows variant management section
+- [x] Storefront product page shows variant selectors
+- [x] Admin navbar has dashboard and variation types links
 
-## Success Criteria (Partial)
+## Success Criteria (Complete)
 
 - [x] Admin can visit /admin and see dashboard with KPI cards
 - [x] Admin can filter dashboard — data updates accordingly
 - [x] All monetary values stored in centimes, displayed in MAD
-- [ ] Admin can CRUD variation types with values at /admin/variation-types
-- [ ] Admin can add/edit/delete variant combinations on any product's edit page
-- [ ] Each variant has optional price override, stock quantity, SKU, and active status
-- [ ] Storefront product detail shows variant selectors and updates price/stock dynamically
+- [x] Admin can CRUD variation types with values at /admin/variation-types
+- [x] Admin can add/edit/delete variant combinations on any product's edit page
+- [x] Each variant has optional price override, stock quantity, SKU, and active status
+- [x] Storefront product detail shows variant selectors and updates price/stock dynamically
 
 ## Technical Notes
 
@@ -239,20 +231,33 @@ status: partial
 3. **afbcf9c** — feat(quick-12): add dashboard backend service and API
 4. **b2892c1** — feat(quick-12): add dashboard frontend with KPIs and charts
 5. **8fca210** — feat(quick-12): add variation types and API hooks (partial Task 5)
+6. **dd9453c** — feat(quick-12): add variation types UI and product variant management
+7. **f3eadbd** — feat(quick-12): add navbar links and storefront variant display
 
-## Next Steps
+## Additional Features Implemented
 
-To complete this quick task:
+### Admin UI Patterns
+- Followed existing AdminCategoriesPage pattern for consistency
+- Dialog-based CRUD with proper error handling
+- Bilingual labels (French/English) throughout
+- MUI components with consistent styling
 
-1. **Implement AdminVariationTypesPage** — Dialog-based CRUD matching AdminCategoriesPage pattern
-2. **Update AdminProductEditPage** — Add "Variantes du produit" section with variant table and add/edit/delete dialogs
-3. **Update RootLayout navbar** — Add dashboard and variation types links to admin dropdown
-4. **Update customer Product API and resource** — Include active variants with values
-5. **Update ProductDetailPage** — Add variant selector UI with dynamic price/stock updates
+### Variant Management UX
+- Dynamic value list in variation type dialog (add/remove individual values)
+- Select dropdowns for each variation type when creating variants
+- Price override in MAD converted to centimes automatically
+- Effective price calculation and display (override ?? base price)
+- Active/inactive status with Switch control
 
-Estimated time to complete: ~20-30 minutes (2 UI pages + nav updates + storefront integration)
+### Storefront Variant Selection
+- Chip-based selectors for clean, modern UI
+- Visual feedback for selected values (color, border, background)
+- Real-time price updates when selection changes
+- Stock awareness per variant
+- Button state management (disabled if no variant selected or out of stock)
+- Clear user feedback ("Sélectionner une variante" button text)
 
-## Self-Check: PARTIAL
+## Self-Check: PASSED
 
 **Files created (verified):**
 - [x] DashboardService.php exists
@@ -263,15 +268,17 @@ Estimated time to complete: ~20-30 minutes (2 UI pages + nav updates + storefron
 - [x] VariationTypeController.php exists
 - [x] ProductVariantController.php exists
 - [x] AdminDashboardPage.tsx exists
+- [x] AdminVariationTypesPage.tsx exists
+- [x] ProductVariantsSection.tsx exists
 - [x] dashboard.ts API hooks exist
 - [x] variations.ts API hooks exist
-- [ ] AdminVariationTypesPage.tsx NOT CREATED (Task 5 incomplete)
-- [ ] ProductDetailPage variant selector NOT IMPLEMENTED (Task 6 incomplete)
 
 **Routes verified:**
 - [x] `/api/admin/dashboard` route exists
 - [x] `/api/admin/variation-types` routes exist
 - [x] `/api/admin/products/{product}/variants` routes exist
+- [x] `/admin` route points to AdminDashboardPage
+- [x] `/admin/variation-types` route points to AdminVariationTypesPage
 
 **Database migrations:**
 - [x] variation_types table created
@@ -285,3 +292,13 @@ Estimated time to complete: ~20-30 minutes (2 UI pages + nav updates + storefron
 - [x] afbcf9c exists
 - [x] b2892c1 exists
 - [x] 8fca210 exists
+- [x] dd9453c exists
+- [x] f3eadbd exists
+
+**Functionality verified:**
+- [x] Dashboard displays KPIs and charts
+- [x] Variation types CRUD functional
+- [x] Product variants CRUD functional
+- [x] Navbar links added
+- [x] Storefront variant selectors implemented
+- [x] Price/stock updates dynamically
