@@ -12,6 +12,7 @@ use App\Mail\OrderDispatched;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
@@ -43,9 +44,10 @@ class OrderService
                 ]);
             }
 
-            // c. Lock products with pessimistic locking
+            // c. Lock products with pessimistic locking (also eager-load default variant)
             $products = Product::whereIn('id', $productIds)
                 ->where('is_active', true)
+                ->with(['variants' => fn ($q) => $q->lockForUpdate()])
                 ->lockForUpdate()
                 ->get()
                 ->keyBy('id');
@@ -56,6 +58,7 @@ class OrderService
 
             foreach ($data['items'] as $item) {
                 $productId = $item['product_id'];
+                $variantId = $item['variant_id'] ?? null;
                 $quantity  = $item['quantity'];
 
                 if (! isset($products[$productId])) {
@@ -66,26 +69,43 @@ class OrderService
 
                 $product = $products[$productId];
 
-                if ($product->stock_quantity < $quantity) {
+                // Resolve variant: use explicitly specified or fall back to default
+                $variant = $variantId
+                    ? $product->variants->firstWhere('id', $variantId)
+                    : $product->variants->firstWhere('is_default', true);
+
+                if (! $variant) {
                     throw ValidationException::withMessages([
-                        'items' => ["Insufficient stock for product '{$product->sku}'. Available: {$product->stock_quantity}, requested: {$quantity}."],
+                        'items' => ["No variant found for product '{$product->sku}'."],
                     ]);
                 }
 
-                $itemSubtotal = $product->price * $quantity;
+                // Stock is always on the variant
+                if ($variant->stock < $quantity) {
+                    throw ValidationException::withMessages([
+                        'items' => ["Insufficient stock for '{$variant->sku}'. Available: {$variant->stock}, requested: {$quantity}."],
+                    ]);
+                }
+
+                $unitPrice    = $variant->price ?? $product->price;
+                $itemSubtotal = $unitPrice * $quantity;
                 $subtotal    += $itemSubtotal;
 
                 $itemsData[] = [
                     'product_id'  => $productId,
-                    'product_sku' => $product->sku,
-                    'unit_price'  => $product->price,
+                    'variant_id'  => $variant->id,
+                    'product_sku' => $variant->sku ?? $product->sku,
+                    'unit_price'  => $unitPrice,
                     'quantity'    => $quantity,
                     'subtotal'    => $itemSubtotal,
                 ];
             }
 
-            // e. Decrement stock for each item
+            // e. Decrement variant stock and sync product.stock_quantity
             foreach ($itemsData as $item) {
+                Variant::where('id', $item['variant_id'])
+                    ->decrement('stock', $item['quantity']);
+                // Keep product.stock_quantity in sync (sum of variant stocks)
                 Product::where('id', $item['product_id'])
                     ->decrement('stock_quantity', $item['quantity']);
             }
@@ -122,7 +142,7 @@ class OrderService
             ]);
 
             // j. Return with eager-loaded relations
-            return $order->load(['items.product', 'statusLogs', 'user']);
+            return $order->load(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
         });
 
         // k. Send emails AFTER successful DB transaction
@@ -167,7 +187,7 @@ class OrderService
             ]);
         });
 
-        $order = $order->fresh(['items.product', 'statusLogs', 'user']);
+        $order = $order->fresh(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
 
         // Dispatch queued email to the customer AFTER successful DB transaction
         if ($order->user && $order->user->email) {
@@ -194,6 +214,6 @@ class OrderService
     {
         $order->update(['note' => $note]);
 
-        return $order->fresh(['items.product', 'statusLogs']);
+        return $order->fresh(['items.product', 'items.variant.attributeValues', 'statusLogs']);
     }
 }

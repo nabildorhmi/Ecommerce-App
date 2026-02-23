@@ -9,22 +9,57 @@ class ProductResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        // Compute stock from variants (sum of active variants' stock)
+        $computedStock = $this->relationLoaded('variants')
+            ? $this->variants->where('is_active', true)->sum('stock')
+            : $this->computed_stock;
+
+        // Filter out the default variant from the variant list shown to customers
+        // (default variant = no attribute values, just holds base stock/price)
+        $displayVariants = $this->whenLoaded('variants', function () {
+            return $this->variants
+                ->where('is_active', true)
+                ->filter(fn ($v) => ! $v->is_default)
+                ->map(fn ($variant) => [
+                    'id'               => $variant->id,
+                    'sku'              => $variant->sku,
+                    'price'            => $variant->price ?? $this->price,
+                    'stock'            => $variant->stock,
+                    'attribute_values' => $variant->attributeValues->map(fn ($av) => [
+                        'attribute' => $av->attribute?->name,
+                        'value'     => $av->value,
+                    ]),
+                ])
+                ->values();
+        });
+
+        // Default variant info (always present)
+        $defaultVariant = $this->whenLoaded('variants', function () {
+            $dv = $this->variants->firstWhere('is_default', true);
+            return $dv ? [
+                'id'    => $dv->id,
+                'sku'   => $dv->sku,
+                'price' => $dv->price ?? $this->price,
+                'stock' => $dv->stock,
+            ] : null;
+        });
+
         return [
-            'id'             => $this->id,
-            'sku'            => $this->sku,
-            'name'           => $this->name,
-            'slug'           => $this->slug,
-            'description'    => $this->description,
-            'price'          => $this->price,
-            'stock_quantity' => $this->stock_quantity,
-            'in_stock'       => $this->stock_quantity > 0,
-            'attributes'     => $this->attributes,
-            'is_active'      => $this->is_active,
-            'is_featured'    => $this->is_featured,
-            'category'       => $this->whenLoaded('category', fn () =>
+            'id'              => $this->id,
+            'sku'             => $this->sku,
+            'name'            => $this->name,
+            'slug'            => $this->slug,
+            'description'     => $this->description,
+            'price'           => $this->price,
+            'stock_quantity'  => $computedStock,
+            'in_stock'        => $computedStock > 0,
+            'attributes'      => $this->attributes,
+            'is_active'       => $this->is_active,
+            'is_featured'     => $this->is_featured,
+            'category'        => $this->whenLoaded('category', fn () =>
                 new CategoryResource($this->category)
             ),
-            'images'         => $this->whenLoaded('media', fn () =>
+            'images'          => $this->whenLoaded('media', fn () =>
                 $this->getMedia('images')->map(fn ($media) => [
                     'id'        => $media->id,
                     'thumbnail' => $media->getUrl('thumbnail'),
@@ -33,19 +68,9 @@ class ProductResource extends JsonResource
                     'original'  => $media->original_url,
                 ])
             ),
-            'variants'       => $this->whenLoaded('variants', fn () =>
-                $this->variants->where('is_active', true)->map(fn ($variant) => [
-                    'id'             => $variant->id,
-                    'sku'            => $variant->sku,
-                    'price'          => $variant->price ?? $this->price,
-                    'stock'          => $variant->stock,
-                    'attribute_values' => $variant->attributeValues->map(fn ($av) => [
-                        'attribute' => $av->attribute?->name,
-                        'value'     => $av->value,
-                    ]),
-                ])->values()
-            ),
-            'created_at'     => $this->created_at,
+            'default_variant' => $defaultVariant,
+            'variants'        => $displayVariants,
+            'created_at'      => $this->created_at,
         ];
     }
 }

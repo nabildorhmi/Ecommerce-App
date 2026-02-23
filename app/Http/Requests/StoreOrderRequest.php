@@ -19,6 +19,7 @@ class StoreOrderRequest extends FormRequest
             'city'                => ['required', 'string', 'max:100'],
             'items'               => ['required', 'array', 'min:1'],
             'items.*.product_id'  => ['required', 'integer', 'exists:products,id'],
+            'items.*.variant_id'  => ['nullable', 'integer', 'exists:variants,id'],
             'items.*.quantity'    => ['required', 'integer', 'min:1', 'max:10'],
             'note'                => ['nullable', 'string', 'max:500'],
         ];

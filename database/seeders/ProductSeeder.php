@@ -125,10 +125,21 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($products as $data) {
-            Product::firstOrCreate(
+            $product = Product::firstOrCreate(
                 ['sku' => $data['sku']],
                 $data
             );
+
+            // Create default variant if the product doesn't have one
+            if (! $product->variants()->where('is_default', true)->exists()) {
+                $product->variants()->create([
+                    'sku'        => $data['sku'],
+                    'price'      => $data['price'],
+                    'stock'      => $data['stock_quantity'],
+                    'is_active'  => true,
+                    'is_default' => true,
+                ]);
+            }
         }
     }
 }

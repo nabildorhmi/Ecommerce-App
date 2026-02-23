@@ -78,6 +78,22 @@ class Product extends Model implements HasMedia
         );
     }
 
+    /**
+     * The default variant (always exists — Shopify-style).
+     */
+    public function defaultVariant()
+    {
+        return $this->hasOne(Variant::class)->where('is_default', true);
+    }
+
+    /**
+     * Computed stock: sum of all active variants' stock.
+     */
+    public function getComputedStockAttribute(): int
+    {
+        return (int) $this->variants()->where('is_active', true)->sum('stock');
+    }
+
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
