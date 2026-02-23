@@ -33,6 +33,18 @@ class ProductResource extends JsonResource
                     'original'  => $media->original_url,
                 ])
             ),
+            'variants'       => $this->whenLoaded('variants', fn () =>
+                $this->variants->where('is_active', true)->map(fn ($variant) => [
+                    'id'             => $variant->id,
+                    'sku'            => $variant->sku,
+                    'price'          => $variant->price_override ?? $this->price,
+                    'stock_quantity' => $variant->stock_quantity,
+                    'values'         => $variant->values->map(fn ($val) => [
+                        'type'  => $val->type->name,
+                        'value' => $val->value,
+                    ]),
+                ])->values()
+            ),
             'created_at'     => $this->created_at,
         ];
     }
