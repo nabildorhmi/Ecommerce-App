@@ -14,7 +14,7 @@ class ProductVariantController extends Controller
 {
     public function index(Product $product)
     {
-        $variants = $product->variants()->with(['values.type', 'product'])->get();
+        $variants = $product->variants()->with(['attributeValues.attribute', 'product'])->get();
         return ProductVariantResource::collection($variants);
     }
 

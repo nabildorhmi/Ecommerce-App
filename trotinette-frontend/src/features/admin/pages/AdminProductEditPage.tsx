@@ -63,7 +63,7 @@ export function AdminProductEditPage() {
           <ProductForm product={product} onSuccess={handleSuccess} />
 
           {!isCreate && productId > 0 && (
-            <ProductVariantsSection productId={productId} />
+            <ProductVariantsSection productId={productId} productSku={product?.sku ?? ''} />
           )}
         </>
       )}

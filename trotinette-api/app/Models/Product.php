@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
@@ -64,7 +65,17 @@ class Product extends Model implements HasMedia
 
     public function variants(): HasMany
     {
-        return $this->hasMany(ProductVariant::class);
+        return $this->hasMany(Variant::class);
+    }
+
+    public function attributes(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Attribute::class,
+            'product_attributes',
+            'product_id',
+            'attribute_id'
+        );
     }
 
     public function scopeActive(Builder $query): void

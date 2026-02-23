@@ -20,8 +20,8 @@ export interface ProductVariantDisplay {
   id: number;
   sku: string | null;
   price: number; // integer in centimes
-  stock_quantity: number;
-  values: { type: string; value: string }[];
+  stock: number;
+  attribute_values: { attribute: string; value: string }[];
 }
 
 export interface Product {

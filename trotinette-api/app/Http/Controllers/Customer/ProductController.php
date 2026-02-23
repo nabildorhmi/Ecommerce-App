@@ -55,7 +55,7 @@ class ProductController extends Controller
         $product = Product::query()
             ->where('is_active', true)
             ->where('slug', $slug)
-            ->with(['media', 'category', 'variants.values.type'])
+            ->with(['media', 'category', 'variants.attributeValues.attribute'])
             ->firstOrFail();
 
         return new ProductResource($product);

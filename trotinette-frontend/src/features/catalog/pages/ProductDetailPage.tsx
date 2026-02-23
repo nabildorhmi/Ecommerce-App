@@ -73,11 +73,12 @@ export function ProductDetailPage() {
     if (!product?.variants || product.variants.length === 0) return [];
     const typesMap = new Map<string, Set<string>>();
     product.variants.forEach((variant) => {
-      variant.values.forEach((val) => {
-        if (!typesMap.has(val.type)) {
-          typesMap.set(val.type, new Set());
+      (variant.attribute_values ?? []).forEach((val) => {
+        const attrName = val.attribute ?? '';
+        if (!typesMap.has(attrName)) {
+          typesMap.set(attrName, new Set());
         }
-        typesMap.get(val.type)!.add(val.value);
+        typesMap.get(attrName)!.add(val.value);
       });
     });
     return Array.from(typesMap.entries()).map(([type, values]) => ({
@@ -93,14 +94,16 @@ export function ProductDetailPage() {
 
     return (
       product.variants.find((variant) => {
-        return variant.values.every((val) => selectedVariantValues[val.type] === val.value);
+        return (variant.attribute_values ?? []).every(
+          (val) => selectedVariantValues[val.attribute ?? ''] === val.value
+        );
       }) ?? null
     );
   }, [product?.variants, selectedVariantValues, variationTypes]);
 
   // Determine displayed price and stock
   const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
-  const displayStock = selectedVariant?.stock_quantity ?? product?.stock_quantity ?? 0;
+  const displayStock = selectedVariant?.stock ?? product?.stock_quantity ?? 0;
   const displayInStock = displayStock > 0;
 
   if (isLoading) return <ProductDetailSkeleton />;

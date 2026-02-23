@@ -36,10 +36,12 @@ import {
   useDeleteProductVariant,
 } from '../api/variations';
 import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { VariantGenerator } from './VariantGenerator';
 import type { ProductVariant, VariationType } from '../types';
 
 interface ProductVariantsSectionProps {
   productId: number;
+  productSku?: string;
 }
 
 interface VariantFormData {
@@ -74,17 +76,17 @@ function VariantDialog({
   // Initialize form data
   const initialSelectedValues: Record<number, number> = {};
   if (editTarget) {
-    editTarget.values.forEach((val) => {
-      initialSelectedValues[val.variation_type_id] = val.id;
+    editTarget.attribute_values.forEach((val) => {
+      initialSelectedValues[val.attribute_id] = val.id;
     });
   }
 
   const [formData, setFormData] = useState<VariantFormData>({
     sku: editTarget?.sku ?? '',
-    priceOverrideMad: editTarget?.price_override
-      ? (editTarget.price_override / 100).toFixed(2)
+    priceOverrideMad: editTarget?.price
+      ? (editTarget.price / 100).toFixed(2)
       : '',
-    stockQuantity: editTarget?.stock_quantity.toString() ?? '0',
+    stockQuantity: editTarget?.stock.toString() ?? '0',
     isActive: editTarget?.is_active ?? true,
     selectedValues: initialSelectedValues,
   });
@@ -237,7 +239,7 @@ function DeleteDialog({
               <br />
               <br />
               <strong>
-                {variant.values.map((v) => v.value).join(' / ')}
+                {variant.attribute_values.map((v) => v.value).join(' / ')}
               </strong>
             </>
           )}
@@ -267,7 +269,7 @@ function DeleteDialog({
   );
 }
 
-export function ProductVariantsSection({ productId }: ProductVariantsSectionProps) {
+export function ProductVariantsSection({ productId, productSku }: ProductVariantsSectionProps) {
   const { data: variantsData, isLoading: variantsLoading } = useProductVariants(productId);
   const { data: typesData, isLoading: typesLoading } = useVariationTypes();
   const createMutation = useCreateProductVariant();
@@ -292,10 +294,10 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
       productId,
       data: {
         sku: data.sku.trim() || null,
-        price_override: priceOverrideCentimes,
-        stock_quantity: parseInt(data.stockQuantity, 10),
+        price: priceOverrideCentimes,
+        stock: parseInt(data.stockQuantity, 10),
         is_active: data.isActive,
-        variation_value_ids: variationValueIds,
+        attribute_value_ids: variationValueIds,
       },
     });
     setDialogOpen(false);
@@ -315,10 +317,10 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
       variantId: editTarget.id,
       data: {
         sku: data.sku.trim() || null,
-        price_override: priceOverrideCentimes,
-        stock_quantity: parseInt(data.stockQuantity, 10),
+        price: priceOverrideCentimes,
+        stock: parseInt(data.stockQuantity, 10),
         is_active: data.isActive,
-        variation_value_ids: variationValueIds,
+        attribute_value_ids: variationValueIds,
       },
     });
     setDialogOpen(false);
@@ -350,9 +352,12 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
 
   return (
     <Box mt={4}>
+      {/* Auto-generator: select attribute values → generate all combos in one click */}
+      <VariantGenerator productId={productId} productSku={productSku ?? ''} />
+
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
         <Typography variant="h6" fontWeight="bold">
-          Variantes du produit / Product Variants
+          Variantes du produit / Product Variants ({variants.length})
         </Typography>
         <Button
           variant="outlined"
@@ -360,7 +365,7 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
           onClick={openCreate}
           size="small"
         >
-          Ajouter une variante / Add variant
+          + Manuelle
         </Button>
       </Box>
 
@@ -387,13 +392,13 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
               variants.map((variant) => (
                 <TableRow key={variant.id} hover>
                   <TableCell>
-                    {variant.values.map((v) => v.value).join(' / ')}
+                    {variant.attribute_values.map((v) => v.value).join(' / ')}
                   </TableCell>
                   <TableCell>{variant.sku ?? '—'}</TableCell>
                   <TableCell align="right">
                     {formatCurrency(variant.effective_price)}
                   </TableCell>
-                  <TableCell align="right">{variant.stock_quantity}</TableCell>
+                  <TableCell align="right">{variant.stock}</TableCell>
                   <TableCell>
                     <Chip
                       label={variant.is_active ? 'Active' : 'Inactive'}
@@ -425,8 +430,9 @@ export function ProductVariantsSection({ productId }: ProductVariantsSectionProp
         </Table>
       </TableContainer>
 
-      {/* Create / Edit Dialog */}
+      {/* Create / Edit Dialog — key forces full remount so useState re-initializes */}
       <VariantDialog
+        key={editTarget ? `edit-${editTarget.id}` : 'create'}
         open={dialogOpen}
         editTarget={editTarget}
         productId={productId}

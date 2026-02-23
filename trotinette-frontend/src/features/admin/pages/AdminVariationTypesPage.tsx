@@ -82,8 +82,8 @@ function FormDialog({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
         {editTarget
-          ? 'Modifier le type de variation / Edit variation type'
-          : 'Nouveau type de variation / New variation type'}
+          ? 'Modifier l\'attribut / Edit attribute'
+          : 'Nouvel attribut / New attribute'}
       </DialogTitle>
       <DialogContent>
         <Box pt={1}>
@@ -174,12 +174,12 @@ function DeleteDialog({
 }: DeleteDialogProps) {
   return (
     <Dialog open={Boolean(type)} onClose={onClose}>
-      <DialogTitle>Supprimer le type de variation / Delete variation type</DialogTitle>
+      <DialogTitle>Supprimer l'attribut / Delete attribute</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Êtes-vous sûr de vouloir supprimer{' '}
           <strong>{type?.name}</strong>
-          {' '}? Are you sure you want to delete this variation type?
+          {' '}? Are you sure you want to delete this attribute?
           {type?.values && type.values.length > 0 && (
             <>
               <br />
@@ -191,7 +191,7 @@ function DeleteDialog({
         {deleteError && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {(deleteError as { response?: { data?: { message?: string } } })
-              ?.response?.data?.message ?? 'Suppression impossible / Deletion failed. This type may be in use by product variants.'}
+              ?.response?.data?.message ?? 'Suppression impossible / Deletion failed. This attribute may be in use by variants.'}
           </Alert>
         )}
       </DialogContent>
@@ -266,7 +266,7 @@ export function AdminVariationTypesPage() {
   if (error) {
     return (
       <Alert severity="error">
-        Impossible de charger les types de variations / Failed to load variation types
+        Impossible de charger les attributs / Failed to load attributes
       </Alert>
     );
   }
@@ -280,14 +280,14 @@ export function AdminVariationTypesPage() {
         mb={3}
       >
         <Typography variant="h5" fontWeight="bold">
-          Types de variations / Variation Types
+          Attributs / Attributes
         </Typography>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={openCreate}
         >
-          Ajouter un type / Add type
+          Ajouter un attribut / Add attribute
         </Button>
       </Box>
 
@@ -304,7 +304,7 @@ export function AdminVariationTypesPage() {
             {types.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  Aucun type de variation / No variation types found
+                  Aucun attribut / No attributes found
                 </TableCell>
               </TableRow>
             ) : (

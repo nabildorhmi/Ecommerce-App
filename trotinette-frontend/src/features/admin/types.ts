@@ -128,33 +128,44 @@ export interface DashboardFilters {
   status?: string;
 }
 
-export interface VariationValue {
+export interface AttributeValue {
   id: number;
   value: string;
+  slug: string;
 }
 
-export interface VariationType {
+export interface Attribute {
   id: number;
   name: string;
-  values: VariationValue[];
+  slug: string;
+  values: AttributeValue[];
   created_at: string;
 }
 
-export interface ProductVariantValue {
+export interface VariantAttributeValue {
   id: number;
-  variation_type_id: number;
-  variation_type_name: string;
+  attribute_id: number;
+  attribute_name: string;
+  attribute_slug: string;
   value: string;
+  slug: string;
 }
 
-export interface ProductVariant {
+export interface Variant {
   id: number;
   product_id: number;
   sku: string | null;
-  price_override: number | null;
-  stock_quantity: number;
+  price: number | null;        // null = use product base_price
+  stock: number;
   is_active: boolean;
-  values: ProductVariantValue[];
+  status: 'active' | 'inactive';
+  attribute_values: VariantAttributeValue[];
   effective_price: number;
   created_at: string;
 }
+
+// Legacy aliases (kept for backward compat during migration)
+export type VariationValue = AttributeValue;
+export type VariationType = Attribute;
+export type ProductVariantValue = VariantAttributeValue;
+export type ProductVariant = Variant;
