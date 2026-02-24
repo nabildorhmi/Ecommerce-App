@@ -16,6 +16,7 @@ class VariantResource extends JsonResource
             'price'          => $this->price,
             'stock'          => $this->stock,
             'is_active'      => $this->is_active,
+            'is_default'     => (bool) $this->is_default,
             'status'         => $this->is_active ? 'active' : 'inactive',
             'attribute_values' => $this->whenLoaded('attributeValues', fn () =>
                 $this->attributeValues->map(fn ($av) => [
