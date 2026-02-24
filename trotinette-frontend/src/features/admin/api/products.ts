@@ -37,7 +37,6 @@ function buildProductFormData(data: {
   slug?: string;
   description?: string;
   price?: number; // centimes (already converted)
-  stock_quantity?: number;
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
@@ -52,8 +51,6 @@ function buildProductFormData(data: {
   if (data.slug !== undefined) fd.append('slug', data.slug);
   if (data.description !== undefined) fd.append('description', data.description);
   if (data.price !== undefined) fd.append('price', String(data.price));
-  if (data.stock_quantity !== undefined)
-    fd.append('stock_quantity', String(data.stock_quantity));
   if (data.category_id !== undefined && data.category_id !== null)
     fd.append('category_id', String(data.category_id));
   if (data.is_active !== undefined)
@@ -91,7 +88,6 @@ interface CreateProductInput {
   slug: string;
   description: string;
   price: number; // in MAD — we convert to centimes here
-  stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
@@ -128,7 +124,6 @@ interface UpdateProductInput {
   slug?: string;
   description?: string;
   price?: number; // in MAD — converted to centimes
-  stock_quantity?: number;
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;

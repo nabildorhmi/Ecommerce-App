@@ -43,6 +43,12 @@ class VariantController extends Controller
                 ->unique();
             $product->attributes()->syncWithoutDetaching($attributeIds);
 
+            // Deactivate bare default variant when real attribute variants are added
+            $product->variants()
+                ->where('is_default', true)
+                ->where('is_active', true)
+                ->update(['is_active' => false]);
+
             return $variant->load(['attributeValues.attribute', 'product']);
         });
 
@@ -59,12 +65,24 @@ class VariantController extends Controller
                 'is_active' => $request->input('is_active', true),
             ]);
 
-            $variant->attributeValues()->sync($request->input('attribute_value_ids'));
+            // Only sync attribute values if provided (default variants have none)
+            if ($request->has('attribute_value_ids') && !empty($request->input('attribute_value_ids'))) {
+                $variant->attributeValues()->sync($request->input('attribute_value_ids'));
 
-            $attributeIds = \App\Models\AttributeValue::whereIn('id', $request->input('attribute_value_ids'))
-                ->pluck('attribute_id')
-                ->unique();
-            $product->attributes()->syncWithoutDetaching($attributeIds);
+                $attributeIds = \App\Models\AttributeValue::whereIn('id', $request->input('attribute_value_ids'))
+                    ->pluck('attribute_id')
+                    ->unique();
+                $product->attributes()->syncWithoutDetaching($attributeIds);
+            }
+
+            // Sync default variant stock/price back to product
+            if ($variant->is_default) {
+                $productUpdates = ['stock_quantity' => $variant->stock];
+                if ($variant->price !== null) {
+                    $productUpdates['price'] = $variant->price;
+                }
+                $product->update($productUpdates);
+            }
 
             return $variant->load(['attributeValues.attribute', 'product']);
         });
@@ -74,7 +92,25 @@ class VariantController extends Controller
 
     public function destroy(Product $product, Variant $variant)
     {
+        if ($variant->is_default) {
+            return response()->json([
+                'message' => 'Impossible de supprimer la variante par défaut / Cannot delete the default variant.',
+            ], 422);
+        }
+
         $variant->delete();
+
+        // If no non-default variants remain, re-activate the default variant
+        $remainingAttributeVariants = $product->variants()
+            ->where('is_default', false)
+            ->count();
+
+        if ($remainingAttributeVariants === 0) {
+            $product->variants()
+                ->where('is_default', true)
+                ->update(['is_active' => true]);
+        }
+
         return response()->json(['message' => 'Variante supprimée / Variant deleted.']);
     }
 

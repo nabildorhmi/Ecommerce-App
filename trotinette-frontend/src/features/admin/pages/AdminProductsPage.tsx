@@ -11,7 +11,6 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -27,63 +26,8 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useAdminProducts, useDeleteProduct, useUpdateProduct } from '../api/products';
 import type { AdminProduct } from '../types';
-
 function formatPrice(centimes: number): string {
   return `${(centimes / 100).toFixed(2)} MAD`;
-}
-
-interface InlineStockEditorProps {
-  product: AdminProduct;
-}
-
-function InlineStockEditor({ product }: InlineStockEditorProps) {
-  const updateMutation = useUpdateProduct();
-  const [editing, setEditing] = useState(false);
-  const [value, setValue] = useState(String(product.stock_quantity));
-
-  const save = async () => {
-    const qty = parseInt(value, 10);
-    if (!isNaN(qty) && qty >= 0 && qty !== product.stock_quantity) {
-      await updateMutation.mutateAsync({
-        id: product.id,
-        stock_quantity: qty,
-      });
-    }
-    setEditing(false);
-  };
-
-  if (editing) {
-    return (
-      <TextField
-        size="small"
-        type="number"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onBlur={save}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') void save();
-          if (e.key === 'Escape') setEditing(false);
-        }}
-        inputProps={{ min: 0, style: { width: 60 } }}
-        autoFocus
-      />
-    );
-  }
-
-  return (
-    <Box
-      component="span"
-      onClick={() => setEditing(true)}
-      sx={{ cursor: 'pointer', textDecoration: 'underline dotted' }}
-      title="Cliquer pour modifier / Click to edit"
-    >
-      {updateMutation.isPending ? (
-        <CircularProgress size={14} />
-      ) : (
-        product.stock_quantity
-      )}
-    </Box>
-  );
 }
 
 interface DeleteDialogProps {
@@ -246,7 +190,7 @@ export function AdminProductsPage() {
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>
-                      <InlineStockEditor product={product} />
+                      {product.stock_quantity}
                     </TableCell>
                     <TableCell>
                       <Chip

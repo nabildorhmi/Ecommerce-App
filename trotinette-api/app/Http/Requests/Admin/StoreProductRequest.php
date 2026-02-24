@@ -19,7 +19,7 @@ class StoreProductRequest extends FormRequest
             'slug'            => 'required|string|max:255|unique:products,slug',
             'description'     => 'nullable|string',
             'price'           => 'required|integer|min:0',
-            'stock_quantity'  => 'required|integer|min:0',
+            'stock_quantity'  => 'nullable|integer|min:0',
             'category_id'     => 'required|exists:categories,id',
             'is_active'       => 'boolean',
             'is_featured'     => 'boolean',

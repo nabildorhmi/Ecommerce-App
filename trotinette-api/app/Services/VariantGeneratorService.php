@@ -111,21 +111,20 @@ class VariantGeneratorService
                 $product->attributes()->syncWithoutDetaching($allAttributeIds->unique()->all());
             }
 
-            // Deactivate the bare default variant now that real variants exist.
-            // Transfer its stock to the first generated variant if it had stock.
+            // Deactivate the bare default variant now that real attribute variants exist.
+            // Keep is_default=true so ProductResource still recognises it as the base.
             $defaultVariant = $product->variants()
                 ->where('is_default', true)
                 ->whereDoesntHave('attributeValues')
                 ->first();
 
             if ($defaultVariant && $created->isNotEmpty()) {
-                // If the first created variant has 0 stock, transfer default's stock to it
+                // Transfer stock from default to the first generated variant if needed
                 if ($defaultVariant->stock > 0 && $created->first()->stock === 0) {
                     $created->first()->update(['stock' => $defaultVariant->stock]);
                 }
-                $defaultVariant->update(['is_active' => false, 'is_default' => false]);
-                // Mark the first real variant as the new default
-                $created->first()->update(['is_default' => true]);
+                // Deactivate default variant but keep is_default flag
+                $defaultVariant->update(['is_active' => false]);
             }
         });
 

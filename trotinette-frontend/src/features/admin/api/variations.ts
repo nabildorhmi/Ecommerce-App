@@ -112,7 +112,7 @@ export function useUpdateVariant() {
         price?: number | null;
         stock: number;
         is_active: boolean;
-        attribute_value_ids: number[];
+        attribute_value_ids?: number[];
       };
     }) => {
       const res = await apiClient.put(`/admin/products/${productId}/variants/${variantId}`, data);

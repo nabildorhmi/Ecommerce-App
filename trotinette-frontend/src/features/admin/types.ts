@@ -43,7 +43,6 @@ export interface ProductFormData {
   slug: string;
   description: string;
   price: number; // in MAD — converted to centimes on submit
-  stock_quantity: number;
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
@@ -159,6 +158,7 @@ export interface Variant {
   price: number | null;        // null = use product base_price
   stock: number;
   is_active: boolean;
+  is_default: boolean;
   status: 'active' | 'inactive';
   attribute_values: VariantAttributeValue[];
   effective_price: number;

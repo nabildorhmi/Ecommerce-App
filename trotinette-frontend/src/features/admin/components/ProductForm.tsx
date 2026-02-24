@@ -51,10 +51,6 @@ const schema = z.object({
   slug: z.string().min(1, 'Slug requis').max(255),
   description: z.string().default(''),
   price: z.number({ error: 'Prix invalide' }).min(0),
-  stock_quantity: z
-    .number({ error: 'Quantite invalide' })
-    .int()
-    .min(0),
   category_id: z.number({ error: 'Categorie requise' }).nullable(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
@@ -280,7 +276,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     slug: product?.slug ?? '',
     description: product?.description ?? '',
     price: product ? product.price / 100 : 0,
-    stock_quantity: product?.stock_quantity ?? 0,
     category_id: product?.category_id ?? product?.category?.id ?? null,
     is_active: product?.is_active ?? true,
     is_featured: product?.is_featured ?? false,
@@ -345,7 +340,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       slug: values.slug,
       description: values.description ?? '',
       price: values.price,
-      stock_quantity: values.stock_quantity,
       category_id: values.category_id,
       is_active: values.is_active,
       is_featured: values.is_featured,
@@ -395,15 +389,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             {...register('price', { valueAsNumber: true })}
             error={Boolean(errors.price)}
             helperText={errors.price?.message}
-            required
-          />
-          <TextField
-            label="Stock"
-            type="number"
-            inputProps={{ min: '0', step: '1' }}
-            {...register('stock_quantity', { valueAsNumber: true })}
-            error={Boolean(errors.stock_quantity)}
-            helperText={errors.stock_quantity?.message}
             required
           />
           <Controller
