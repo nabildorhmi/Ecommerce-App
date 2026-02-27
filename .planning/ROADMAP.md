@@ -17,6 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: User Accounts** - Customer registration, login, profile, and saved address; admin user management and route protection
 - [ ] **Phase 4: Cart, Checkout, and Orders** - Complete transaction loop — cart persistence, city-based delivery fee, COD checkout, order state machine with audit log, and admin order management
 - [ ] **Phase 5: Wishlist and Translation Completion** - Wishlist for browse-before-buy behavior and the full FR/AR/EN string translation pass across all UI
+- [ ] **Phase 6: UI/UX Futuristic Design Refactoring** - Futuristic high-tech redesign with glassmorphism, 3D hero scene, micro-interactions, animated dashboards, and premium component styling — preserving existing color palette
 
 ## Phase Details
 
@@ -104,7 +105,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -113,3 +114,23 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. User Accounts | 2/2 | Complete | 2026-02-17 |
 | 4. Cart, Checkout, and Orders | 4/4 | Complete | 2026-02-19 |
 | 5. Wishlist and Translation Completion | 0/2 | Not started | - |
+| 6. UI/UX Futuristic Design Refactoring | 0/5 | Not started | - |
+
+### Phase 6: UI/UX Futuristic Design Refactoring
+**Goal**: The entire storefront and admin UI is refactored to a futuristic, high-tech, premium aesthetic — with glassmorphism surfaces, 3D interactive hero, smooth micro-interactions via Framer Motion, animated dashboards with count-up KPIs, and modernized components (buttons, modals, sidebar, tables) — while preserving the existing color palette and brand identity
+**Depends on**: Phase 5
+**Requirements**: UX-01 (futuristic redesign)
+**Success Criteria** (what must be TRUE):
+  1. The homepage hero section features an interactive 3D scene (React Three Fiber) with floating shapes/particles reacting to cursor movement, smooth entrance animations, and a glowing CTA button
+  2. Login/register pages use centered glassmorphic cards with soft background animations, floating labels, animated input focus states, and loading/success transitions
+  3. Admin tables have rounded rows, hover elevation, animated sorting/filtering, sticky headers with blur; dashboard KPI cards animate with count-up numbers and charts have smooth transitions
+  4. Navigation sidebar is collapsible with smooth animation and active-item glow; buttons have ripple/magnetic hover effects; modals and drawers use scale + blur entrance animations
+  5. All animations maintain 60fps performance, all interactive elements remain accessible (keyboard navigable, proper ARIA), and the existing color palette is unchanged
+**Plans:** 5 plans
+
+Plans:
+- [ ] 06-01-PLAN.md — Animation infrastructure: install R3F, Framer Motion, react-countup; Vite bundle splitting; shared animation presets and hooks; MotionConfig wrapper with reduced-motion support
+- [ ] 06-02-PLAN.md — 3D hero and homepage animations: R3F particle hero with cursor interaction, lazy-loaded with 2D fallback, Framer Motion entrance animations on all homepage sections
+- [ ] 06-03-PLAN.md — Auth page animations: glassmorphic cards with floating background orbs, animated tab transitions, input focus glow states, loading/success transitions
+- [ ] 06-04-PLAN.md — Admin dashboard and tables: AnimatedKPICard with count-up, AnimatedChart wrappers, sticky blur table headers, hover elevation rows
+- [ ] 06-05-PLAN.md — Modals, drawers, navbar, and catalog: AnimatedModal (scale+blur), AnimatedDrawer (slide+blur), navbar active-item glow, product card hover effects, catalog staggered entrance
