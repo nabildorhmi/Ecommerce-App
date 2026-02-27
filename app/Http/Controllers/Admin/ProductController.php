@@ -43,7 +43,7 @@ class ProductController extends Controller
             ])
             ->allowedSorts(['price', 'created_at', 'sku'])
             ->defaultSort('-created_at')
-            ->paginate(perPage: 20)
+            ->paginate(perPage: min($request->integer('per_page', 20), 100))
             ->appends($request->query());
 
         return ProductResource::collection($products);

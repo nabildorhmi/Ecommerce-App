@@ -36,7 +36,7 @@ class OrderController extends Controller
             ])
             ->defaultSort('-created_at')
             ->allowedSorts(['created_at', 'total', 'status'])
-            ->paginate(20)
+            ->paginate(min($request->integer('per_page', 20), 100))
             ->appends($request->query());
 
         return OrderResource::collection($orders);

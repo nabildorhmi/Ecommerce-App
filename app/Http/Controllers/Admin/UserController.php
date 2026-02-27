@@ -12,9 +12,9 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index(): ResourceCollection
+    public function index(Request $request): ResourceCollection
     {
-        $users = User::with('roles')->paginate(25);
+        $users = User::with('roles')->paginate(min($request->integer('per_page', 25), 100));
 
         return UserResource::collection($users);
     }
