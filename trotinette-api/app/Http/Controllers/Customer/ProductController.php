@@ -22,6 +22,12 @@ class ProductController extends Controller
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
                 AllowedFilter::exact('is_featured'),
+                AllowedFilter::exact('is_new'),
+                AllowedFilter::callback('is_on_sale', fn ($query, $value) =>
+                    $query->when((bool) $value, fn ($q) =>
+                        $q->whereNotNull('promo_price')->whereColumn('promo_price', '<', 'price')
+                    )
+                ),
                 AllowedFilter::callback('min_price', fn ($query, $value) =>
                     $query->where('price', '>=', (int) $value)
                 ),
@@ -46,7 +52,7 @@ class ProductController extends Controller
             ])
             ->allowedSorts(['price', 'created_at'])
             ->defaultSort('-created_at')
-            ->paginate(perPage: 12)
+            ->paginate(perPage: min($request->integer('per_page', 12), 48))
             ->appends($request->query());
 
         return ProductResource::collection($products);

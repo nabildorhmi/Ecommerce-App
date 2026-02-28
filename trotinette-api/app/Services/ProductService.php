@@ -21,6 +21,8 @@ class ProductService
             'category_id'    => $data['category_id'],
             'is_active'      => $data['is_active'] ?? true,
             'is_featured'    => $data['is_featured'] ?? false,
+            'promo_price'    => $data['promo_price'] ?? null,
+            'is_new'         => $data['is_new'] ?? false,
         ]);
 
         // Auto-create default variant (Shopify-style: every product has at least one variant)
@@ -56,7 +58,13 @@ class ProductService
             'category_id'    => $data['category_id'] ?? null,
             'is_active'      => $data['is_active'] ?? null,
             'is_featured'    => $data['is_featured'] ?? null,
+            'is_new'         => $data['is_new'] ?? null,
         ], fn ($v) => $v !== null));
+
+        // Handle promo_price separately to allow clearing it with null
+        if (array_key_exists('promo_price', $data)) {
+            $product->update(['promo_price' => $data['promo_price']]);
+        }
 
         // Sync default variant stock & price with product-level values
         $defaultVariant = $product->variants()->where('is_default', true)->first();

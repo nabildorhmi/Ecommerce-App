@@ -56,6 +56,9 @@ class ProductResource extends JsonResource
             'attributes'      => $this->attributes,
             'is_active'       => $this->is_active,
             'is_featured'     => $this->is_featured,
+            'promo_price'     => $this->promo_price,
+            'is_new'          => (bool) $this->is_new,
+            'is_on_sale'      => $this->promo_price !== null && $this->promo_price < $this->price,
             'category'        => $this->whenLoaded('category', fn () =>
                 new CategoryResource($this->category)
             ),
