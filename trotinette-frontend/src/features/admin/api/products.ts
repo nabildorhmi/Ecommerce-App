@@ -95,7 +95,7 @@ interface CreateProductInput {
   slug: string;
   description: string;
   price: number; // in MAD — we convert to centimes here
-  promo_price?: number | null; // in MAD
+  promo_price?: number | null; // in MAD — base promo price
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
@@ -134,7 +134,7 @@ interface UpdateProductInput {
   slug?: string;
   description?: string;
   price?: number; // in MAD — converted to centimes
-  promo_price?: number | null; // in MAD
+  promo_price?: number | null; // in MAD — base promo price
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;

@@ -25,7 +25,7 @@ export interface AdminProduct {
   category?: { id: number; name: string; slug: string; is_active: boolean } | null;
   attributes: Record<string, string | number>;
   images: ProductImage[];
-  default_variant?: { id: number; sku: string; price: number; stock: number } | null;
+  default_variant?: { id: number; sku: string; price: number; promo_price: number | null; is_on_sale: boolean; stock: number } | null;
   created_at: string;
   updated_at: string;
 }
@@ -159,12 +159,15 @@ export interface Variant {
   product_id: number;
   sku: string | null;
   price: number | null;        // null = use product base_price
+  promo_price: number | null;  // null = no promo
   stock: number;
   is_active: boolean;
   is_default: boolean;
+  is_on_sale: boolean;
   status: 'active' | 'inactive';
   attribute_values: VariantAttributeValue[];
   effective_price: number;
+  effective_promo_price: number | null;
   created_at: string;
 }
 

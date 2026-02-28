@@ -24,6 +24,8 @@ class ProductResource extends JsonResource
                     'id'               => $variant->id,
                     'sku'              => $variant->sku,
                     'price'            => $variant->price ?? $this->price,
+                    'promo_price'      => $variant->effective_promo_price,
+                    'is_on_sale'       => $variant->is_on_sale,
                     'stock'            => $variant->stock,
                     'attribute_values' => $variant->attributeValues->map(fn ($av) => [
                         'attribute' => $av->attribute?->name,
@@ -37,12 +39,20 @@ class ProductResource extends JsonResource
         $defaultVariant = $this->whenLoaded('variants', function () {
             $dv = $this->variants->firstWhere('is_default', true);
             return $dv ? [
-                'id'    => $dv->id,
-                'sku'   => $dv->sku,
-                'price' => $dv->price ?? $this->price,
-                'stock' => $dv->stock,
+                'id'          => $dv->id,
+                'sku'         => $dv->sku,
+                'price'       => $dv->price ?? $this->price,
+                'promo_price' => $dv->effective_promo_price,
+                'is_on_sale'  => $dv->is_on_sale,
+                'stock'       => $dv->stock,
             ] : null;
         });
+
+        // Product-level is_on_sale: true if default variant is on sale
+        $isOnSale = $this->whenLoaded('variants', function () {
+            $dv = $this->variants->firstWhere('is_default', true);
+            return $dv ? $dv->is_on_sale : false;
+        }, false);
 
         return [
             'id'              => $this->id,
@@ -58,7 +68,7 @@ class ProductResource extends JsonResource
             'is_featured'     => $this->is_featured,
             'promo_price'     => $this->promo_price,
             'is_new'          => (bool) $this->is_new,
-            'is_on_sale'      => $this->promo_price !== null && $this->promo_price < $this->price,
+            'is_on_sale'      => $isOnSale,
             'category'        => $this->whenLoaded('category', fn () =>
                 new CategoryResource($this->category)
             ),

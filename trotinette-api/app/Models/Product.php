@@ -22,12 +22,12 @@ class Product extends Model implements HasMedia
         'slug',
         'description',
         'price',
+        'promo_price',
         'stock_quantity',
         'attributes',
         'category_id',
         'is_active',
         'is_featured',
-        'promo_price',
         'is_new',
     ];
 

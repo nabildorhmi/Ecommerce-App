@@ -58,6 +58,7 @@ interface ProductVariantsSectionProps {
 interface VariantFormData {
   sku: string;
   priceOverrideMad: string; // in MAD for display
+  promoPriceMad: string;    // in MAD for display
   stockQuantity: string;
   isActive: boolean;
   selectedValues: Record<number, number>; // attribute_id -> attribute_value_id
@@ -101,6 +102,9 @@ function VariantDialog({
     sku: editTarget?.sku ?? '',
     priceOverrideMad: editTarget?.price
       ? (editTarget.price / 100).toFixed(2)
+      : '',
+    promoPriceMad: editTarget?.promo_price
+      ? (editTarget.promo_price / 100).toFixed(2)
       : '',
     stockQuantity: editTarget?.stock.toString() ?? '0',
     isActive: editTarget?.is_active ?? true,
@@ -183,6 +187,19 @@ function VariantDialog({
             margin="normal"
             inputProps={{ step: '0.01', min: '0' }}
             helperText="Laissez vide pour utiliser le prix de base du produit / Leave empty to use base product price"
+          />
+
+          <TextField
+            label="Prix promo (MAD) - optionnel / Promo price (MAD) - optional"
+            type="number"
+            value={formData.promoPriceMad}
+            onChange={(e) =>
+              setFormData({ ...formData, promoPriceMad: e.target.value })
+            }
+            fullWidth
+            margin="normal"
+            inputProps={{ step: '0.01', min: '0' }}
+            helperText="Laissez vide pour aucune promotion / Leave empty for no promotion"
           />
 
           <TextField
@@ -358,6 +375,11 @@ function VariantCard({
           <Typography variant="body2">
             Prix / Price: {formatCurrency(variant.effective_price)}
           </Typography>
+          {variant.is_on_sale && variant.promo_price != null && (
+            <Typography variant="body2" sx={{ color: '#FF6B35', fontWeight: 600 }}>
+              Promo: {formatCurrency(variant.promo_price)}
+            </Typography>
+          )}
           <Typography variant="body2" fontWeight="bold">
             Stock: {variant.stock}
           </Typography>
@@ -429,11 +451,16 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
       ? Math.round(parseFloat(data.priceOverrideMad) * 100)
       : null;
 
+    const promoPriceCentimes = data.promoPriceMad.trim()
+      ? Math.round(parseFloat(data.promoPriceMad) * 100)
+      : null;
+
     await createMutation.mutateAsync({
       productId,
       data: {
         sku: data.sku.trim() || null,
         price: priceOverrideCentimes,
+        promo_price: promoPriceCentimes,
         stock: parseInt(data.stockQuantity, 10),
         is_active: data.isActive,
         attribute_value_ids: variationValueIds,
@@ -454,9 +481,14 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
       ? Math.round(parseFloat(data.priceOverrideMad) * 100)
       : null;
 
+    const promoPriceCentimes = data.promoPriceMad.trim()
+      ? Math.round(parseFloat(data.promoPriceMad) * 100)
+      : null;
+
     const payload: Record<string, unknown> = {
       sku: data.sku.trim() || null,
       price: priceOverrideCentimes,
+      promo_price: promoPriceCentimes,
       stock: parseInt(data.stockQuantity, 10),
       is_active: data.isActive,
     };

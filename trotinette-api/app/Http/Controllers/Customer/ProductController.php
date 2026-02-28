@@ -25,7 +25,18 @@ class ProductController extends Controller
                 AllowedFilter::exact('is_new'),
                 AllowedFilter::callback('is_on_sale', fn ($query, $value) =>
                     $query->when((bool) $value, fn ($q) =>
-                        $q->whereNotNull('promo_price')->whereColumn('promo_price', '<', 'price')
+                        $q->where(function ($qq) {
+                            // Product is on sale if default variant has promo_price OR product has promo_price
+                            $qq->whereHas('variants', fn ($vq) =>
+                                $vq->where('is_default', true)
+                                    ->whereNotNull('promo_price')
+                                    ->whereColumn('promo_price', '<', 'variants.price')
+                            )->orWhere(function ($qq2) {
+                                // Product-level promo_price applies when variant has no override
+                                $qq2->whereNotNull('promo_price')
+                                    ->whereColumn('promo_price', '<', 'price');
+                            });
+                        })
                     )
                 ),
                 AllowedFilter::callback('min_price', fn ($query, $value) =>

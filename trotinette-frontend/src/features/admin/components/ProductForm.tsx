@@ -398,14 +398,14 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             required
           />
           <TextField
-            label="Prix promo (MAD)"
+            label="Prix promo de base (MAD)"
             type="number"
             inputProps={{ step: '0.01', min: '0' }}
             {...register('promo_price', {
               setValueAs: (v) => (v === '' || v == null ? '' : Number(v))
             })}
             error={Boolean(errors.promo_price)}
-            helperText={errors.promo_price?.message ?? 'Laisser vide pour aucun promo'}
+            helperText={errors.promo_price?.message ?? 'Prix promo par défaut (les variantes peuvent le surcharger)'}
           />
           <Controller
             name="category_id"

@@ -221,13 +221,13 @@ export function AdminProductsPage() {
                     <TableCell>{product.sku}</TableCell>
                     <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>
-                      {product.is_on_sale && product.promo_price ? (
+                      {product.is_on_sale && product.default_variant?.promo_price ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
                           <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', textDecoration: 'line-through' }}>
                             {formatPrice(product.price)}
                           </Typography>
                           <Typography sx={{ fontSize: '0.82rem', color: '#FF6B35', fontWeight: 600 }}>
-                            {formatPrice(product.promo_price)}
+                            {formatPrice(product.default_variant.promo_price)}
                           </Typography>
                         </Box>
                       ) : (

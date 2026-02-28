@@ -247,7 +247,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Price + stock */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
           {/* Price badge */}
-          {product.is_on_sale ? (
+          {product.is_on_sale && product.default_variant?.promo_price != null ? (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
               <Typography
                 sx={{
@@ -273,7 +273,7 @@ export function ProductCard({ product }: ProductCardProps) {
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  {formatCurrency(product.promo_price!)}
+                  {formatCurrency(product.default_variant.promo_price)}
                 </Typography>
               </Box>
             </Box>

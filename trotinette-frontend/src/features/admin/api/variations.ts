@@ -82,6 +82,7 @@ export function useCreateVariant() {
       data: {
         sku?: string | null;
         price?: number | null;
+        promo_price?: number | null;
         stock: number;
         is_active: boolean;
         attribute_value_ids: number[];
@@ -110,6 +111,7 @@ export function useUpdateVariant() {
       data: {
         sku?: string | null;
         price?: number | null;
+        promo_price?: number | null;
         stock: number;
         is_active: boolean;
         attribute_value_ids?: number[];

@@ -13,16 +13,18 @@ class Variant extends Model
         'product_id',
         'sku',
         'price',
+        'promo_price',
         'stock',
         'is_active',
         'is_default',
     ];
 
     protected $casts = [
-        'price'      => 'integer',
-        'stock'      => 'integer',
-        'is_active'  => 'boolean',
-        'is_default' => 'boolean',
+        'price'       => 'integer',
+        'promo_price' => 'integer',
+        'stock'       => 'integer',
+        'is_active'   => 'boolean',
+        'is_default'  => 'boolean',
     ];
 
     public function product(): BelongsTo
@@ -54,5 +56,22 @@ class Variant extends Model
     public function getEffectivePriceAttribute(): int
     {
         return $this->price ?? $this->product?->price ?? 0;
+    }
+
+    /**
+     * The effective promo price: variant promo_price overrides product promo_price.
+     */
+    public function getEffectivePromoPriceAttribute(): ?int
+    {
+        return $this->promo_price ?? $this->product?->promo_price;
+    }
+
+    /**
+     * Whether this variant is on sale (has an effective promo price lower than effective price).
+     */
+    public function getIsOnSaleAttribute(): bool
+    {
+        $promoPrice = $this->effective_promo_price;
+        return $promoPrice !== null && $promoPrice < $this->effective_price;
     }
 }

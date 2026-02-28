@@ -14,9 +14,11 @@ class VariantResource extends JsonResource
             'product_id'     => $this->product_id,
             'sku'            => $this->sku,
             'price'          => $this->price,
+            'promo_price'    => $this->promo_price,
             'stock'          => $this->stock,
             'is_active'      => $this->is_active,
             'is_default'     => (bool) $this->is_default,
+            'is_on_sale'     => $this->is_on_sale,
             'status'         => $this->is_active ? 'active' : 'inactive',
             'attribute_values' => $this->whenLoaded('attributeValues', fn () =>
                 $this->attributeValues->map(fn ($av) => [
@@ -28,7 +30,8 @@ class VariantResource extends JsonResource
                     'slug'           => $av->slug,
                 ])
             ),
-            'effective_price' => $this->price ?? $this->product?->price,
+            'effective_price'       => $this->price ?? $this->product?->price,
+            'effective_promo_price' => $this->effective_promo_price,
             'created_at'     => $this->created_at?->toISOString(),
         ];
     }

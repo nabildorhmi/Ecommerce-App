@@ -102,8 +102,10 @@ export function ProductDetailPage() {
     );
   }, [product?.variants, selectedVariantValues, variationTypes]);
 
-  // Determine displayed price and stock
+  // Determine displayed price, promo, and stock from selected or default variant
   const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
+  const displayPromoPrice = selectedVariant?.promo_price ?? product?.default_variant?.promo_price ?? null;
+  const displayIsOnSale = selectedVariant?.is_on_sale ?? product?.default_variant?.is_on_sale ?? false;
   const displayStock = selectedVariant?.stock ?? product?.stock_quantity ?? 0;
   const displayInStock = displayStock > 0;
 
@@ -296,7 +298,7 @@ export function ProductDetailPage() {
                 </Typography>
 
                 {/* Price */}
-                {product.is_on_sale ? (
+                {displayIsOnSale && displayPromoPrice != null ? (
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
                       <Chip
@@ -320,7 +322,7 @@ export function ProductDetailPage() {
                           fontWeight: 500,
                         }}
                       >
-                        {formatCurrency(product.price)}
+                        {formatCurrency(displayPrice)}
                       </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
@@ -334,7 +336,7 @@ export function ProductDetailPage() {
                           textShadow: '0 0 20px rgba(255,107,53,0.4)',
                         }}
                       >
-                        {formatCurrency(product.promo_price!)}
+                        {formatCurrency(displayPromoPrice)}
                       </Typography>
                     </Box>
                   </Box>

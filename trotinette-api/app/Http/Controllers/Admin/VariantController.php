@@ -28,11 +28,12 @@ class VariantController extends Controller
     {
         $variant = DB::transaction(function () use ($request, $product) {
             $variant = Variant::create([
-                'product_id' => $product->id,
-                'sku'        => $request->input('sku'),
-                'price'      => $request->input('price'),
-                'stock'      => $request->input('stock'),
-                'is_active'  => $request->input('is_active', true),
+                'product_id'  => $product->id,
+                'sku'         => $request->input('sku'),
+                'price'       => $request->input('price'),
+                'promo_price' => $request->input('promo_price'),
+                'stock'       => $request->input('stock'),
+                'is_active'   => $request->input('is_active', true),
             ]);
 
             $variant->attributeValues()->sync($request->input('attribute_value_ids'));
@@ -58,12 +59,19 @@ class VariantController extends Controller
     public function update(UpdateVariantRequest $request, Product $product, Variant $variant)
     {
         $variant = DB::transaction(function () use ($request, $product, $variant) {
-            $variant->update([
+            $updateData = [
                 'sku'       => $request->input('sku'),
                 'price'     => $request->input('price'),
                 'stock'     => $request->input('stock'),
                 'is_active' => $request->input('is_active', true),
-            ]);
+            ];
+
+            // Handle promo_price separately to allow clearing it with null
+            if ($request->has('promo_price')) {
+                $updateData['promo_price'] = $request->input('promo_price');
+            }
+
+            $variant->update($updateData);
 
             // Only sync attribute values if provided (default variants have none)
             if ($request->has('attribute_value_ids') && !empty($request->input('attribute_value_ids'))) {
