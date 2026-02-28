@@ -19,6 +19,7 @@ class HeroBanner extends Model implements HasMedia
         'link',
         'sort_order',
         'is_active',
+        'object_position',
     ];
 
     protected $casts = [

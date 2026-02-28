@@ -35,16 +35,18 @@ class HeroBannerController extends Controller
             'subtitle'   => ['nullable', 'string', 'max:255'],
             'link'       => ['nullable', 'string', 'max:500'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-            'is_active'  => ['nullable', 'boolean'],
-            'image'      => ['required', 'image', 'max:5120'], // 5 MB
+            'is_active'       => ['nullable', 'boolean'],
+            'image'           => ['required', 'image', 'max:5120'], // 5 MB
+            'object_position' => ['nullable', 'string', 'max:50'],
         ]);
 
         $banner = HeroBanner::create([
-            'title'      => $data['title'] ?? null,
-            'subtitle'   => $data['subtitle'] ?? null,
-            'link'       => $data['link'] ?? null,
-            'sort_order' => $data['sort_order'] ?? 0,
-            'is_active'  => $data['is_active'] ?? true,
+            'title'           => $data['title'] ?? null,
+            'subtitle'        => $data['subtitle'] ?? null,
+            'link'            => $data['link'] ?? null,
+            'sort_order'      => $data['sort_order'] ?? 0,
+            'is_active'       => $data['is_active'] ?? true,
+            'object_position' => $data['object_position'] ?? 'center center',
         ]);
 
         $banner->addMediaFromRequest('image')
@@ -77,21 +79,23 @@ class HeroBannerController extends Controller
             'subtitle'   => ['nullable', 'string', 'max:255'],
             'link'       => ['nullable', 'string', 'max:500'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-            'is_active'  => ['nullable', 'boolean'],
-            'image'      => ['nullable', 'image', 'max:5120'],
+            'is_active'       => ['nullable', 'boolean'],
+            'image'           => ['nullable', 'image', 'max:5120'],
+            'object_position' => ['nullable', 'string', 'max:50'],
         ]);
 
         // Update each field only when it was actually submitted;
         // fall back to the current DB value for booleans/integers so that
         // a partial update never accidentally clears them.
         $heroBanner->update([
-            'title'      => $data['title'] ?? null,
-            'subtitle'   => $data['subtitle'] ?? null,
-            'link'       => $data['link'] ?? null,
-            'sort_order' => $data['sort_order'] ?? $heroBanner->sort_order,
-            'is_active'  => array_key_exists('is_active', $data)
+            'title'           => $data['title'] ?? null,
+            'subtitle'        => $data['subtitle'] ?? null,
+            'link'           => $data['link'] ?? null,
+            'sort_order'      => $data['sort_order'] ?? $heroBanner->sort_order,
+            'is_active'       => array_key_exists('is_active', $data)
                 ? (bool) $data['is_active']
                 : $heroBanner->is_active,
+            'object_position' => $data['object_position'] ?? $heroBanner->object_position,
         ]);
 
         if ($request->hasFile('image')) {

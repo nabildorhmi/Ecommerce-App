@@ -17,8 +17,9 @@ class HeroBannerResource extends JsonResource
             'subtitle'   => $this->subtitle,
             'link'       => $this->link,
             'sort_order' => $this->sort_order,
-            'is_active'  => $this->is_active,
-            'image'      => $media ? [
+            'is_active'         => $this->is_active,
+            'object_position'   => $this->object_position ?? 'center center',
+            'image'             => $media ? [
                 'id'        => $media->id,
                 'url'       => $media->getUrl(),
                 'thumbnail' => $media->getUrl('thumbnail'),
