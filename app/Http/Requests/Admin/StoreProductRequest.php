@@ -23,6 +23,8 @@ class StoreProductRequest extends FormRequest
             'category_id'     => 'required|exists:categories,id',
             'is_active'       => 'boolean',
             'is_featured'     => 'boolean',
+            'promo_price'     => 'nullable|integer|min:0',
+            'is_new'          => 'boolean',
             'attributes'      => 'nullable|array',
             'images'          => 'nullable|array',
             'images.*'        => 'image|mimes:jpeg,png,webp|max:5120',

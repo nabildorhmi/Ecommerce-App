@@ -22,6 +22,7 @@ class UpdateVariantRequest extends FormRequest
                 Rule::unique('variants', 'sku')->ignore($this->route('variant')),
             ],
             'price'                => ['nullable', 'integer', 'min:0'],
+            'promo_price'          => ['sometimes', 'nullable', 'integer', 'min:0'],
             'stock'                => ['required', 'integer', 'min:0'],
             'is_active'            => ['boolean'],
             'attribute_value_ids'  => ['sometimes', 'array'],

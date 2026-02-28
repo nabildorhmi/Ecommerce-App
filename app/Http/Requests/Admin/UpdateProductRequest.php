@@ -26,6 +26,8 @@ class UpdateProductRequest extends FormRequest
             'category_id'     => 'sometimes|exists:categories,id',
             'is_active'       => 'sometimes|boolean',
             'is_featured'     => 'sometimes|boolean',
+            'promo_price'     => 'sometimes|nullable|integer|min:0',
+            'is_new'          => 'sometimes|boolean',
             'attributes'      => 'sometimes|nullable|array',
             'images'          => 'sometimes|nullable|array',
             'images.*'        => 'image|mimes:jpeg,png,webp|max:5120',

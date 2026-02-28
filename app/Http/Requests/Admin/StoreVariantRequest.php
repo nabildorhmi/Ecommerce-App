@@ -16,6 +16,7 @@ class StoreVariantRequest extends FormRequest
         return [
             'sku'                  => ['nullable', 'string', 'max:50', 'unique:variants,sku'],
             'price'                => ['nullable', 'integer', 'min:0'],
+            'promo_price'          => ['nullable', 'integer', 'min:0'],
             'stock'                => ['required', 'integer', 'min:0'],
             'is_active'            => ['boolean'],
             'attribute_value_ids'  => ['required', 'array', 'min:1'],
