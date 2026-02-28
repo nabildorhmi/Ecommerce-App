@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 Phase: 4 of 5 (Cart, Checkout & Orders)
 Plan: 4 of 4 in current phase — 04-04 COMPLETE. Phase 4 fully done.
 Status: Phase 4 complete — full order lifecycle implemented (backend + frontend). Next: Phase 5 (I18N-02, remaining features).
-Last activity: 2026-02-22 - Completed quick task 11: Inline WYSIWYG page editing, PDF invoice layout improvements
+Last activity: 2026-02-28 - Completed quick task 13: Add product sales/promo pricing and New tag system with frontend badges and navbar promo/new links
 
 Progress: [█████████░] 90%
 
@@ -110,6 +110,10 @@ Recent decisions affecting current work:
 - [01-01]: Sanctum must be installed via composer require, not php artisan install:api (fails silently in non-interactive mode)
 - [01-01]: PHP 8.3 via winget, MySQL 8.4 standalone (no service), Composer manual install — no admin rights required
 
+### Roadmap Evolution
+
+- Phase 6 added: UI/UX Futuristic Design Refactoring — futuristic high-tech redesign with glassmorphism, 3D hero (React Three Fiber), Framer Motion micro-interactions, animated dashboards, premium component styling
+
 ### Pending Todos
 
 None.
@@ -131,9 +135,10 @@ None.
 | 10 | Redesign PDF invoice (neutral palette), editable CMS pages, change password, forgot/reset password | 2026-02-22 | b53002d, aebfd39, c681864, a96507c, 87e03db | [10-redesign-pdf-invoice-template-editable-s](./quick/10-redesign-pdf-invoice-template-editable-s/) |
 | 11 | Inline WYSIWYG page editing for admins, PDF invoice layout improvements | 2026-02-22 | bd727db, d43c30b | [11-inline-page-editing-with-wysiwyg-on-stat](./quick/11-inline-page-editing-with-wysiwyg-on-stat/) |
 | 12 | Admin dashboard with KPIs/analytics, generic product variations backend (PARTIAL: frontend variations UI not complete) | 2026-02-23 | 3fad26b, 5d67cca, afbcf9c, b2892c1, 8fca210, c7a3294 | [12-admin-dashboard-kpis-analytics-generic-p](./quick/12-admin-dashboard-kpis-analytics-generic-p/) |
+| 13 | Add product sales/promo pricing and New tag system with frontend badges and navbar promo/new links | 2026-02-28 | 059fdbe, b7c1757, 493c8d0 | [13-add-product-sales-promo-pricing-and-new-](./quick/13-add-product-sales-promo-pricing-and-new-/) |
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Completed quick task 12 (partial) — Dashboard with KPIs/charts fully functional at /admin, generic product variations backend complete (schema, models, API), frontend variations API hooks created but UI pages not implemented.
+Last session: 2026-02-28
+Stopped at: Completed quick task 13 — Promo pricing and New tag system fully implemented across backend and frontend.
 Resume file: None
