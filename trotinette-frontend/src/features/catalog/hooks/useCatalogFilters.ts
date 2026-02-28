@@ -15,8 +15,11 @@ export function useCatalogFilters() {
     'filter[max_price]':   searchParams.get('filter[max_price]') ?? '',
     'filter[in_stock]':    searchParams.get('filter[in_stock]') ?? '',
     'filter[search]':      searchParams.get('filter[search]') ?? '',
-    sort:  searchParams.get('sort') ?? '-created_at',
-    page:  Number(searchParams.get('page') ?? '1'),
+    'filter[is_new]':      searchParams.get('filter[is_new]') ?? '',
+    'filter[is_on_sale]':  searchParams.get('filter[is_on_sale]') ?? '',
+    sort:     searchParams.get('sort') ?? '-created_at',
+    page:     Number(searchParams.get('page') ?? '1'),
+    per_page: Number(searchParams.get('per_page') ?? '12'),
   };
 
   const setFilter = (key: string, value: string) => {

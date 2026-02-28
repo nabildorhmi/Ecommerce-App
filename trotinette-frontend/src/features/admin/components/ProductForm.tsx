@@ -51,9 +51,11 @@ const schema = z.object({
   slug: z.string().min(1, 'Slug requis').max(255),
   description: z.string().default(''),
   price: z.number({ error: 'Prix invalide' }).min(0),
+  promo_price: z.union([z.number().min(0), z.literal('')]).optional(),
   category_id: z.number({ error: 'Categorie requise' }).nullable(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
+  is_new: z.boolean(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -276,9 +278,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     slug: product?.slug ?? '',
     description: product?.description ?? '',
     price: product ? product.price / 100 : 0,
+    promo_price: product ? (product.promo_price !== null ? product.promo_price / 100 : '') : '',
     category_id: product?.category_id ?? product?.category?.id ?? null,
     is_active: product?.is_active ?? true,
     is_featured: product?.is_featured ?? false,
+    is_new: product?.is_new ?? false,
   };
 
   const {
@@ -340,9 +344,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       slug: values.slug,
       description: values.description ?? '',
       price: values.price,
+      promo_price: values.promo_price !== '' && values.promo_price != null ? values.promo_price : null,
       category_id: values.category_id,
       is_active: values.is_active,
       is_featured: values.is_featured,
+      is_new: values.is_new,
       attributes: rowsToAttrs(attrRows),
       images: newImages,
       delete_images: deletedImageIds,
@@ -390,6 +396,16 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             error={Boolean(errors.price)}
             helperText={errors.price?.message}
             required
+          />
+          <TextField
+            label="Prix promo (MAD)"
+            type="number"
+            inputProps={{ step: '0.01', min: '0' }}
+            {...register('promo_price', {
+              setValueAs: (v) => (v === '' || v == null ? '' : Number(v))
+            })}
+            error={Boolean(errors.promo_price)}
+            helperText={errors.promo_price?.message ?? 'Laisser vide pour aucun promo'}
           />
           <Controller
             name="category_id"
@@ -448,6 +464,23 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                   />
                 }
                 label="En vedette (page d'accueil)"
+              />
+            )}
+          />
+        </Box>
+        <Box mt={1}>
+          <Controller
+            name="is_new"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                  />
+                }
+                label="Nouveau produit"
               />
             )}
           />

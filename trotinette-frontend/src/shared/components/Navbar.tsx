@@ -39,6 +39,7 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import PeopleIcon from '@mui/icons-material/People';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TuneIcon from '@mui/icons-material/Tune';
+import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import { useAuthStore } from '../../features/auth/store';
 import { CartBadge } from '../../features/cart/components/CartBadge';
 import { CartDrawer } from '../../features/cart/components/CartDrawer';
@@ -130,7 +131,16 @@ export function Navbar() {
 
   return (
     <>
-      <AppBar position="sticky" elevation={0}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          background: 'var(--glass-bg)',
+          backdropFilter: 'var(--glass-blur)',
+          WebkitBackdropFilter: 'var(--glass-blur)',
+          borderBottom: '1px solid var(--glass-border)',
+        }}
+      >
         <Toolbar sx={{ minHeight: { xs: 60, md: 68 }, px: { xs: 2, md: 4 } }}>
           {/* ── Brand Logo ── */}
           <Box
@@ -172,6 +182,42 @@ export function Navbar() {
               TOUS LES PRODUITS
             </Button>
 
+            <Button
+              component={Link}
+              to="/products?filter[is_on_sale]=1"
+              sx={{
+                color: location.search.includes('is_on_sale') ? '#FF6B35' : '#9CA3AF',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.08em',
+                px: 1.5,
+                py: 0.75,
+                borderRadius: '4px',
+                minWidth: 'auto',
+                '&:hover': { color: '#FF6B35', backgroundColor: 'rgba(255,107,53,0.04)' },
+              }}
+            >
+              PROMOS
+            </Button>
+
+            <Button
+              component={Link}
+              to="/products?filter[is_new]=1"
+              sx={{
+                color: location.search.includes('is_new') ? '#00C853' : '#9CA3AF',
+                fontWeight: 600,
+                fontSize: '0.75rem',
+                letterSpacing: '0.08em',
+                px: 1.5,
+                py: 0.75,
+                borderRadius: '4px',
+                minWidth: 'auto',
+                '&:hover': { color: '#00C853', backgroundColor: 'rgba(0,200,83,0.04)' },
+              }}
+            >
+              NOUVEAUTÉS
+            </Button>
+
             {categories.length > 0 && (
               <>
                 <Button
@@ -200,10 +246,12 @@ export function Navbar() {
                     sx: {
                       mt: 1,
                       minWidth: 220,
-                      backgroundColor: 'background.paper',
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(22, 22, 28, 0.6)' : 'background.paper',
+                      backdropFilter: (theme) => theme.palette.mode === 'dark' ? 'blur(16px)' : 'none',
                       border: '1px solid',
-                      borderColor: 'divider',
+                      borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'divider',
                       boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+                      borderRadius: 2,
                     },
                   }}
                 >
@@ -278,10 +326,12 @@ export function Navbar() {
                     sx={{
                       mt: 0.5,
                       border: '1px solid',
-                      borderColor: 'divider',
-                      backgroundColor: 'background.paper',
+                      borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'divider',
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(22, 22, 28, 0.8)' : 'background.paper',
+                      backdropFilter: (theme) => theme.palette.mode === 'dark' ? 'blur(20px)' : 'none',
                       overflow: 'hidden',
                       minWidth: 240,
+                      borderRadius: 2,
                     }}
                   >
                     <List dense disablePadding>
@@ -355,10 +405,12 @@ export function Navbar() {
                         sx: {
                           mt: 1,
                           minWidth: 200,
-                          backgroundColor: 'background.paper',
+                          backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(22, 22, 28, 0.8)' : 'background.paper',
+                          backdropFilter: (theme) => theme.palette.mode === 'dark' ? 'blur(20px)' : 'none',
                           border: '1px solid',
-                          borderColor: 'divider',
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'divider',
                           boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+                          borderRadius: 2,
                         },
                       }}
                     >
@@ -370,6 +422,7 @@ export function Navbar() {
                           { to: '/admin/variation-types', icon: <TuneIcon fontSize="small" />, label: 'Types de variations' },
                           { to: '/admin/orders', icon: <Badge badgeContent={pendingCount} color="error" max={99}><ReceiptLongIcon fontSize="small" /></Badge>, label: 'Commandes' },
                           { to: '/admin/pages', icon: <DescriptionIcon fontSize="small" />, label: 'Pages' },
+                          { to: '/admin/hero-banners', icon: <ViewCarouselIcon fontSize="small" />, label: 'Hero Banners' },
                         ];
 
                         // Add Utilisateurs menu item only for global_admin
@@ -416,10 +469,12 @@ export function Navbar() {
                     sx: {
                       mt: 1,
                       minWidth: 190,
-                      backgroundColor: 'background.paper',
+                      backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(22, 22, 28, 0.8)' : 'background.paper',
+                      backdropFilter: (theme) => theme.palette.mode === 'dark' ? 'blur(20px)' : 'none',
                       border: '1px solid',
-                      borderColor: 'divider',
+                      borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'divider',
                       boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+                      borderRadius: 2,
                     },
                   }}
                 >
@@ -475,9 +530,10 @@ export function Navbar() {
         PaperProps={{
           sx: {
             width: 280,
-            backgroundColor: 'background.paper',
+            backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(11, 11, 14, 0.65)' : 'background.paper',
+            backdropFilter: (theme) => theme.palette.mode === 'dark' ? 'blur(24px)' : 'none',
             borderLeft: '1px solid',
-            borderColor: 'divider',
+            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.06)' : 'divider',
           },
         }}
       >
@@ -540,6 +596,22 @@ export function Navbar() {
             sx={{ justifyContent: 'flex-start', color: 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
           >
             TOUS LES PRODUITS
+          </Button>
+          <Button
+            component={Link} to="/products?filter[is_on_sale]=1"
+            onClick={() => setMobileOpen(false)}
+            fullWidth
+            sx={{ justifyContent: 'flex-start', color: location.search.includes('is_on_sale') ? '#FF6B35' : 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
+          >
+            PROMOS
+          </Button>
+          <Button
+            component={Link} to="/products?filter[is_new]=1"
+            onClick={() => setMobileOpen(false)}
+            fullWidth
+            sx={{ justifyContent: 'flex-start', color: location.search.includes('is_new') ? '#00C853' : 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
+          >
+            NOUVEAUTÉS
           </Button>
           <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
           <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', letterSpacing: '0.1em', fontWeight: 700, px: 1, pb: 0.5, textTransform: 'uppercase' }}>

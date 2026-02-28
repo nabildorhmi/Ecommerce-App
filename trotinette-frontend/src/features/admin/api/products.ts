@@ -37,9 +37,11 @@ function buildProductFormData(data: {
   slug?: string;
   description?: string;
   price?: number; // centimes (already converted)
+  promo_price?: number | null; // centimes (already converted)
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
+  is_new?: boolean;
   attributes?: Record<string, string | number>;
   images?: File[];
   delete_images?: number[];
@@ -51,12 +53,17 @@ function buildProductFormData(data: {
   if (data.slug !== undefined) fd.append('slug', data.slug);
   if (data.description !== undefined) fd.append('description', data.description);
   if (data.price !== undefined) fd.append('price', String(data.price));
+  if (data.promo_price !== undefined) {
+    fd.append('promo_price', data.promo_price !== null ? String(data.promo_price) : '');
+  }
   if (data.category_id !== undefined && data.category_id !== null)
     fd.append('category_id', String(data.category_id));
   if (data.is_active !== undefined)
     fd.append('is_active', data.is_active ? '1' : '0');
   if (data.is_featured !== undefined)
     fd.append('is_featured', data.is_featured ? '1' : '0');
+  if (data.is_new !== undefined)
+    fd.append('is_new', data.is_new ? '1' : '0');
 
   // Attributes as JSON string (backend decodes in PrepareForValidation)
   if (data.attributes) {
@@ -88,9 +95,11 @@ interface CreateProductInput {
   slug: string;
   description: string;
   price: number; // in MAD — we convert to centimes here
+  promo_price?: number | null; // in MAD
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
+  is_new: boolean;
   attributes: Record<string, string | number>;
   images: File[];
 }
@@ -103,6 +112,7 @@ export function useCreateProduct() {
       const fd = buildProductFormData({
         ...input,
         price: Math.round(input.price * 100), // MAD -> centimes
+        promo_price: input.promo_price != null ? Math.round(input.promo_price * 100) : null,
         delete_images: [],
       });
       const res = await apiClient.post('/admin/products', fd, {
@@ -124,9 +134,11 @@ interface UpdateProductInput {
   slug?: string;
   description?: string;
   price?: number; // in MAD — converted to centimes
+  promo_price?: number | null; // in MAD
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
+  is_new?: boolean;
   attributes?: Record<string, string | number>;
   images?: File[];
   delete_images?: number[];
@@ -136,10 +148,13 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, price, ...rest }: UpdateProductInput) => {
+    mutationFn: async ({ id, price, promo_price, ...rest }: UpdateProductInput) => {
       const fd = buildProductFormData({
         ...rest,
         price: price !== undefined ? Math.round(price * 100) : undefined,
+        promo_price: promo_price !== undefined
+          ? (promo_price != null ? Math.round(promo_price * 100) : null)
+          : undefined,
       });
       // Laravel doesn't support PUT/PATCH with multipart — use POST + _method
       fd.append('_method', 'PATCH');

@@ -78,18 +78,28 @@ export function FilterBar() {
     !!filters['filter[category_id]'] ||
     !!filters['filter[min_price]'] ||
     !!filters['filter[max_price]'] ||
-    !!filters['filter[in_stock]'];
+    !!filters['filter[in_stock]'] ||
+    !!filters['filter[is_new]'] ||
+    !!filters['filter[is_on_sale]'];
 
   return (
     <Box
+      className="mirai-glass"
       sx={{
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider',
-        borderRadius: '8px',
+        borderRadius: '16px',
         p: 2.5,
         position: { md: 'sticky' },
         top: { md: 80 },
+        overflow: 'hidden',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          background: 'linear-gradient(90deg, #00C2FF, transparent)',
+        },
       }}
     >
       {/* Header */}
@@ -98,6 +108,9 @@ export function FilterBar() {
           <TuneIcon sx={{ fontSize: '1rem', color: '#00C2FF' }} />
           <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: 'text.primary', textTransform: 'uppercase' }}>
             {"Filtres"}
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.55rem', color: 'rgba(0,194,255,0.2)' }}>
+            フィルター
           </Typography>
         </Box>
         {hasActiveFilters && (
@@ -112,7 +125,7 @@ export function FilterBar() {
               '&:hover': { backgroundColor: 'rgba(230,57,70,0.08)' },
             }}
           >
-            {"Effacer les filtres"}
+            {"Effacer"}
           </Button>
         )}
       </Box>
@@ -140,7 +153,7 @@ export function FilterBar() {
           />
         </Box>
 
-        <Divider />
+        <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
 
         {/* Category */}
         <Box>
@@ -164,7 +177,7 @@ export function FilterBar() {
           </FormControl>
         </Box>
 
-        <Divider />
+        <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
 
         {/* Price Range */}
         <Box>
@@ -191,7 +204,7 @@ export function FilterBar() {
           </Stack>
         </Box>
 
-        <Divider />
+        <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
 
         {/* In Stock */}
         <FormControlLabel
@@ -205,6 +218,40 @@ export function FilterBar() {
           label={
             <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
               {"En stock uniquement"}
+            </Typography>
+          }
+          sx={{ mx: 0 }}
+        />
+
+        {/* Promotions */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={filters['filter[is_on_sale]'] === '1'}
+              onChange={(e) => setFilter('filter[is_on_sale]', e.target.checked ? '1' : '')}
+              size="small"
+            />
+          }
+          label={
+            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+              {"Promotions"}
+            </Typography>
+          }
+          sx={{ mx: 0 }}
+        />
+
+        {/* Nouveautes */}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={filters['filter[is_new]'] === '1'}
+              onChange={(e) => setFilter('filter[is_new]', e.target.checked ? '1' : '')}
+              size="small"
+            />
+          }
+          label={
+            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+              {"Nouveautés"}
             </Typography>
           }
           sx={{ mx: 0 }}

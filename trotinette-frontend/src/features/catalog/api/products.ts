@@ -14,8 +14,11 @@ export function useProducts(filters: CatalogFilters) {
   if (filters['filter[max_price]']) params['filter[max_price]'] = filters['filter[max_price]']!;
   if (filters['filter[in_stock]']) params['filter[in_stock]'] = filters['filter[in_stock]']!;
   if (filters['filter[search]']) params['filter[search]'] = filters['filter[search]']!;
+  if (filters['filter[is_new]']) params['filter[is_new]'] = filters['filter[is_new]']!;
+  if (filters['filter[is_on_sale]']) params['filter[is_on_sale]'] = filters['filter[is_on_sale]']!;
   if (filters.sort) params.sort = filters.sort;
   if (filters.page && filters.page > 1) params.page = filters.page;
+  if (filters.per_page && filters.per_page !== 12) params.per_page = filters.per_page;
 
   return useQuery<PaginatedResponse<Product>>({
     queryKey: ['products', filters],

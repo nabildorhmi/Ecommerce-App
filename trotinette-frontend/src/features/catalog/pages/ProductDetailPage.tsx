@@ -25,6 +25,7 @@ import { TrustSignals } from '../components/TrustSignals';
 import { CategoryBreadcrumb } from '../components/CategoryBreadcrumb';
 import { useCartStore } from '../../cart/store';
 import type { ProductVariantDisplay } from '../types';
+import { PageDecor } from '../../../shared/components/PageDecor';
 
 function ProductDetailSkeleton() {
   return (
@@ -138,12 +139,12 @@ export function ProductDetailPage() {
     const variantToAdd = selectedVariant ?? (
       !hasVariants && product.default_variant
         ? {
-            id: product.default_variant.id,
-            sku: product.default_variant.sku,
-            price: product.default_variant.price,
-            stock: product.default_variant.stock,
-            attribute_values: [],
-          } as ProductVariantDisplay
+          id: product.default_variant.id,
+          sku: product.default_variant.sku,
+          price: product.default_variant.price,
+          stock: product.default_variant.stock,
+          attribute_values: [],
+        } as ProductVariantDisplay
         : null
     );
     addItem(product, product.name, variantToAdd);
@@ -151,8 +152,11 @@ export function ProductDetailPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
-      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}>
+      {/* Futuristic side decorations */}
+      <PageDecor variant="productDetail" />
+
+      <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 }, position: 'relative', zIndex: 1 }}>
         {/* Breadcrumb */}
         <Box sx={{ mb: 3 }}>
           <CategoryBreadcrumb category={product.category} />
@@ -226,31 +230,56 @@ export function ProductDetailPage() {
           {/* Right: product info panel */}
           <Grid size={{ xs: 12, md: 5 }}>
             <Box
+              className="mirai-glass"
               sx={{
-                backgroundColor: 'background.paper',
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: '12px',
+                borderRadius: '20px',
                 p: { xs: 2.5, md: 3.5 },
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: 'linear-gradient(90deg, #00C2FF, #0099CC, transparent)',
+                },
               }}
             >
               <Stack spacing={2.5}>
-                {/* Category chip */}
-                {product.category && (
-                  <Chip
-                    label={product.category.name}
-                    size="small"
-                    sx={{
-                      alignSelf: 'flex-start',
-                      backgroundColor: 'rgba(0,194,255,0.12)',
-                      color: '#00C2FF',
-                      fontSize: '0.65rem',
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                    }}
-                  />
-                )}
+                {/* Category chip + NEW badge */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                  {product.category && (
+                    <Chip
+                      label={product.category.name}
+                      size="small"
+                      sx={{
+                        backgroundColor: 'rgba(0,194,255,0.12)',
+                        color: '#00C2FF',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    />
+                  )}
+                  {product.is_new && (
+                    <Chip
+                      label="NOUVEAU"
+                      size="small"
+                      sx={{
+                        backgroundColor: 'rgba(0,200,83,0.15)',
+                        color: '#00C853',
+                        border: '1px solid rgba(0,200,83,0.3)',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    />
+                  )}
+                </Box>
 
                 {/* Product name */}
                 <Typography
@@ -267,20 +296,64 @@ export function ProductDetailPage() {
                 </Typography>
 
                 {/* Price */}
-                <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                  <BoltIcon sx={{ fontSize: '1.2rem', color: '#00C2FF', mb: '-2px' }} />
-                  <Typography
-                    sx={{
-                      fontSize: '2rem',
-                      fontWeight: 800,
-                      color: '#00C2FF',
-                      lineHeight: 1,
-                      textShadow: '0 0 20px rgba(0,194,255,0.4)',
-                    }}
-                  >
-                    {formatCurrency(displayPrice)}
-                  </Typography>
-                </Box>
+                {product.is_on_sale ? (
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                      <Chip
+                        label="PROMO"
+                        size="small"
+                        sx={{
+                          backgroundColor: 'rgba(255,107,53,0.15)',
+                          color: '#FF6B35',
+                          border: '1px solid rgba(255,107,53,0.3)',
+                          fontSize: '0.6rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          height: 20,
+                        }}
+                      />
+                      <Typography
+                        sx={{
+                          fontSize: '0.95rem',
+                          color: 'text.disabled',
+                          textDecoration: 'line-through',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {formatCurrency(product.price)}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                      <BoltIcon sx={{ fontSize: '1.2rem', color: '#FF6B35', mb: '-2px' }} />
+                      <Typography
+                        sx={{
+                          fontSize: '2rem',
+                          fontWeight: 800,
+                          color: '#FF6B35',
+                          lineHeight: 1,
+                          textShadow: '0 0 20px rgba(255,107,53,0.4)',
+                        }}
+                      >
+                        {formatCurrency(product.promo_price!)}
+                      </Typography>
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+                    <BoltIcon sx={{ fontSize: '1.2rem', color: '#00C2FF', mb: '-2px' }} />
+                    <Typography
+                      sx={{
+                        fontSize: '2rem',
+                        fontWeight: 800,
+                        color: '#00C2FF',
+                        lineHeight: 1,
+                        textShadow: '0 0 20px rgba(0,194,255,0.4)',
+                      }}
+                    >
+                      {formatCurrency(displayPrice)}
+                    </Typography>
+                  </Box>
+                )}
 
                 {/* Variant selectors */}
                 {variationTypes.length > 0 && (
@@ -357,16 +430,20 @@ export function ProductDetailPage() {
                       fontWeight: 700,
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
+                      borderRadius: '12px',
+                      background: isAddDisabled ? undefined : 'linear-gradient(45deg, #00C2FF, #0099CC)',
                       boxShadow: isAddDisabled
                         ? 'none'
                         : '0 0 24px rgba(0,194,255,0.35)',
+                      transition: 'all 0.3s',
+                      '&:hover': { transform: isAddDisabled ? 'none' : 'translateY(-2px)' },
                     }}
                   >
                     {variantNotSelected
                       ? "Sélectionner une variante"
                       : isAtMaxStock && displayInStock
-                      ? "Stock maximum atteint"
-                      : "Ajouter au panier"}
+                        ? "Stock maximum atteint"
+                        : "Ajouter au panier"}
                   </Button>
                 </Stack>
               </Stack>

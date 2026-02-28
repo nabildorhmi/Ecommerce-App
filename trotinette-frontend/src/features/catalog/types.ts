@@ -33,6 +33,9 @@ export interface Product {
   attributes: Record<string, string | number> | null;
   is_active: boolean;
   is_featured: boolean;
+  promo_price: number | null;
+  is_new: boolean;
+  is_on_sale: boolean;
   name: string;
   description: string | null;
   slug: string;
@@ -73,6 +76,9 @@ export interface CatalogFilters {
   'filter[in_stock]'?: string;
   'filter[search]'?: string;
   'filter[is_featured]'?: string;
+  'filter[is_new]'?: string;
+  'filter[is_on_sale]'?: string;
   sort?: string;
   page?: number;
+  per_page?: number;
 }
