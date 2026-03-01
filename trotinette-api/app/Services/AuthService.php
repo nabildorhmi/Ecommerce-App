@@ -19,6 +19,7 @@ class AuthService
         ]);
         $user->assignRole('customer');
         $user->refresh();
+        $user->load('roles');
 
         return (object) [
             'plainTextToken' => $user->createToken('api')->plainTextToken,
@@ -28,7 +29,7 @@ class AuthService
 
     public function login(string $email, string $password): object
     {
-        $user = User::where('email', $email)->firstOrFail();
+        $user = User::with('roles')->where('email', $email)->firstOrFail();
 
         if (! $user->is_active) {
             throw new AuthenticationException('Account deactivated.');
