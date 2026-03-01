@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-12)
 ## Current Position
 
 Phase: 8 of 8 (Frontend Refactoring)
-Plan: 1 of 3 in current phase — 08-01 COMPLETE. Dead code removed, TypeScript errors fixed, CSS consolidated.
-Status: Phase 8 in progress — frontend cleanup complete, architecture refactoring next.
-Last activity: 2026-03-01 - Completed 08-01: Frontend cleanup (dead code, TypeScript fixes, CSS consolidation)
+Plan: 2 of 3 in current phase — 08-02 COMPLETE. Path aliases configured, all deep relative imports converted to @/ aliases.
+Status: Phase 8 in progress — cleanup and architecture refactoring complete, performance optimization next.
+Last activity: 2026-03-01 - Completed 08-02: Path aliases configuration (TypeScript + Vite @/ aliases, 58 files converted)
 
-Progress: [██████████] 96%
+Progress: [██████████] 97%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: ~4min
-- Total execution time: ~1.25 hours
+- Total execution time: ~1.33 hours
 
 **By Phase:**
 
@@ -32,11 +32,11 @@ Progress: [██████████] 96%
 | 03-user-accounts | 2 | ~10 min | ~5 min |
 | 04-cart-checkout-orders | 4 | ~17 min | ~4 min |
 | 07-backend-refactoring | 4 | ~15 min | ~4 min |
-| 08-frontend-refactoring | 1 | ~3 min | ~3 min |
+| 08-frontend-refactoring | 2 | ~8 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 08-01 (frontend cleanup), 07-04 (Action pattern refactoring), 07-03 (performance indexes + eager loading), 07-02 (RFC 7807 errors), 07-01 (security hardening)
-- Trend: Active — Phase 8 started, 08-01 completed in ~3 min
+- Last 5 plans: 08-02 (path aliases), 08-01 (frontend cleanup), 07-04 (Action pattern refactoring), 07-03 (performance indexes + eager loading), 07-02 (RFC 7807 errors)
+- Trend: Active — Phase 8 in progress, 08-02 completed in ~5 min
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Progress: [██████████] 96%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [08-02]: TypeScript path alias @/ configured with baseUrl + paths in tsconfig.app.json — matches industry standard React/TypeScript pattern
+- [08-02]: Vite resolve.alias matches TypeScript paths using ESM __dirname (import.meta.url + fileURLToPath) — ensures dev + build both resolve @/ imports
+- [08-02]: Single-level relative imports within same feature preserved (../types) — co-located files benefit from relative clarity
 - [04-04]: Accordion-based order detail for customers — no separate customer detail page; inline expansion sufficient for COD use case
 - [04-04]: Dialog-based delivery zone CRUD mirrors AdminCategoriesPage pattern — simple entity, same CRUD approach
 - [04-04]: Per-transition note textarea shown only after clicking transition button — two-step UX avoids always-visible textarea clutter
@@ -158,5 +161,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 08-01-PLAN.md — Frontend cleanup (dead code removed, TypeScript errors fixed, CSS consolidated). Ready for 08-02 architecture refactoring.
+Stopped at: Completed 08-02-PLAN.md — Path aliases configured (TypeScript @/ aliases, Vite resolve.alias, 58 files converted). Ready for 08-03 performance optimization.
 Resume file: None
