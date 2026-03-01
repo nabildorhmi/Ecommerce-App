@@ -1,0 +1,87 @@
+/* ─── MiraiTech Global Animations ──────────────────────────────────── */
+
+/* Shimmer sweep across cards */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Slow float for decorative elements */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-12px) rotate(1deg); }
+  66% { transform: translateY(6px) rotate(-1deg); }
+}
+
+/* Breathing glow for CTA buttons */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,194,255,0.3), 0 0 60px rgba(0,194,255,0.1); }
+  50% { box-shadow: 0 0 30px rgba(0,194,255,0.5), 0 0 80px rgba(0,194,255,0.2); }
+}
+
+/* Background gradient shift */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Slow rotation for decorative rings */
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Counter-rotation */
+@keyframes rotate-slow-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Subtle fade-in upward for sections */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Border glow animation */
+@keyframes border-glow {
+  0%, 100% { border-color: rgba(0,194,255,0.15); }
+  50% { border-color: rgba(0,194,255,0.4); }
+}
+
+/* Pulsing dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+
+/* Glow pulse for PROMOS button (orange) */
+@keyframes promo-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(255,107,53,0.3), 0 0 18px rgba(255,107,53,0.1); }
+  50% { box-shadow: 0 0 10px rgba(255,107,53,0.5), 0 0 28px rgba(255,107,53,0.2); }
+}
+
+/* Glow pulse for NOUVEAUTÉS button (green) */
+@keyframes nouveaute-glow {
+  0%, 100% { box-shadow: 0 0 6px rgba(0,200,83,0.3), 0 0 18px rgba(0,200,83,0.1); }
+  50% { box-shadow: 0 0 10px rgba(0,200,83,0.5), 0 0 28px rgba(0,200,83,0.2); }
+}
+
+/* Section fade-in animation (from index.css) */
+@keyframes miraiSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scanline subtle texture for hero (from index.css) */
+@keyframes scanlines {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
