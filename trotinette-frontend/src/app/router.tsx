@@ -1,32 +1,38 @@
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter } from 'react-router';
-import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
-import { ProductDetailPage } from '@/features/catalog/pages/ProductDetailPage';
-import { AdminProductsPage } from '@/features/admin/pages/AdminProductsPage';
-import { AdminProductEditPage } from '@/features/admin/pages/AdminProductEditPage';
-import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
-import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage';
-import { AdminUserDetailPage } from '@/features/admin/pages/AdminUserDetailPage';
-import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
 import { AdminRoute } from '@/shared/components/AdminRoute';
-import { LoginPage } from '@/features/auth/pages/LoginPage';
-import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
-import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
-import { ProfilePage } from '@/features/auth/pages/ProfilePage';
-import { CheckoutPage } from '@/features/checkout/pages/CheckoutPage';
-import { OrderConfirmationPage } from '@/features/checkout/pages/OrderConfirmationPage';
-import { MyOrdersPage } from '@/features/orders/pages/MyOrdersPage';
-import { AdminOrdersPage } from '@/features/orders/pages/AdminOrdersPage';
-import { AdminOrderDetailPage } from '@/features/orders/pages/AdminOrderDetailPage';
-import { AdminPagesPage } from '@/features/admin/pages/AdminPagesPage';
-import { AdminVariationTypesPage } from '@/features/admin/pages/AdminVariationTypesPage';
-import { AdminHeroBannersPage } from '@/features/admin/pages/AdminHeroBannersPage';
 import { RootLayout } from '@/shared/components/RootLayout';
-import { HomePage } from '@/features/home/pages/HomePage';
-import { AboutPage } from '@/features/info/pages/AboutPage';
-import { ContactPage } from '@/features/info/pages/ContactPage';
-import { CgvPage } from '@/features/info/pages/CgvPage';
-import { MentionsLegalesPage } from '@/features/info/pages/MentionsLegalesPage';
+import { PageLoader } from '@/shared/components/PageLoader';
+
+// Lazy-loaded page components
+const HomePage = lazy(() => import('@/features/home/pages/HomePage').then(m => ({ default: m.HomePage })));
+const CatalogPage = lazy(() => import('@/features/catalog/pages/CatalogPage').then(m => ({ default: m.CatalogPage })));
+const ProductDetailPage = lazy(() => import('@/features/catalog/pages/ProductDetailPage').then(m => ({ default: m.ProductDetailPage })));
+const LoginPage = lazy(() => import('@/features/auth/pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const ForgotPasswordPage = lazy(() => import('@/features/auth/pages/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const ResetPasswordPage = lazy(() => import('@/features/auth/pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
+const ProfilePage = lazy(() => import('@/features/auth/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const CheckoutPage = lazy(() => import('@/features/checkout/pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
+const OrderConfirmationPage = lazy(() => import('@/features/checkout/pages/OrderConfirmationPage').then(m => ({ default: m.OrderConfirmationPage })));
+const MyOrdersPage = lazy(() => import('@/features/orders/pages/MyOrdersPage').then(m => ({ default: m.MyOrdersPage })));
+const AboutPage = lazy(() => import('@/features/info/pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import('@/features/info/pages/ContactPage').then(m => ({ default: m.ContactPage })));
+const CgvPage = lazy(() => import('@/features/info/pages/CgvPage').then(m => ({ default: m.CgvPage })));
+const MentionsLegalesPage = lazy(() => import('@/features/info/pages/MentionsLegalesPage').then(m => ({ default: m.MentionsLegalesPage })));
+
+// Admin pages
+const AdminDashboardPage = lazy(() => import('@/features/admin/pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+const AdminProductsPage = lazy(() => import('@/features/admin/pages/AdminProductsPage').then(m => ({ default: m.AdminProductsPage })));
+const AdminProductEditPage = lazy(() => import('@/features/admin/pages/AdminProductEditPage').then(m => ({ default: m.AdminProductEditPage })));
+const AdminCategoriesPage = lazy(() => import('@/features/admin/pages/AdminCategoriesPage').then(m => ({ default: m.AdminCategoriesPage })));
+const AdminUsersPage = lazy(() => import('@/features/admin/pages/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminUserDetailPage = lazy(() => import('@/features/admin/pages/AdminUserDetailPage').then(m => ({ default: m.AdminUserDetailPage })));
+const AdminOrdersPage = lazy(() => import('@/features/orders/pages/AdminOrdersPage').then(m => ({ default: m.AdminOrdersPage })));
+const AdminOrderDetailPage = lazy(() => import('@/features/orders/pages/AdminOrderDetailPage').then(m => ({ default: m.AdminOrderDetailPage })));
+const AdminPagesPage = lazy(() => import('@/features/admin/pages/AdminPagesPage').then(m => ({ default: m.AdminPagesPage })));
+const AdminVariationTypesPage = lazy(() => import('@/features/admin/pages/AdminVariationTypesPage').then(m => ({ default: m.AdminVariationTypesPage })));
+const AdminHeroBannersPage = lazy(() => import('@/features/admin/pages/AdminHeroBannersPage').then(m => ({ default: m.AdminHeroBannersPage })));
 
 export const router = createBrowserRouter([
   {
@@ -36,51 +42,51 @@ export const router = createBrowserRouter([
       {
         // Homepage — MiraiTech landing page with hero + featured carousel
         path: '/',
-        element: <HomePage />,
+        element: <Suspense fallback={<PageLoader />}><HomePage /></Suspense>,
       },
       {
         path: '/products',
-        element: <CatalogPage />,
+        element: <Suspense fallback={<PageLoader />}><CatalogPage /></Suspense>,
       },
       {
         path: '/products/:slug',
-        element: <ProductDetailPage />,
+        element: <Suspense fallback={<PageLoader />}><ProductDetailPage /></Suspense>,
       },
       {
         path: '/login',
-        element: <LoginPage />,
+        element: <Suspense fallback={<PageLoader />}><LoginPage /></Suspense>,
       },
       {
         path: '/forgot-password',
-        element: <ForgotPasswordPage />,
+        element: <Suspense fallback={<PageLoader />}><ForgotPasswordPage /></Suspense>,
       },
       {
         path: '/reset-password',
-        element: <ResetPasswordPage />,
+        element: <Suspense fallback={<PageLoader />}><ResetPasswordPage /></Suspense>,
       },
       {
         path: '/checkout',
-        element: <CheckoutPage />,
+        element: <Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense>,
       },
       {
         path: '/orders/:orderNumber/confirmation',
-        element: <OrderConfirmationPage />,
+        element: <Suspense fallback={<PageLoader />}><OrderConfirmationPage /></Suspense>,
       },
       {
         path: '/a-propos',
-        element: <AboutPage />,
+        element: <Suspense fallback={<PageLoader />}><AboutPage /></Suspense>,
       },
       {
         path: '/contact',
-        element: <ContactPage />,
+        element: <Suspense fallback={<PageLoader />}><ContactPage /></Suspense>,
       },
       {
         path: '/cgv',
-        element: <CgvPage />,
+        element: <Suspense fallback={<PageLoader />}><CgvPage /></Suspense>,
       },
       {
         path: '/mentions-legales',
-        element: <MentionsLegalesPage />,
+        element: <Suspense fallback={<PageLoader />}><MentionsLegalesPage /></Suspense>,
       },
       // Protected routes — require authentication
       {
@@ -88,11 +94,11 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/profile',
-            element: <ProfilePage />,
+            element: <Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>,
           },
           {
             path: '/orders',
-            element: <MyOrdersPage />,
+            element: <Suspense fallback={<PageLoader />}><MyOrdersPage /></Suspense>,
           },
         ],
       },
@@ -102,51 +108,51 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/admin',
-            element: <AdminDashboardPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminDashboardPage /></Suspense>,
           },
           {
             path: '/admin/products',
-            element: <AdminProductsPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminProductsPage /></Suspense>,
           },
           {
             path: '/admin/products/create',
-            element: <AdminProductEditPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminProductEditPage /></Suspense>,
           },
           {
             path: '/admin/products/:id/edit',
-            element: <AdminProductEditPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminProductEditPage /></Suspense>,
           },
           {
             path: '/admin/categories',
-            element: <AdminCategoriesPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminCategoriesPage /></Suspense>,
           },
           {
             path: '/admin/users',
-            element: <AdminUsersPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminUsersPage /></Suspense>,
           },
           {
             path: '/admin/users/:id',
-            element: <AdminUserDetailPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminUserDetailPage /></Suspense>,
           },
           {
             path: '/admin/orders',
-            element: <AdminOrdersPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminOrdersPage /></Suspense>,
           },
           {
             path: '/admin/orders/:id',
-            element: <AdminOrderDetailPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminOrderDetailPage /></Suspense>,
           },
           {
             path: '/admin/pages',
-            element: <AdminPagesPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminPagesPage /></Suspense>,
           },
           {
             path: '/admin/variation-types',
-            element: <AdminVariationTypesPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminVariationTypesPage /></Suspense>,
           },
           {
             path: '/admin/hero-banners',
-            element: <AdminHeroBannersPage />,
+            element: <Suspense fallback={<PageLoader />}><AdminHeroBannersPage /></Suspense>,
           },
         ],
       },
