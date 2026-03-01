@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PageController as AdminPageController;
 use App\Http\Controllers\Admin\AttributeController as AdminAttributeController;
 use App\Http\Controllers\Admin\VariantController as AdminVariantController;
+use App\Http\Controllers\Admin\HeroBannerController as AdminHeroBannerController;
 use App\Http\Controllers\Customer\AuthController;
+use App\Http\Controllers\Customer\HeroBannerController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
 use App\Http\Controllers\Customer\OrderController;
@@ -21,11 +23,11 @@ use Illuminate\Support\Facades\Route;
 // Health check — unauthenticated
 Route::get('/ping', fn() => response()->json(['status' => 'ok']));
 
-// Auth routes — unauthenticated
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login',    [AuthController::class, 'login']);
-Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
-Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword']);
+// Auth routes — unauthenticated (rate-limited to prevent brute-force)
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
+Route::post('/auth/login',    [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:3,1');
+Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1');
 
 // Public catalog routes — unauthenticated
 Route::get('/products',        [ProductController::class, 'index']);
@@ -33,6 +35,7 @@ Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories',      [CategoryController::class, 'index']);
 Route::get('/delivery-zones',  [DeliveryZoneController::class, 'index']);
 Route::get('/pages/{page}',    [PageController::class, 'show']);
+Route::get('/hero-banners',    [HeroBannerController::class, 'index']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -110,5 +113,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/products/{product}/variants/generate',    [AdminVariantController::class, 'generate']);
         Route::put('/products/{product}/variants/{variant}',    [AdminVariantController::class, 'update']);
         Route::delete('/products/{product}/variants/{variant}', [AdminVariantController::class, 'destroy']);
+
+        // Hero banners (carousel images for the homepage)
+        Route::get('/hero-banners',                             [AdminHeroBannerController::class, 'index']);
+        Route::post('/hero-banners',                            [AdminHeroBannerController::class, 'store']);
+        Route::get('/hero-banners/{heroBanner}',                [AdminHeroBannerController::class, 'show']);
+        Route::post('/hero-banners/{heroBanner}',               [AdminHeroBannerController::class, 'update']);
+        Route::delete('/hero-banners/{heroBanner}',             [AdminHeroBannerController::class, 'destroy']);
     });
 });
