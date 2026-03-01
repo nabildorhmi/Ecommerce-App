@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-12)
 
 **Core value:** Customers can browse electric scooters, place orders, and pay cash on delivery — with an admin who controls the entire catalog, orders, and delivery zones.
-**Current focus:** Phase 4 — Cart, Checkout & Orders (COMPLETE) — Phase 5 next
+**Current focus:** Phase 7 — Backend Refactoring (COMPLETE)
 
 ## Current Position
 
 Phase: 7 of 7 (Backend Refactoring)
-Plan: 2 of 4 in current phase — 07-02 COMPLETE
-Status: Phase 7 in progress — RFC 7807 error handling implemented
-Last activity: 2026-03-01 - Completed 07-02: RFC 7807 Problem Details error format with ErrorCode enum
+Plan: 4 of 4 in current phase — 07-04 COMPLETE. Phase 7 fully done.
+Status: Phase 7 complete — security hardening, RFC 7807 errors, performance indexes, Action pattern refactoring all done.
+Last activity: 2026-03-01 - Completed Phase 7: Backend Refactoring — all 4 plans executed
 
-Progress: [█████████░] 92%
+Progress: [██████████] 95%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 13
 - Average duration: ~5min
-- Total execution time: ~1.05 hours
+- Total execution time: ~1.2 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████████░] 92%
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
 | 04-cart-checkout-orders | 4 | ~17 min | ~4 min |
-| 07-backend-refactoring | 2 | ~4 min | ~2 min |
+| 07-backend-refactoring | 4 | ~15 min | ~4 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-01 (security hardening), 07-02 (RFC 7807 errors), 04-04 (order history frontend), 04-03 (cart+checkout frontend), 04-02 (order backend)
-- Trend: Active — 07-01 took 2 min, no deviations
+- Last 5 plans: 07-04 (Action pattern refactoring), 07-03 (performance indexes + eager loading), 07-02 (RFC 7807 errors), 07-01 (security hardening), 04-04 (order history frontend)
+- Trend: Active — Phase 7 completed in ~15 min total
 
 *Updated after each plan completion*
 
@@ -116,6 +116,12 @@ Recent decisions affecting current work:
 - [07-02]: ErrorCode enum follows OrderStatus pattern with string-backed values and label() method for consistency
 - [07-02]: RFC 7807 error rendering via renderable callbacks in withExceptions closure - Laravel 12 pattern, not separate Handler class
 - [07-02]: ValidationException returns RFC 7807 envelope PLUS errors field with field-level details for frontend parsing
+- [07-03]: Conditional index checks use raw DB::select("SHOW INDEX FROM...") for MySQL compatibility
+- [07-03]: Auth routes needed eager loading for roles relationship — UserResource::getRoleNames() triggers lazy load without it
+- [07-04]: Service+Action pattern extracts concerns from monolithic OrderService::createOrder
+- [07-04]: CreateOrderDTO provides type-safe, immutable parameter object with fromRequest/fromArray factories
+- [07-04]: Constructor injection for Actions enables independent testability
+- [07-04]: API contract unchanged — same request/response behavior for POST /orders
 
 ### Roadmap Evolution
 
@@ -148,5 +154,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 07-01 — Security hardening with auth rate limiting, CORS restrictions, Sanctum token expiration, and strict Eloquent mode
+Stopped at: Completed Phase 7 — Backend Refactoring fully done (4/4 plans). All security, performance, architecture, and error handling improvements in place.
 Resume file: None
