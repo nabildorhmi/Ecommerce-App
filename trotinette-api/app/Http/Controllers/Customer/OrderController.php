@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\DTOs\CreateOrderDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
@@ -22,7 +23,8 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request): JsonResponse
     {
-        $order = $this->orderService->createOrder($request->validated(), $request->user()->id);
+        $dto = CreateOrderDTO::fromRequest($request);
+        $order = $this->orderService->createOrder($dto, $request->user()->id);
 
         return (new OrderResource($order))
             ->response()
@@ -32,7 +34,7 @@ class OrderController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $orders = Order::forUser($request->user()->id)
-            ->with(['items.product', 'items.variant.attributeValues', 'deliveryZone'])
+            ->with(['items.product', 'items.variant.attributeValues.attribute', 'deliveryZone'])
             ->latest()
             ->paginate(10);
 
@@ -45,7 +47,7 @@ class OrderController extends Controller
             abort(403, 'This order does not belong to you.');
         }
 
-        $order->load(['items.product', 'items.variant.attributeValues', 'deliveryZone', 'statusLogs']);
+        $order->load(['items.product', 'items.variant.attributeValues.attribute', 'deliveryZone', 'statusLogs']);
 
         return new OrderResource($order);
     }
