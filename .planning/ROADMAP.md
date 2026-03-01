@@ -134,3 +134,15 @@ Plans:
 - [ ] 06-03-PLAN.md — Auth page animations: glassmorphic cards with floating background orbs, animated tab transitions, input focus glow states, loading/success transitions
 - [ ] 06-04-PLAN.md — Admin dashboard and tables: AnimatedKPICard with count-up, AnimatedChart wrappers, sticky blur table headers, hover elevation rows
 - [ ] 06-05-PLAN.md — Modals, drawers, navbar, and catalog: AnimatedModal (scale+blur), AnimatedDrawer (slide+blur), navbar active-item glow, product card hover effects, catalog staggered entrance
+
+### Phase 7: Backend Refactoring — Code Architecture, Security Hardening, Performance Optimization, and Error Code System
+
+**Goal:** The Laravel API is hardened with rate limiting on auth routes, restricted CORS, token expiration, strict Eloquent mode, database performance indexes, consistent eager loading, standardized RFC 7807 error responses, and a refactored OrderService using the Action pattern with DTOs for testability
+**Depends on:** Phase 6
+**Plans:** 4 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Security hardening: rate-limit auth routes, tighten CORS allowed headers, set Sanctum token expiration, enable preventLazyLoading and preventAccessingMissingAttributes
+- [ ] 07-02-PLAN.md — Error code system: ErrorCode enum with AUTH/ORD/PROD/VAL/SYS categories, RFC 7807 Problem Details rendering in bootstrap/app.php
+- [ ] 07-03-PLAN.md — Performance optimization: database index migration for all foreign keys and filter columns, eager loading audit across all controllers
+- [ ] 07-04-PLAN.md — Architecture refactoring: extract OrderService into Action classes (CheckDuplicate, ValidateStock, CalculateTotal, DecrementStock), CreateOrderDTO with readonly properties
