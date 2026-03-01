@@ -17,12 +17,36 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
-        manualChunks: {
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
-          'animation-vendor': ['framer-motion'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            // Three.js and 3D libraries
+            if (id.includes('three') || id.includes('@react-three')) {
+              return 'three-vendor';
+            }
+            // Animation library
+            if (id.includes('framer-motion')) {
+              return 'animation-vendor';
+            }
+            // MUI and Emotion (CSS-in-JS)
+            if (id.includes('@mui') || id.includes('@emotion')) {
+              return 'mui-vendor';
+            }
+            // React core
+            if (id.includes('react-dom') || id.includes('/react/') || id.includes('react-router') || id.includes('scheduler')) {
+              return 'react-vendor';
+            }
+            // TanStack Query
+            if (id.includes('@tanstack')) {
+              return 'query-vendor';
+            }
+          }
+          // Don't return anything for app code — let Vite's
+          // dynamic import splitting handle route chunks automatically
         },
       },
     },
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500, // Warn if any chunk > 500KB
   },
   optimizeDeps: {
     include: ['three', '@react-three/fiber', '@react-three/drei'],
