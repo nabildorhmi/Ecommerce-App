@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useParams, Link } from 'react-router';
@@ -68,6 +68,19 @@ export function ProductDetailPage() {
 
   // Variant selection state
   const [selectedVariantValues, setSelectedVariantValues] = useState<Record<string, string>>({});
+
+  // Description expand / collapse
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [prevSlug, setPrevSlug] = useState(slug);
+  if (prevSlug !== slug) { setPrevSlug(slug); setDescExpanded(false); }
+  const descRef = useRef<HTMLDivElement>(null);
+  const [descClamped, setDescClamped] = useState(false);
+
+  useEffect(() => {
+    if (!descExpanded && descRef.current) {
+      setDescClamped(descRef.current.scrollHeight > descRef.current.clientHeight + 2);
+    }
+  }, [product?.description, descExpanded]);
 
   // Extract unique variation types from variants
   const variationTypes = useMemo(() => {
@@ -144,6 +157,8 @@ export function ProductDetailPage() {
           id: product.default_variant.id,
           sku: product.default_variant.sku,
           price: product.default_variant.price,
+          promo_price: product.default_variant.promo_price,
+          is_on_sale: product.default_variant.is_on_sale,
           stock: product.default_variant.stock,
           attribute_values: [],
         } as ProductVariantDisplay
@@ -165,13 +180,16 @@ export function ProductDetailPage() {
         </Box>
 
         <Grid container spacing={{ xs: 3, md: 6 }}>
-          {/* Left: Image gallery */}
-          <Grid size={{ xs: 12, md: 7 }}>
+          {/* Gallery */}
+          <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 1, md: 1 } }}>
             <ProductGallery images={product.images} />
+          </Grid>
 
-            {/* Description — displayed below gallery */}
+          {/* Description + Specs — shown after cart on mobile */}
+          <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 3, md: 3 } }}>
+            {/* Description */}
             {product.description && (
-              <Box sx={{ mt: 4 }}>
+              <Box>
                 <Typography
                   sx={{
                     fontSize: '0.7rem',
@@ -184,32 +202,68 @@ export function ProductDetailPage() {
                 >
                   DESCRIPTION
                 </Typography>
-                <Box
-                  sx={{
-                    fontSize: '0.92rem',
-                    color: 'text.secondary',
-                    lineHeight: 1.8,
-                    '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
-                    '& ul': { pl: 3, listStyleType: 'disc' },
-                    '& ol': { pl: 3, listStyleType: 'decimal' },
-                    '& li': { mb: 0.5, display: 'list-item' },
-                    '& p': { mb: 1.5 },
-                    '& p:last-child': { mb: 0 },
-                    '& a': { color: '#00C2FF' },
-                    '& strong': { color: 'text.primary', fontWeight: 700 },
-                    '& em': { fontStyle: 'italic' },
-                    '& blockquote': { borderLeft: '3px solid #00C2FF', pl: 2, ml: 0, color: 'text.disabled' },
-                    '& code': { fontFamily: 'monospace', fontSize: '0.85em', bgcolor: 'action.hover', px: 0.5, borderRadius: 0.5 },
-                  }}
-                >
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {product.description}
-                  </ReactMarkdown>
+                <Box sx={{ position: 'relative' }}>
+                  <Box
+                    ref={descRef}
+                    sx={{
+                      fontSize: '0.92rem',
+                      color: 'text.secondary',
+                      lineHeight: 1.8,
+                      ...(!descExpanded && { maxHeight: 135, overflow: 'hidden' }),
+                      '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
+                      '& ul': { pl: 3, listStyleType: 'disc' },
+                      '& ol': { pl: 3, listStyleType: 'decimal' },
+                      '& li': { mb: 0.5, display: 'list-item' },
+                      '& p': { mb: 1.5 },
+                      '& p:last-child': { mb: 0 },
+                      '& a': { color: '#00C2FF' },
+                      '& strong': { color: 'text.primary', fontWeight: 700 },
+                      '& em': { fontStyle: 'italic' },
+                      '& blockquote': { borderLeft: '3px solid #00C2FF', pl: 2, ml: 0, color: 'text.disabled' },
+                      '& code': { fontFamily: 'monospace', fontSize: '0.85em', bgcolor: 'action.hover', px: 0.5, borderRadius: 0.5 },
+                    }}
+                  >
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {product.description}
+                    </ReactMarkdown>
+                  </Box>
+                  {descClamped && !descExpanded && (
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 60,
+                        background: 'linear-gradient(to bottom, transparent, #0B0B0E)',
+                        pointerEvents: 'none',
+                      }}
+                    />
+                  )}
                 </Box>
+                {descClamped && (
+                  <Button
+                    onClick={() => setDescExpanded((prev) => !prev)}
+                    size="small"
+                    sx={{
+                      mt: 0.5,
+                      color: '#00C2FF',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.04em',
+                      textTransform: 'none',
+                      px: 0,
+                      minWidth: 0,
+                      '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' },
+                    }}
+                  >
+                    {descExpanded ? 'Afficher moins' : 'Afficher plus'}
+                  </Button>
+                )}
               </Box>
             )}
 
-            {/* Specs — displayed below description */}
+            {/* Specs */}
             {product.attributes && Object.keys(product.attributes).length > 0 && (
               <Box sx={{ mt: 4 }}>
                 <Typography
@@ -229,8 +283,8 @@ export function ProductDetailPage() {
             )}
           </Grid>
 
-          {/* Right: product info panel */}
-          <Grid size={{ xs: 12, md: 5 }}>
+          {/* Right: product info panel — order 2 so it appears before description on mobile */}
+          <Grid size={{ xs: 12, md: 5 }} sx={{ order: { xs: 2, md: 2 } }}>
             <Box
               className="mirai-glass"
               sx={{

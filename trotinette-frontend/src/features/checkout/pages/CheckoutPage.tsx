@@ -23,6 +23,7 @@ import Paper from '@mui/material/Paper';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { PageDecor } from '../../../shared/components/PageDecor';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -84,8 +85,11 @@ export function CheckoutPage() {
       useAuthStore.getState().setAuth(data.token, data.user);
       setRegisterError(null);
     },
-    onError: (error: any) => {
-      setRegisterError(error.response?.data?.message ?? 'Registration failed');
+    onError: (error: unknown) => {
+      const message =
+        (error as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Registration failed';
+      setRegisterError(message);
     },
   });
 
@@ -98,8 +102,11 @@ export function CheckoutPage() {
       setEditingDelivery(false);
       setSaveError(null);
     },
-    onError: (err: any) => {
-      setSaveError(err.response?.data?.message ?? 'Erreur lors de la sauvegarde');
+    onError: (err: unknown) => {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? 'Erreur lors de la sauvegarde';
+      setSaveError(message);
     },
   });
 
@@ -173,15 +180,40 @@ export function CheckoutPage() {
   if (items.length === 0) return null;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" fontWeight={700} gutterBottom>
-        Commande
-      </Typography>
+    <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      <PageDecor variant="checkout" />
+      <Container maxWidth="md" sx={{ py: 4, position: 'relative', zIndex: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 3 }}>
+        <Typography variant="h4" fontWeight={800} color="var(--mirai-white)">
+          Commande
+        </Typography>
+        <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.7rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+          注文
+        </Typography>
+      </Box>
 
       <Stack spacing={3}>
         {/* Guest section */}
         {!user && (
-          <Paper variant="outlined" sx={{ p: 3 }}>
+          <Paper
+            elevation={0}
+            className="mirai-glass"
+            sx={{
+              p: 3,
+              borderRadius: '20px',
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                background: 'linear-gradient(90deg, #00C2FF, #0099CC, transparent)',
+              },
+            }}
+          >
             <Typography variant="h6" gutterBottom fontWeight={600}>
               Entrez vos informations
             </Typography>
@@ -194,7 +226,14 @@ export function CheckoutPage() {
 
         {/* Delivery info card */}
         {user && (
-          <Paper variant="outlined" sx={{ p: 2.5 }}>
+          <Paper
+            elevation={0}
+            className="mirai-glass"
+            sx={{
+              p: 2.5,
+              borderRadius: '20px',
+            }}
+          >
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={editingDelivery ? 2 : 1.5}>
               <Typography variant="subtitle1" fontWeight={700}>
                 Informations de livraison
@@ -324,7 +363,14 @@ export function CheckoutPage() {
             <Alert severity="info">Paiement à la livraison</Alert>
 
             {/* Order items */}
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Paper
+              elevation={0}
+              className="mirai-glass"
+              sx={{
+                p: 2,
+                borderRadius: '20px',
+              }}
+            >
               <Typography variant="h6" fontWeight={600} gutterBottom>
                 Récapitulatif de commande
               </Typography>
@@ -351,7 +397,14 @@ export function CheckoutPage() {
             </Paper>
 
             {/* Pricing */}
-            <Paper variant="outlined" sx={{ p: 2 }}>
+            <Paper
+              elevation={0}
+              className="mirai-glass"
+              sx={{
+                p: 2,
+                borderRadius: '20px',
+              }}
+            >
               <Stack spacing={1}>
                 <Stack direction="row" justifyContent="space-between">
                   <Typography variant="body2">Sous-total</Typography>
@@ -393,6 +446,14 @@ export function CheckoutPage() {
               fullWidth
               disabled={isPending || !user || editingDelivery}
               startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
+              sx={{
+                py: 1.75,
+                borderRadius: '12px',
+                fontWeight: 700,
+                background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
+                '&:hover': { transform: 'translateY(-2px)' },
+                transition: 'transform 0.2s',
+              }}
             >
               {isPending ? 'Envoi en cours...' : 'Confirmer la commande'}
             </Button>
@@ -406,5 +467,6 @@ export function CheckoutPage() {
         </Box>
       </Stack>
     </Container>
+    </Box>
   );
 }
