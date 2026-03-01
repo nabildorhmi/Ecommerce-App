@@ -55,7 +55,8 @@ class Variant extends Model
      */
     public function getEffectivePriceAttribute(): int
     {
-        return $this->price ?? $this->product?->price ?? 0;
+        // Only access product if the relation is already loaded (prevent lazy loading)
+        return $this->price ?? ($this->relationLoaded('product') ? $this->product?->price : null) ?? 0;
     }
 
     /**
@@ -63,7 +64,8 @@ class Variant extends Model
      */
     public function getEffectivePromoPriceAttribute(): ?int
     {
-        return $this->promo_price ?? $this->product?->promo_price;
+        // Only access product if the relation is already loaded (prevent lazy loading)
+        return $this->promo_price ?? ($this->relationLoaded('product') ? $this->product?->promo_price : null);
     }
 
     /**

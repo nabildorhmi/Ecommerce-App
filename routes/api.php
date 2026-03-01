@@ -23,11 +23,11 @@ use Illuminate\Support\Facades\Route;
 // Health check — unauthenticated
 Route::get('/ping', fn() => response()->json(['status' => 'ok']));
 
-// Auth routes — unauthenticated
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login',    [AuthController::class, 'login']);
-Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword']);
-Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword']);
+// Auth routes — unauthenticated (rate-limited to prevent brute-force)
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:3,1');
+Route::post('/auth/login',    [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/auth/forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:3,1');
+Route::post('/auth/reset-password',  [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1');
 
 // Public catalog routes — unauthenticated
 Route::get('/products',        [ProductController::class, 'index']);

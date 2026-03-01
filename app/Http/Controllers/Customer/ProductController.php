@@ -17,7 +17,7 @@ class ProductController extends Controller
         $products = QueryBuilder::for(
             Product::query()
                 ->where('is_active', true)
-                ->with(['media', 'category', 'variants'])
+                ->with(['media', 'category', 'variants.attributeValues.attribute'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),

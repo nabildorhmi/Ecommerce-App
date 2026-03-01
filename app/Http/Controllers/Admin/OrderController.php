@@ -26,7 +26,7 @@ class OrderController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $orders = QueryBuilder::for(
-            Order::query()->with(['user', 'items', 'deliveryZone'])
+            Order::query()->with(['user', 'items.product', 'items.variant.attributeValues.attribute', 'deliveryZone'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('status'),
@@ -44,7 +44,7 @@ class OrderController extends Controller
 
     public function show(Order $order): OrderResource
     {
-        $order->load(['items.product', 'items.variant.attributeValues', 'deliveryZone', 'statusLogs', 'user']);
+        $order->load(['items.product', 'items.variant.attributeValues.attribute', 'deliveryZone', 'statusLogs', 'user']);
 
         return new OrderResource($order);
     }
