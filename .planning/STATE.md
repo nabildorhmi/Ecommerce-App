@@ -19,9 +19,9 @@ Progress: [█████████░] 92%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: ~5min
-- Total execution time: ~1.0 hours
+- Total execution time: ~1.05 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [█████████░] 92%
 | 02-product-catalog | 3 | ~25 min | ~8 min |
 | 03-user-accounts | 2 | ~10 min | ~5 min |
 | 04-cart-checkout-orders | 4 | ~17 min | ~4 min |
-| 07-backend-refactoring | 1 | ~2 min | ~2 min |
+| 07-backend-refactoring | 2 | ~4 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 07-02 (RFC 7807 errors), 04-04 (order history frontend), 04-03 (cart+checkout frontend), 04-02 (order backend), 04-01 (delivery zones)
-- Trend: Active — 07-02 took 2 min, no deviations
+- Last 5 plans: 07-01 (security hardening), 07-02 (RFC 7807 errors), 04-04 (order history frontend), 04-03 (cart+checkout frontend), 04-02 (order backend)
+- Trend: Active — 07-01 took 2 min, no deviations
 
 *Updated after each plan completion*
 
@@ -110,9 +110,12 @@ Recent decisions affecting current work:
 - [01-01]: guard_name=sanctum for roles + User.$guard_name=sanctum required for Spatie to resolve roles correctly in Sanctum bearer token auth (not web guard)
 - [01-01]: Sanctum must be installed via composer require, not php artisan install:api (fails silently in non-interactive mode)
 - [01-01]: PHP 8.3 via winget, MySQL 8.4 standalone (no service), Composer manual install — no admin rights required
-- [Phase 07-02]: ErrorCode enum follows OrderStatus pattern with string-backed values and label() method for consistency
-- [Phase 07-02]: RFC 7807 error rendering via renderable callbacks in withExceptions closure - Laravel 12 pattern, not separate Handler class
-- [Phase 07-02]: ValidationException returns RFC 7807 envelope PLUS errors field with field-level details for frontend parsing
+- [07-01]: Rate limit thresholds: login/reset 5/min, register/forgot 3/min — higher for frequent legitimate use (login), lower for rare/abusable (register)
+- [07-01]: Sanctum token expiration default 43200 minutes (30 days) — balances security with UX, configurable via SANCTUM_TOKEN_EXPIRATION env var
+- [07-01]: CORS allowed_headers whitelist (Content-Type, Authorization, X-Requested-With, Accept, Accept-Language) — reduces attack surface vs wildcard
+- [07-02]: ErrorCode enum follows OrderStatus pattern with string-backed values and label() method for consistency
+- [07-02]: RFC 7807 error rendering via renderable callbacks in withExceptions closure - Laravel 12 pattern, not separate Handler class
+- [07-02]: ValidationException returns RFC 7807 envelope PLUS errors field with field-level details for frontend parsing
 
 ### Roadmap Evolution
 
@@ -145,5 +148,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 07-02-PLAN.md - RFC 7807 Error Handling
+Stopped at: Completed 07-01 — Security hardening with auth rate limiting, CORS restrictions, Sanctum token expiration, and strict Eloquent mode
 Resume file: None
