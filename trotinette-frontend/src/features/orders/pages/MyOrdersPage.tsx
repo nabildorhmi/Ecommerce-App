@@ -18,11 +18,12 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { PageDecor } from '@/shared/components/PageDecor';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useMyOrders } from '../api/orders';
 import { OrderStatusChip } from '../components/OrderStatusChip';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
-import { apiClient } from '../../../shared/api/client';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
+import { apiClient } from '@/shared/api/client';
 
 /**
  * Customer order history page.
@@ -71,7 +72,9 @@ export function MyOrdersPage() {
   const totalPages = data?.meta?.last_page ?? 1;
 
   return (
-    <Box p={3} maxWidth="md" mx="auto">
+    <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      <PageDecor variant="orders" />
+      <Box p={3} maxWidth="md" mx="auto" sx={{ position: 'relative', zIndex: 1 }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
         {"Mes commandes"}
       </Typography>
@@ -196,6 +199,7 @@ export function MyOrdersPage() {
           )}
         </>
       )}
+    </Box>
     </Box>
   );
 }

@@ -5,8 +5,8 @@ import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
 import { Link } from 'react-router';
-import { useCategories } from '../../features/catalog/api/categories';
-import miraiLogo from '../../assets/miraiTech-Logo.png';
+import { useCategories } from '@/features/catalog/api/categories';
+import miraiLogo from '@/assets/miraiTech-Logo.png';
 
 /**
  * MiraiTech Footer — dark, minimal, Japanese-inspired.
@@ -19,13 +19,25 @@ export function Footer() {
       component="footer"
       sx={{
         backgroundColor: '#0B0B0E',
-        borderTop: '1px solid #1E1E28',
         mt: 'auto',
-        pt: 6,
+        pt: 0,
         pb: 3,
+        position: 'relative',
+        overflow: 'hidden',
+        /* Subtle scan-line overlay */
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,194,255,0.015) 2px, rgba(0,194,255,0.015) 4px)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        },
       }}
     >
-      <Container maxWidth="xl">
+      {/* Gradient top border — sharper neon */}
+      <Box sx={{ height: 1, background: 'linear-gradient(90deg, transparent 0%, #E63946 20%, #00C2FF 50%, #0099CC 80%, transparent 100%)', mb: 6, position: 'relative', zIndex: 1, boxShadow: '0 0 12px rgba(0,194,255,0.3)' }} />
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={4} sx={{ mb: 5 }}>
           {/* Brand Column */}
           <Grid size={{ xs: 12, md: 6 }}>
@@ -49,16 +61,17 @@ export function Footer() {
             >
               123 Bd Mohammed V, Casablanca, Maroc
             </Typography>
-            {/* Japanese accent */}
+            {/* Japanese accent — visible now */}
             <Typography
               sx={{
-                fontFamily: 'serif',
-                fontSize: '0.75rem',
-                color: '#1E1E28',
-                letterSpacing: '0.2em',
+                fontFamily: '"Noto Serif JP", serif',
+                fontSize: '0.85rem',
+                color: 'rgba(0,194,255,0.15)',
+                letterSpacing: '0.25em',
+                mt: 1,
               }}
             >
-              ミライデッタ
+              ミライテック — 未来の技術
             </Typography>
           </Grid>
 
@@ -84,8 +97,8 @@ export function Footer() {
                   fontSize: '0.82rem',
                   color: '#9CA3AF',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: '#F5F7FA' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                 }}
               >
                 Tous les produits
@@ -99,8 +112,8 @@ export function Footer() {
                     fontSize: '0.82rem',
                     color: '#9CA3AF',
                     textDecoration: 'none',
-                    transition: 'color 0.2s',
-                    '&:hover': { color: '#F5F7FA' },
+                    transition: 'all 0.3s ease',
+                    '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                   }}
                 >
                   {cat.name}
@@ -131,8 +144,8 @@ export function Footer() {
                   fontSize: '0.82rem',
                   color: '#9CA3AF',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: '#F5F7FA' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                 }}
               >
                 A propos
@@ -144,8 +157,8 @@ export function Footer() {
                   fontSize: '0.82rem',
                   color: '#9CA3AF',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: '#F5F7FA' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                 }}
               >
                 Contact
@@ -157,8 +170,8 @@ export function Footer() {
                   fontSize: '0.82rem',
                   color: '#9CA3AF',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: '#F5F7FA' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                 }}
               >
                 Conditions generales de vente
@@ -170,8 +183,8 @@ export function Footer() {
                   fontSize: '0.82rem',
                   color: '#9CA3AF',
                   textDecoration: 'none',
-                  transition: 'color 0.2s',
-                  '&:hover': { color: '#F5F7FA' },
+                  transition: 'all 0.3s ease',
+                  '&:hover': { color: '#00C2FF', transform: 'translateX(4px)' },
                 }}
               >
                 Mentions legales
@@ -186,8 +199,8 @@ export function Footer() {
           <Typography sx={{ fontSize: '0.75rem', color: '#9CA3AF' }}>
             © {new Date().getFullYear()} MiraiTech. Tous droits réservés.
           </Typography>
-          <Typography sx={{ fontFamily: 'serif', fontSize: '0.7rem', color: '#1E1E28', letterSpacing: '0.15em' }}>
-            未来の移動
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.8rem', color: 'rgba(0,194,255,0.12)', letterSpacing: '0.15em' }}>
+            未来の移動 · FUTURE MOBILITY
           </Typography>
         </Box>
       </Container>

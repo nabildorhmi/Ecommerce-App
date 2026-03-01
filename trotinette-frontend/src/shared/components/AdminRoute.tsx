@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router';
-import { useAuthStore } from '../../features/auth/store';
+import { useAuthStore } from '@/features/auth/store';
 
 /**
  * AdminRoute — redirects unauthenticated users to /login, non-admins to /products.

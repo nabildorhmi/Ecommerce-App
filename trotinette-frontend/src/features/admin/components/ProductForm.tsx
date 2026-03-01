@@ -366,7 +366,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     <Box
       component="form"
       onSubmit={handleSubmit(onSubmit as Parameters<typeof handleSubmit>[0])}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+      sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}
     >
       {mutationError && (
         <Alert severity="error">
@@ -375,14 +375,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         </Alert>
       )}
 
-      {/* Section 1: Basic info */}
+      {/* Section 1: Basic info + flags */}
       <Box>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ fontSize: '0.85rem' }}>
           Informations de base
         </Typography>
-        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
+        <Box display="grid" gridTemplateColumns="1fr 1fr 1fr" gap={1.5}>
           <TextField
             label="SKU"
+            size="small"
             {...register('sku')}
             error={Boolean(errors.sku)}
             helperText={errors.sku?.message}
@@ -390,6 +391,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           />
           <TextField
             label="Prix (MAD)"
+            size="small"
             type="number"
             inputProps={{ step: '0.01', min: '0' }}
             {...register('price', { valueAsNumber: true })}
@@ -398,20 +400,21 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             required
           />
           <TextField
-            label="Prix promo de base (MAD)"
+            label="Prix promo (MAD)"
+            size="small"
             type="number"
             inputProps={{ step: '0.01', min: '0' }}
             {...register('promo_price', {
               setValueAs: (v) => (v === '' || v == null ? '' : Number(v))
             })}
             error={Boolean(errors.promo_price)}
-            helperText={errors.promo_price?.message ?? 'Prix promo par défaut (les variantes peuvent le surcharger)'}
+            helperText={errors.promo_price?.message}
           />
           <Controller
             name="category_id"
             control={control}
             render={({ field }) => (
-              <FormControl error={Boolean(errors.category_id)}>
+              <FormControl error={Boolean(errors.category_id)} size="small">
                 <InputLabel>Categorie</InputLabel>
                 <Select
                   label="Categorie"
@@ -434,53 +437,37 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             )}
           />
         </Box>
-        <Box mt={2}>
+        <Box display="flex" gap={2} mt={1} flexWrap="wrap">
           <Controller
             name="is_active"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                }
+                control={<Switch size="small" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
                 label="Actif"
+                sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.8rem' } }}
               />
             )}
           />
-        </Box>
-        <Box mt={1}>
           <Controller
             name="is_featured"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                }
-                label="En vedette (page d'accueil)"
+                control={<Switch size="small" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
+                label="Vedette"
+                sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.8rem' } }}
               />
             )}
           />
-        </Box>
-        <Box mt={1}>
           <Controller
             name="is_new"
             control={control}
             render={({ field }) => (
               <FormControlLabel
-                control={
-                  <Switch
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                  />
-                }
-                label="Nouveau produit"
+                control={<Switch size="small" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />}
+                label="Nouveau"
+                sx={{ '& .MuiFormControlLabel-label': { fontSize: '0.8rem' } }}
               />
             )}
           />
@@ -491,12 +478,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       {/* Section 2: Product Info */}
       <Box>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ fontSize: '0.85rem' }}>
           Informations produit
         </Typography>
-        <Box display="flex" flexDirection="column" gap={2}>
+        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={1.5}>
           <TextField
             label="Nom"
+            size="small"
             {...register('name')}
             error={Boolean(errors.name)}
             helperText={errors.name?.message}
@@ -504,31 +492,31 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           />
           <TextField
             label="Slug"
+            size="small"
             {...register('slug', {
               onChange: () => setSlugManual(true),
             })}
             error={Boolean(errors.slug)}
             helperText={errors.slug?.message ?? 'Auto-genere depuis le nom'}
           />
-
-          {/* Markdown Description */}
-          <Box data-color-mode="dark">
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              Description (Markdown)
-            </Typography>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => (
-                <MDEditor
-                  value={field.value}
-                  onChange={(val) => field.onChange(val ?? '')}
-                  height={220}
-                  preview="edit"
-                />
-              )}
-            />
-          </Box>
+        </Box>
+        {/* Markdown Description */}
+        <Box data-color-mode="dark" mt={1.5}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, fontSize: '0.78rem' }}>
+            Description (Markdown)
+          </Typography>
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <MDEditor
+                value={field.value}
+                onChange={(val) => field.onChange(val ?? '')}
+                height={120}
+                preview="edit"
+              />
+            )}
+          />
         </Box>
       </Box>
 
@@ -536,8 +524,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       {/* Section 3: Dynamic Attributes */}
       <Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="subtitle1" fontWeight="bold">
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
+          <Typography variant="subtitle2" fontWeight="bold" sx={{ fontSize: '0.85rem' }}>
             Caracteristiques
           </Typography>
           <Button
@@ -551,8 +539,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
         {/* Template chips */}
         {templates.length > 0 && (
-          <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center', mr: 0.5 }}>
+          <Box sx={{ display: 'flex', gap: 0.5, mb: 1, flexWrap: 'wrap' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center', mr: 0.5, fontSize: '0.75rem' }}>
               Appliquer:
             </Typography>
             {templates.map((t) => (
@@ -569,13 +557,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         )}
 
         {templates.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontSize: '0.75rem' }}>
             Aucun modele. Cliquez sur "Gerer les modeles" pour en creer.
           </Typography>
         )}
 
         {attrRows.map((row, index) => (
-          <Box key={index} display="flex" gap={1} mb={1} alignItems="center">
+          <Box key={index} display="flex" gap={0.5} mb={0.5} alignItems="center">
             <TextField
               label="Cle"
               size="small"
@@ -611,7 +599,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       {/* Section 4: Images */}
       <Box>
-        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+        <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ fontSize: '0.85rem' }}>
           Images
         </Typography>
         <ImageUploader

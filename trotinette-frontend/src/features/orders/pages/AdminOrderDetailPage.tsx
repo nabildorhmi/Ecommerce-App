@@ -22,9 +22,9 @@ import DialogActions from '@mui/material/DialogActions';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { useAdminOrder, useTransitionOrder, useAddOrderNote } from '../api/orders';
-import { apiClient } from '../../../shared/api/client';
+import { apiClient } from '@/shared/api/client';
 import { OrderStatusChip } from '../components/OrderStatusChip';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 
 /** French labels for status transition buttons */
 const STATUS_LABELS: Record<string, string> = {

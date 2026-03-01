@@ -6,7 +6,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useCartStore } from '../store';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 import type { CartItem as CartItemType } from '../types';
 
 interface CartItemProps {
@@ -29,7 +29,7 @@ export function CartItem({ item }: CartItemProps) {
         gap: 2,
         py: 1.5,
         borderBottom: '1px solid',
-        borderColor: 'divider',
+        borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'divider',
       }}
     >
       {/* Thumbnail */}

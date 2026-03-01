@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router';
-import { useAuthStore } from '../../features/auth/store';
+import { useAuthStore } from '@/features/auth/store';
 
 /**
  * ProtectedRoute — redirects unauthenticated users to /login.

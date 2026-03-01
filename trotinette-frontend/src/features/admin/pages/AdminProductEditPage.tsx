@@ -29,20 +29,20 @@ export function AdminProductEditPage() {
   };
 
   return (
-    <Box p={3} maxWidth={900} mx="auto">
-      <Box display="flex" alignItems="center" gap={2} mb={3}>
+    <Box p={2} maxWidth={1400} mx="auto">
+      <Box display="flex" alignItems="center" gap={2} mb={2}>
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => void navigate('/admin/products')}
           variant="outlined"
           size="small"
         >
-          Retour / Back
+          Retour
         </Button>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h6" fontWeight="bold">
           {isCreate
-            ? 'Nouveau produit / New Product'
-            : 'Modifier le produit / Edit Product'}
+            ? 'Nouveau produit'
+            : 'Modifier le produit'}
         </Typography>
       </Box>
 
@@ -59,13 +59,17 @@ export function AdminProductEditPage() {
       )}
 
       {(isCreate || (!isLoading && !error && product)) && (
-        <>
-          <ProductForm product={product} onSuccess={handleSuccess} />
+        <Box display="flex" gap={3} flexDirection={{ xs: 'column', lg: 'row' }} alignItems="flex-start">
+          <Box flex={1} minWidth={0}>
+            <ProductForm product={product} onSuccess={handleSuccess} />
+          </Box>
 
           {!isCreate && productId > 0 && (
-            <ProductVariantsSection productId={productId} productSku={product?.sku ?? ''} />
+            <Box flex={1} minWidth={0}>
+              <ProductVariantsSection productId={productId} productSku={product?.sku ?? ''} />
+            </Box>
           )}
-        </>
+        </Box>
       )}
     </Box>
   );

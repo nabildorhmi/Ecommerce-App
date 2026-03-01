@@ -9,7 +9,8 @@ import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
+import { PageDecor } from '@/shared/components/PageDecor';
 import type { OrderConfirmation } from '../types';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '212600000000';
@@ -43,7 +44,9 @@ export function OrderConfirmationPage() {
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
+    <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      <PageDecor variant="checkout" />
+      <Container maxWidth="sm" sx={{ py: 6, position: 'relative', zIndex: 1 }}>
       <Stack spacing={4} alignItems="center">
         {/* Success icon + heading */}
         <Stack alignItems="center" spacing={2}>
@@ -168,5 +171,6 @@ export function OrderConfirmationPage() {
         </Stack>
       </Stack>
     </Container>
+    </Box>
   );
 }

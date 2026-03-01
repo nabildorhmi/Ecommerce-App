@@ -52,6 +52,7 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
         error={Boolean(errors.email)}
         helperText={errors.email?.message}
         {...register('email')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <TextField
@@ -62,11 +63,12 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
         error={Boolean(errors.password)}
         helperText={errors.password?.message}
         {...register('password')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <Box textAlign="right">
-        <Link component={RouterLink} to="/forgot-password" variant="body2">
-          Mot de passe oublie ?
+        <Link component={RouterLink} to="/forgot-password" variant="body2" sx={{ color: 'var(--mirai-gray)', '&:hover': { color: 'var(--mirai-cyan)' } }}>
+          Mot de passe oublié ?
         </Link>
       </Box>
 
@@ -75,7 +77,17 @@ export function LoginForm({ onSubmit, error }: LoginFormProps) {
         variant="contained"
         fullWidth
         disabled={isSubmitting}
-        startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
+        startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+        className="mirai-glow"
+        sx={{
+          py: 1.5,
+          mt: 2,
+          borderRadius: '12px',
+          fontWeight: 700,
+          background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
+          transition: 'transform 0.2s',
+          '&:hover': { transform: 'translateY(-2px)' }
+        }}
       >
         {"Se connecter"}
       </Button>

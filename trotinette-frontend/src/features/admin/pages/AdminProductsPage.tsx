@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useDeferredValue } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -24,6 +24,8 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -31,7 +33,10 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import NewReleasesOutlinedIcon from '@mui/icons-material/NewReleasesOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import { useAdminProducts, useDeleteProduct, useUpdateProduct } from '../api/products';
+import { useCategories } from '../../catalog/api/categories';
 import type { AdminProduct } from '../types';
 function formatPrice(centimes: number): string {
   return `${(centimes / 100).toFixed(2)} MAD`;
@@ -83,7 +88,20 @@ function DeleteDialog({
 export function AdminProductsPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
-  const { data, isLoading, error } = useAdminProducts({ page, per_page: perPage });
+  const [search, setSearch] = useState('');
+  const [categoryId, setCategoryId] = useState<number | ''>('');
+  const [activeFilter, setActiveFilter] = useState<'' | '1' | '0'>('');
+
+  const deferredSearch = useDeferredValue(search);
+
+  const params: Record<string, unknown> = { page, per_page: perPage };
+  if (deferredSearch) params['filter[search]'] = deferredSearch;
+  if (categoryId !== '') params['filter[category_id]'] = categoryId;
+  if (activeFilter !== '') params['filter[is_active]'] = activeFilter;
+
+  const { data, isLoading, isFetching, error } = useAdminProducts(params);
+  const { data: categoriesData } = useCategories();
+  const categories = categoriesData?.data ?? [];
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
 
@@ -118,29 +136,13 @@ export function AdminProductsPage() {
     setDeleteTarget(null);
   };
 
-  if (isLoading) {
-    return (
-      <Box display="flex" justifyContent="center" py={6}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert severity="error">
-        Impossible de charger les produits / Failed to load products
-      </Alert>
-    );
-  }
-
   return (
     <Box p={3}>
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={3}
+        mb={2}
       >
         <Typography variant="h5" fontWeight="bold">
           Produits / Products
@@ -155,7 +157,73 @@ export function AdminProductsPage() {
         </Button>
       </Box>
 
-      <TableContainer component={Paper} elevation={0} sx={{ background: 'transparent' }}>
+      {/* ── Filters bar ── */}
+      <Box display="flex" gap={1.5} mb={2} flexWrap="wrap" alignItems="center">
+        <TextField
+          size="small"
+          placeholder="Rechercher (nom, SKU…)"
+          value={search}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          sx={{ minWidth: 220 }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel sx={{ fontSize: '0.82rem' }}>Catégorie</InputLabel>
+          <Select
+            label="Catégorie"
+            value={categoryId}
+            onChange={(e) => { setCategoryId(e.target.value as number | ''); setPage(1); }}
+            startAdornment={<FilterListIcon fontSize="small" sx={{ mr: 0.5, color: 'text.disabled' }} />}
+          >
+            <MenuItem value="">Toutes</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 130 }}>
+          <InputLabel sx={{ fontSize: '0.82rem' }}>Statut</InputLabel>
+          <Select
+            label="Statut"
+            value={activeFilter}
+            onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+          >
+            <MenuItem value="">Tous</MenuItem>
+            <MenuItem value="1">Actifs</MenuItem>
+            <MenuItem value="0">Inactifs</MenuItem>
+          </Select>
+        </FormControl>
+        {(search || categoryId !== '' || activeFilter !== '') && (
+          <Button size="small" variant="outlined" color="inherit" onClick={() => { setSearch(''); setCategoryId(''); setActiveFilter(''); setPage(1); }}>
+            Effacer
+          </Button>
+        )}
+        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+          {data?.meta?.total ?? 0} produit(s)
+        </Typography>
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Impossible de charger les produits
+        </Alert>
+      )}
+
+      <TableContainer component={Paper} elevation={0} sx={{ background: 'transparent', position: 'relative' }}>
+        {/* Loading overlay — shown during refetches without hiding filters */}
+        {isFetching && (
+          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(11,11,14,0.55)', zIndex: 10, borderRadius: 1, backdropFilter: 'blur(2px)' }}>
+            <CircularProgress size={32} />
+          </Box>
+        )}
         <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}>
           <TableHead>
             <TableRow>
@@ -172,10 +240,20 @@ export function AdminProductsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.length === 0 ? (
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, i) => (
+                <TableRow key={i} sx={{ '& td': { borderBottom: 'none', py: 1.5 } }}>
+                  {Array.from({ length: 10 }).map((__, j) => (
+                    <TableCell key={j}>
+                      <Box sx={{ height: 20, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 1, animation: 'pulse 1.5s ease-in-out infinite' }} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} align="center">
-                  Aucun produit / No products found
+                <TableCell colSpan={10} align="center" sx={{ py: 6, color: 'text.secondary' }}>
+                  Aucun produit trouvé
                 </TableCell>
               </TableRow>
             ) : (
@@ -318,9 +396,6 @@ export function AdminProductsPage() {
               <MenuItem value={50}>50 / page</MenuItem>
             </Select>
           </FormControl>
-          <Typography variant="body2" color="text.secondary">
-            {data?.meta?.total ?? 0} au total
-          </Typography>
         </Box>
         {totalPages > 1 && (
           <Pagination

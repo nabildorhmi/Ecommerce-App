@@ -38,7 +38,7 @@ import {
   useUpdateProductVariant,
   useDeleteProductVariant,
 } from '../api/variations';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { VariantGenerator } from './VariantGenerator';
 import type { ProductVariant, VariationType } from '../types';
 

@@ -17,7 +17,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BoltIcon from '@mui/icons-material/Bolt';
 import { useProduct } from '../api/products';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { ProductGallery } from '../components/ProductGallery';
 import { SpecsTable } from '../components/SpecsTable';
 import { StockBadge } from '../components/StockBadge';
@@ -25,7 +25,7 @@ import { TrustSignals } from '../components/TrustSignals';
 import { CategoryBreadcrumb } from '../components/CategoryBreadcrumb';
 import { useCartStore } from '../../cart/store';
 import type { ProductVariantDisplay } from '../types';
-import { PageDecor } from '../../../shared/components/PageDecor';
+import { PageDecor } from '@/shared/components/PageDecor';
 
 function ProductDetailSkeleton() {
   return (

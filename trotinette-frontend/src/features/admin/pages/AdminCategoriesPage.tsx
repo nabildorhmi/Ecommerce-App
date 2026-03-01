@@ -18,6 +18,11 @@ import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
+import Pagination from '@mui/material/Pagination';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -98,6 +103,11 @@ export function AdminCategoriesPage() {
   const [deleteTarget, setDeleteTarget] = useState<AdminCategory | null>(null);
 
   const categories: AdminCategory[] = (data?.data as AdminCategory[]) ?? [];
+
+  const [catPage, setCatPage] = useState(1);
+  const [catPerPage, setCatPerPage] = useState(10);
+  const catTotalPages = Math.ceil(categories.length / catPerPage);
+  const paginatedCategories = categories.slice((catPage - 1) * catPerPage, catPage * catPerPage);
 
   const handleToggleActive = async (cat: AdminCategory) => {
     await updateMutation.mutateAsync({
@@ -180,7 +190,7 @@ export function AdminCategoriesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              categories.map((cat) => (
+              paginatedCategories.map((cat) => (
                 <TableRow key={cat.id} hover>
                   <TableCell>{cat.name ?? '—'}</TableCell>
                   <TableCell>{cat.slug}</TableCell>
@@ -218,6 +228,37 @@ export function AdminCategoriesPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} flexWrap="wrap" gap={2}>
+        <Box display="flex" alignItems="center" gap={1}>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <InputLabel sx={{ fontSize: '0.8rem' }}>Lignes / page</InputLabel>
+            <Select
+              label="Lignes / page"
+              value={catPerPage}
+              onChange={(e) => { setCatPerPage(Number(e.target.value)); setCatPage(1); }}
+              sx={{ fontSize: '0.82rem' }}
+            >
+              <MenuItem value={5}>5 / page</MenuItem>
+              <MenuItem value={10}>10 / page</MenuItem>
+              <MenuItem value={25}>25 / page</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="body2" color="text.secondary">
+            {categories.length} au total
+          </Typography>
+        </Box>
+        {catTotalPages > 1 && (
+          <Pagination
+            count={catTotalPages}
+            page={catPage}
+            onChange={(_e, p) => setCatPage(p)}
+            color="primary"
+            size="small"
+          />
+        )}
+      </Box>
 
       {/* Create / Edit Dialog */}
       <Dialog

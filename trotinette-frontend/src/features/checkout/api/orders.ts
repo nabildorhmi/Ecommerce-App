@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { apiClient } from '../../../shared/api/client';
-import { useCartStore } from '../../cart/store';
+import { apiClient } from '@/shared/api/client';
+import { useCartStore } from '@/features/cart/store';
 import type { PlaceOrderInput, OrderConfirmation } from '../types';
 
 /**

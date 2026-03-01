@@ -11,7 +11,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
-import { MOROCCAN_CITIES } from '../../../shared/constants/moroccanCities';
+import { MOROCCAN_CITIES } from '@/shared/constants/moroccanCities';
 
 const registerSchema = z
   .object({
@@ -74,6 +74,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.name)}
         helperText={errors.name?.message}
         {...register('name')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <TextField
@@ -84,6 +85,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.email)}
         helperText={errors.email?.message}
         {...register('email')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <TextField
@@ -94,10 +96,11 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.phone)}
         helperText={errors.phone?.message}
         {...register('phone')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       {/* Pays */}
-      <FormControl fullWidth>
+      <FormControl fullWidth sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}>
         <InputLabel>Pays</InputLabel>
         <Select label="Pays" value="Maroc" readOnly>
           <MenuItem value="Maroc">Maroc</MenuItem>
@@ -109,7 +112,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         name="address_city"
         control={control}
         render={({ field }) => (
-          <FormControl fullWidth required error={Boolean(errors.address_city)}>
+          <FormControl fullWidth required error={Boolean(errors.address_city)} sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}>
             <InputLabel>Ville</InputLabel>
             <Select
               {...field}
@@ -136,6 +139,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.password)}
         helperText={errors.password?.message}
         {...register('password')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <TextField
@@ -146,6 +150,7 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         error={Boolean(errors.password_confirmation)}
         helperText={errors.password_confirmation?.message}
         {...register('password_confirmation')}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '10px' } }}
       />
 
       <Button
@@ -153,7 +158,17 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
         variant="contained"
         fullWidth
         disabled={isSubmitting}
-        startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
+        startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+        className="mirai-glow"
+        sx={{
+          py: 1.5,
+          mt: 2,
+          borderRadius: '12px',
+          fontWeight: 700,
+          background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
+          transition: 'transform 0.2s',
+          '&:hover': { transform: 'translateY(-2px)' }
+        }}
       >
         {"S'inscrire"}
       </Button>

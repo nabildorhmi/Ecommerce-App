@@ -14,6 +14,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import CircularProgress from '@mui/material/CircularProgress';
 import { resetPasswordApi } from '../api/auth';
+import { PageDecor } from '@/shared/components/PageDecor';
 
 const resetSchema = z
   .object({
@@ -71,7 +72,9 @@ export function ResetPasswordPage() {
 
   if (!token || !email) {
     return (
-      <Container maxWidth="sm" sx={{ py: 8 }}>
+      <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+        <PageDecor variant="auth" />
+        <Container maxWidth="sm" sx={{ py: 8, position: 'relative', zIndex: 1 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Alert severity="error" sx={{ mb: 2 }}>
             Lien de reinitialisation invalide. Veuillez demander un nouveau lien.
@@ -83,11 +86,14 @@ export function ResetPasswordPage() {
           </Box>
         </Paper>
       </Container>
+      </Box>
     );
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
+    <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      <PageDecor variant="auth" />
+      <Container maxWidth="sm" sx={{ py: 8, position: 'relative', zIndex: 1 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" fontWeight="bold" mb={3}>
           Reinitialiser le mot de passe
@@ -151,5 +157,6 @@ export function ResetPasswordPage() {
         </Box>
       </Paper>
     </Container>
+    </Box>
   );
 }

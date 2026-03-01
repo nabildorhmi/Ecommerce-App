@@ -7,6 +7,7 @@ import { queryClient } from './app/queryClient';
 import { router } from './app/router';
 import { RTLProvider } from './shared/components/RTLProvider';
 import './index.css';
+import './animations.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -19,7 +19,7 @@ import Alert from '@mui/material/Alert';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { useAdminOrders } from '../api/orders';
 import { OrderStatusChip } from '../components/OrderStatusChip';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 import type { AdminOrderFilters } from '../api/orders';
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'dispatched', 'delivered', 'cancelled'];
@@ -38,11 +38,13 @@ export function AdminOrdersPage() {
   const dateFrom = searchParams.get('date_from') ?? '';
   const dateTo = searchParams.get('date_to') ?? '';
   const page = Number(searchParams.get('page') ?? '1');
+  const perPage = Number(searchParams.get('per_page') ?? '20');
   const sort = searchParams.get('sort') ?? '-created_at';
 
   // Build filters for query
   const filters: AdminOrderFilters = {
     page,
+    per_page: perPage,
     sort,
   };
   if (status) filters['filter[status]'] = status;
@@ -151,12 +153,12 @@ export function AdminOrdersPage() {
       </Box>
 
       {/* Order table */}
-      <TableContainer component={Paper}>
-        <Table size="small">
+      <TableContainer component={Paper} elevation={0} sx={{ background: 'transparent' }}>
+        <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}>
           <TableHead>
             <TableRow>
-              <TableCell>{"N° de commande"}</TableCell>
-              <TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }}>{"N° de commande"}</TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }}>
                 <TableSortLabel
                   active={isSortActive('created_at')}
                   direction={sortDirection('created_at')}
@@ -165,10 +167,10 @@ export function AdminOrdersPage() {
                   {"Date"}
                 </TableSortLabel>
               </TableCell>
-              <TableCell>{"Client"}</TableCell>
-              <TableCell>{"Statut"}</TableCell>
-              <TableCell>{"Ville"}</TableCell>
-              <TableCell align="right">
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }}>{"Client"}</TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }}>{"Statut"}</TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }}>{"Ville"}</TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }} align="right">
                 <TableSortLabel
                   active={isSortActive('total')}
                   direction={sortDirection('total')}
@@ -177,7 +179,7 @@ export function AdminOrdersPage() {
                   {"Total"}
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="right">{"Articles"}</TableCell>
+              <TableCell sx={{ borderBottom: 'none', color: 'var(--mirai-gray)', fontWeight: 600 }} align="right">{"Articles"}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -198,7 +200,16 @@ export function AdminOrdersPage() {
                 <TableRow
                   key={order.id}
                   hover
-                  sx={{ cursor: 'pointer' }}
+                  sx={{
+                    cursor: 'pointer',
+                    backgroundColor: 'rgba(22, 22, 28, 0.4)',
+                    backdropFilter: 'blur(12px)',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', backgroundColor: 'rgba(22, 22, 28, 0.7)' },
+                    '& td:first-of-type': { borderTopLeftRadius: '12px', borderBottomLeftRadius: '12px' },
+                    '& td:last-child': { borderTopRightRadius: '12px', borderBottomRightRadius: '12px' },
+                    '& td': { borderBottom: 'none', py: 1.5 }
+                  }}
                   onClick={() => void navigate(`/admin/orders/${order.id}`)}
                 >
                   <TableCell>{order.order_number}</TableCell>
@@ -225,12 +236,20 @@ export function AdminOrdersPage() {
           component="div"
           count={meta.total}
           page={page - 1}
-          rowsPerPage={meta.per_page}
-          rowsPerPageOptions={[]}
+          rowsPerPage={perPage}
+          rowsPerPageOptions={[10, 20, 50]}
           onPageChange={(_e, newPage) => {
             setSearchParams((prev) => {
               const next = new URLSearchParams(prev);
               next.set('page', String(newPage + 1));
+              return next;
+            });
+          }}
+          onRowsPerPageChange={(e) => {
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev);
+              next.set('per_page', e.target.value);
+              next.set('page', '1');
               return next;
             });
           }}

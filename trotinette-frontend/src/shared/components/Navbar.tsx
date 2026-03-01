@@ -14,7 +14,6 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Drawer from '@mui/material/Drawer';
-import Tooltip from '@mui/material/Tooltip';
 import Badge from '@mui/material/Badge';
 import InputBase from '@mui/material/InputBase';
 import Popper from '@mui/material/Popper';
@@ -34,19 +33,16 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import PeopleIcon from '@mui/icons-material/People';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
-import { useAuthStore } from '../../features/auth/store';
-import { CartBadge } from '../../features/cart/components/CartBadge';
-import { CartDrawer } from '../../features/cart/components/CartDrawer';
-import { useCategories } from '../../features/catalog/api/categories';
-import { useThemeStore } from '../../app/themeStore';
-import { apiClient } from '../api/client';
-import miraiLogo from '../../assets/miraiTech-Logo.png';
+import { useAuthStore } from '@/features/auth/store';
+import { CartBadge } from '@/features/cart/components/CartBadge';
+import { CartDrawer } from '@/features/cart/components/CartDrawer';
+import { useCategories } from '@/features/catalog/api/categories';
+import { apiClient } from '@/shared/api/client';
+import miraiLogo from '@/assets/miraiTech-Logo.png';
 
 /**
  * MiraiTech Navbar — sticky, transparent/dark blur, dynamic categories.
@@ -56,7 +52,6 @@ export function Navbar() {
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const clearAuth = useAuthStore((s) => s.clearAuth);
-  const { mode, toggleMode } = useThemeStore();
 
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
@@ -186,36 +181,68 @@ export function Navbar() {
               component={Link}
               to="/products?filter[is_on_sale]=1"
               sx={{
-                color: location.search.includes('is_on_sale') ? '#FF6B35' : '#9CA3AF',
-                fontWeight: 600,
+                color: '#FF6B35',
+                fontWeight: 700,
                 fontSize: '0.75rem',
                 letterSpacing: '0.08em',
                 px: 1.5,
                 py: 0.75,
-                borderRadius: '4px',
+                borderRadius: '6px',
                 minWidth: 'auto',
-                '&:hover': { color: '#FF6B35', backgroundColor: 'rgba(255,107,53,0.04)' },
+                border: location.search.includes('is_on_sale') ? '2px solid #FF6B35' : '1px solid rgba(255,107,53,0.3)',
+                backgroundColor: location.search.includes('is_on_sale') ? 'rgba(255,107,53,0.2)' : 'rgba(255,107,53,0.06)',
+                animation: location.search.includes('is_on_sale') ? 'none' : 'promo-glow 2.5s ease-in-out infinite',
+                textShadow: '0 0 8px rgba(255,107,53,0.4)',
+                boxShadow: location.search.includes('is_on_sale') ? '0 0 12px rgba(255,107,53,0.4), inset 0 0 8px rgba(255,107,53,0.1)' : 'none',
+                position: 'relative',
+                '&::after': location.search.includes('is_on_sale') ? {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '20%',
+                  right: '20%',
+                  height: '2px',
+                  backgroundColor: '#FF6B35',
+                  borderRadius: '2px',
+                } : {},
+                '&:hover': { color: '#FF6B35', backgroundColor: 'rgba(255,107,53,0.15)', borderColor: 'rgba(255,107,53,0.5)' },
               }}
             >
-              PROMOS
+              {location.search.includes('is_on_sale') ? '✦ PROMOS' : 'PROMOS'}
             </Button>
 
             <Button
               component={Link}
               to="/products?filter[is_new]=1"
               sx={{
-                color: location.search.includes('is_new') ? '#00C853' : '#9CA3AF',
-                fontWeight: 600,
+                color: '#00C853',
+                fontWeight: 700,
                 fontSize: '0.75rem',
                 letterSpacing: '0.08em',
                 px: 1.5,
                 py: 0.75,
-                borderRadius: '4px',
+                borderRadius: '6px',
                 minWidth: 'auto',
-                '&:hover': { color: '#00C853', backgroundColor: 'rgba(0,200,83,0.04)' },
+                border: location.search.includes('is_new') ? '2px solid #00C853' : '1px solid rgba(0,200,83,0.3)',
+                backgroundColor: location.search.includes('is_new') ? 'rgba(0,200,83,0.2)' : 'rgba(0,200,83,0.06)',
+                animation: location.search.includes('is_new') ? 'none' : 'nouveaute-glow 2.5s ease-in-out infinite',
+                textShadow: '0 0 8px rgba(0,200,83,0.4)',
+                boxShadow: location.search.includes('is_new') ? '0 0 12px rgba(0,200,83,0.4), inset 0 0 8px rgba(0,200,83,0.1)' : 'none',
+                position: 'relative',
+                '&::after': location.search.includes('is_new') ? {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: 0,
+                  left: '20%',
+                  right: '20%',
+                  height: '2px',
+                  backgroundColor: '#00C853',
+                  borderRadius: '2px',
+                } : {},
+                '&:hover': { color: '#00C853', backgroundColor: 'rgba(0,200,83,0.15)', borderColor: 'rgba(0,200,83,0.5)' },
               }}
             >
-              NOUVEAUTÉS
+              {location.search.includes('is_new') ? '✦ NOUVEAUTÉS' : 'NOUVEAUTÉS'}
             </Button>
 
             {categories.length > 0 && (
@@ -367,19 +394,6 @@ export function Navbar() {
 
           {/* ── Right Actions ── */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25, ml: 'auto' }}>
-            {/* ── Theme Toggle ── */}
-            <Tooltip title={mode === 'dark' ? 'Mode clair' : 'Mode sombre'}>
-              <IconButton
-                onClick={toggleMode}
-                size="small"
-                sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', backgroundColor: 'rgba(255,255,255,0.06)' } }}
-              >
-                {mode === 'dark'
-                  ? <LightModeRoundedIcon fontSize="small" />
-                  : <DarkModeRoundedIcon fontSize="small" />}
-              </IconButton>
-            </Tooltip>
-
             <CartBadge onToggle={() => setDrawerOpen(true)} />
 
             {user ? (
@@ -601,17 +615,43 @@ export function Navbar() {
             component={Link} to="/products?filter[is_on_sale]=1"
             onClick={() => setMobileOpen(false)}
             fullWidth
-            sx={{ justifyContent: 'flex-start', color: location.search.includes('is_on_sale') ? '#FF6B35' : 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
+            sx={{
+              justifyContent: 'flex-start',
+              color: '#FF6B35',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              borderRadius: '6px',
+              border: location.search.includes('is_on_sale') ? '2px solid #FF6B35' : '1px solid rgba(255,107,53,0.25)',
+              backgroundColor: location.search.includes('is_on_sale') ? 'rgba(255,107,53,0.2)' : 'rgba(255,107,53,0.05)',
+              animation: location.search.includes('is_on_sale') ? 'none' : 'promo-glow 2.5s ease-in-out infinite',
+              textShadow: '0 0 8px rgba(255,107,53,0.3)',
+              boxShadow: location.search.includes('is_on_sale') ? '0 0 12px rgba(255,107,53,0.3)' : 'none',
+              mb: 0.5,
+            }}
           >
-            PROMOS
+            {location.search.includes('is_on_sale') ? '✦ PROMOS' : 'PROMOS'}
           </Button>
           <Button
             component={Link} to="/products?filter[is_new]=1"
             onClick={() => setMobileOpen(false)}
             fullWidth
-            sx={{ justifyContent: 'flex-start', color: location.search.includes('is_new') ? '#00C853' : 'text.primary', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '0.06em' }}
+            sx={{
+              justifyContent: 'flex-start',
+              color: '#00C853',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              borderRadius: '6px',
+              border: location.search.includes('is_new') ? '2px solid #00C853' : '1px solid rgba(0,200,83,0.25)',
+              backgroundColor: location.search.includes('is_new') ? 'rgba(0,200,83,0.2)' : 'rgba(0,200,83,0.05)',
+              animation: location.search.includes('is_new') ? 'none' : 'nouveaute-glow 2.5s ease-in-out infinite',
+              textShadow: '0 0 8px rgba(0,200,83,0.3)',
+              boxShadow: location.search.includes('is_new') ? '0 0 12px rgba(0,200,83,0.3)' : 'none',
+              mb: 0.5,
+            }}
           >
-            NOUVEAUTÉS
+            {location.search.includes('is_new') ? '✦ NOUVEAUTÉS' : 'NOUVEAUTÉS'}
           </Button>
           <Divider sx={{ borderColor: 'divider', my: 0.5 }} />
           <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', letterSpacing: '0.1em', fontWeight: 700, px: 1, pb: 0.5, textTransform: 'uppercase' }}>

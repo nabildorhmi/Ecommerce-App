@@ -31,8 +31,10 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { useAdminDashboard } from '../api/dashboard';
-import { formatCurrency } from '../../../shared/utils/formatCurrency';
+import { formatCurrency } from '@/shared/utils/formatCurrency';
 import type { DashboardFilters } from '../types';
+import CountUp from 'react-countup';
+import { motion } from 'framer-motion';
 
 const ORDER_STATUSES = [
   { value: 'pending', label: 'En attente' },
@@ -105,12 +107,17 @@ export function AdminDashboardPage() {
 
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Tableau de bord
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+          Tableau de bord
+        </Typography>
+        <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+          管理パネル
+        </Typography>
+      </Box>
 
       {/* Filters */}
-      <Paper sx={{ p: 2, mb: 3 }}>
+      <Paper className="mirai-glass" sx={{ p: 2, mb: 3, borderRadius: '12px' }}>
         <Stack direction="row" spacing={2} flexWrap="wrap" gap={2}>
           <TextField
             label="Date début"
@@ -179,45 +186,42 @@ export function AdminDashboardPage() {
       </Paper>
 
       {/* KPI Cards */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 3 }}>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Commandes totales
-            </Typography>
-            <Typography variant="h4">{data.kpis.total_orders}</Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Chiffre d'affaires
-            </Typography>
-            <Typography variant="h4">{formatCurrency(data.kpis.total_revenue)}</Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Panier moyen
-            </Typography>
-            <Typography variant="h4">{formatCurrency(data.kpis.average_order_value)}</Typography>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent>
-            <Typography color="textSecondary" gutterBottom>
-              Nouveaux clients
-            </Typography>
-            <Typography variant="h4">{data.kpis.new_customers}</Typography>
-          </CardContent>
-        </Card>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
+        {[
+          { title: 'Commandes totales', value: data.kpis.total_orders, color: '#00C2FF' },
+          { title: "Chiffre d'affaires", value: data.kpis.total_revenue, isCurrency: true, color: '#0099CC' },
+          { title: 'Panier moyen', value: data.kpis.average_order_value, isCurrency: true, color: '#E63946' },
+          { title: 'Nouveaux clients', value: data.kpis.new_customers, color: '#9CA3AF' },
+        ].map((kpi, i) => (
+          <motion.div
+            key={kpi.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, duration: 0.5 }}
+            whileHover={{ y: -5 }}
+          >
+            <Card className="mirai-glass" sx={{ borderRadius: '16px', borderBottom: `2px solid ${kpi.color}`, transition: 'all 0.3s' }}>
+              <CardContent>
+                <Typography sx={{ color: 'var(--mirai-gray)', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }} gutterBottom>
+                  {kpi.title}
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+                  {kpi.isCurrency ? (
+                    <CountUp end={kpi.value} duration={2.5} separator=" " suffix=" MAD" />
+                  ) : (
+                    <CountUp end={kpi.value} duration={2.5} separator=" " />
+                  )}
+                </Typography>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
       </Box>
 
       {/* Charts */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 4 }}>
         {/* Status distribution */}
-        <Paper sx={{ p: 2 }}>
+        <Paper className="mirai-glass" sx={{ p: 3, borderRadius: '16px' }}>
           <Typography variant="h6" gutterBottom>
             Commandes par statut
           </Typography>
@@ -242,65 +246,65 @@ export function AdminDashboardPage() {
         </Paper>
 
         {/* Monthly revenue */}
-        <Paper sx={{ p: 2 }}>
+        <Paper className="mirai-glass" sx={{ p: 3, borderRadius: '16px' }}>
           <Typography variant="h6" gutterBottom>
             Chiffre d'affaires mensuel
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.monthly_stats}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="month" />
               <YAxis tickFormatter={(value) => formatCurrency(value)} />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-              <Bar dataKey="revenue" fill="#2196f3" name="Revenue" />
+              <Bar dataKey="revenue" fill="#00C2FF" name="Revenue" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>
 
         {/* Monthly orders */}
-        <Paper sx={{ p: 2 }}>
+        <Paper className="mirai-glass" sx={{ p: 3, borderRadius: '16px' }}>
           <Typography variant="h6" gutterBottom>
             Commandes mensuelles
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={data.monthly_stats}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="order_count" stroke="#4caf50" name="Commandes" />
+              <Line type="monotone" dataKey="order_count" stroke="#00C2FF" strokeWidth={2} dot={{ r: 4, fill: '#00C2FF' }} name="Commandes" />
             </LineChart>
           </ResponsiveContainer>
         </Paper>
 
         {/* Best selling products */}
-        <Paper sx={{ p: 2 }}>
+        <Paper className="mirai-glass" sx={{ p: 3, borderRadius: '16px' }}>
           <Typography variant="h6" gutterBottom>
             Produits les plus vendus
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.kpis.best_selling_products} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis type="number" />
               <YAxis type="category" dataKey="product_name" width={150} />
               <Tooltip />
-              <Bar dataKey="total_quantity" fill="#ff9800" name="Quantité" />
+              <Bar dataKey="total_quantity" fill="#E63946" name="Quantité" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>
 
         {/* Best selling categories */}
-        <Paper sx={{ p: 2 }}>
+        <Paper className="mirai-glass" sx={{ p: 3, borderRadius: '16px' }}>
           <Typography variant="h6" gutterBottom>
             Meilleures catégories
           </Typography>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={data.kpis.best_selling_categories} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
               <XAxis type="number" tickFormatter={(value) => formatCurrency(value)} />
               <YAxis type="category" dataKey="category_name" width={150} />
               <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-              <Bar dataKey="total_revenue" fill="#9c27b0" name="Revenue" />
+              <Bar dataKey="total_revenue" fill="#0099CC" name="Revenue" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>

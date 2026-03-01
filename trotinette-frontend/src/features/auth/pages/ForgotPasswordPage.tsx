@@ -14,6 +14,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import CircularProgress from '@mui/material/CircularProgress';
 import { forgotPasswordApi } from '../api/auth';
+import { PageDecor } from '@/shared/components/PageDecor';
 
 const forgotSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -54,7 +55,9 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: 8 }}>
+    <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+      <PageDecor variant="auth" />
+      <Container maxWidth="sm" sx={{ py: 8, position: 'relative', zIndex: 1 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" fontWeight="bold" mb={2}>
           Mot de passe oublie ?
@@ -110,5 +113,6 @@ export function ForgotPasswordPage() {
         </Box>
       </Paper>
     </Container>
+    </Box>
   );
 }

@@ -49,15 +49,15 @@ export const useCartStore = create<CartState>()(
             .join(' / ');
 
           const newItem: CartItem = {
-            productId:    product.id,
-            sku:          variant?.sku ?? product.sku,
-            name:         localeName,
-            price:        variant?.price ?? product.price,
+            productId: product.id,
+            sku: variant?.sku ?? product.sku,
+            name: localeName,
+            price: variant?.price ?? product.price,
             thumbnailUrl,
-            quantity:     1,
+            quantity: 1,
             stockQuantity: availableStock,
-            variantId:    variant?.id,
-            variantSku:   variant?.sku ?? null,
+            variantId: variant?.id,
+            variantSku: variant?.sku ?? null,
             variantLabel: variantLabel || undefined,
           };
 
@@ -94,7 +94,7 @@ export const useCartStore = create<CartState>()(
       name: 'cart-store',
       storage: createJSONStorage(() => localStorage),
       version: 2,
-      migrate: (persistedState, version) => {
+      migrate: (persistedState, _version) => {
         // v1 → v2: items may be missing variantId field — that's fine, they default to undefined
         return persistedState as CartState;
       },

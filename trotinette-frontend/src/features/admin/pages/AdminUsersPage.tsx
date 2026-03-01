@@ -77,11 +77,12 @@ export function AdminUsersPage() {
   const navigate = useNavigate();
   const currentUser = useAuthStore((s) => s.user);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
   const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ name: '', email: '', phone: '', password: '', role: 'customer' });
 
-  const { data, isLoading, error } = useAdminUsers(page);
+  const { data, isLoading, error } = useAdminUsers(page, perPage);
   const deactivateMutation = useDeactivateUser();
   const updateRoleMutation = useUpdateUserRole();
   const activateMutation = useActivateUser();
@@ -226,16 +227,34 @@ export function AdminUsersPage() {
         </Table>
       </TableContainer>
 
-      {totalPages > 1 && (
-        <Box display="flex" justifyContent="center" mt={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mt={3} flexWrap="wrap" gap={2}>
+        <Box display="flex" alignItems="center" gap={1}>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <InputLabel sx={{ fontSize: '0.8rem' }}>Lignes / page</InputLabel>
+            <Select
+              label="Lignes / page"
+              value={perPage}
+              onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }}
+              sx={{ fontSize: '0.82rem' }}
+            >
+              <MenuItem value={10}>10 / page</MenuItem>
+              <MenuItem value={25}>25 / page</MenuItem>
+              <MenuItem value={50}>50 / page</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="body2" color="text.secondary">
+            {data?.meta?.total ?? 0} au total
+          </Typography>
+        </Box>
+        {totalPages > 1 && (
           <Pagination
             count={totalPages}
             page={page}
             onChange={(_e, p) => setPage(p)}
             color="primary"
           />
-        </Box>
-      )}
+        )}
+      </Box>
 
       <DeactivateDialog
         user={deactivateTarget}

@@ -1,31 +1,32 @@
 import { createBrowserRouter } from 'react-router';
-import { CatalogPage } from '../features/catalog/pages/CatalogPage';
-import { ProductDetailPage } from '../features/catalog/pages/ProductDetailPage';
-import { AdminProductsPage } from '../features/admin/pages/AdminProductsPage';
-import { AdminProductEditPage } from '../features/admin/pages/AdminProductEditPage';
-import { AdminCategoriesPage } from '../features/admin/pages/AdminCategoriesPage';
-import { AdminUsersPage } from '../features/admin/pages/AdminUsersPage';
-import { AdminUserDetailPage } from '../features/admin/pages/AdminUserDetailPage';
-import { AdminDashboardPage } from '../features/admin/pages/AdminDashboardPage';
-import { ProtectedRoute } from '../shared/components/ProtectedRoute';
-import { AdminRoute } from '../shared/components/AdminRoute';
-import { LoginPage } from '../features/auth/pages/LoginPage';
-import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage';
-import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
-import { ProfilePage } from '../features/auth/pages/ProfilePage';
-import { CheckoutPage } from '../features/checkout/pages/CheckoutPage';
-import { OrderConfirmationPage } from '../features/checkout/pages/OrderConfirmationPage';
-import { MyOrdersPage } from '../features/orders/pages/MyOrdersPage';
-import { AdminOrdersPage } from '../features/orders/pages/AdminOrdersPage';
-import { AdminOrderDetailPage } from '../features/orders/pages/AdminOrderDetailPage';
-import { AdminPagesPage } from '../features/admin/pages/AdminPagesPage';
-import { AdminVariationTypesPage } from '../features/admin/pages/AdminVariationTypesPage';
-import { RootLayout } from '../shared/components/RootLayout';
-import { HomePage } from '../features/home/pages/HomePage';
-import { AboutPage } from '../features/info/pages/AboutPage';
-import { ContactPage } from '../features/info/pages/ContactPage';
-import { CgvPage } from '../features/info/pages/CgvPage';
-import { MentionsLegalesPage } from '../features/info/pages/MentionsLegalesPage';
+import { CatalogPage } from '@/features/catalog/pages/CatalogPage';
+import { ProductDetailPage } from '@/features/catalog/pages/ProductDetailPage';
+import { AdminProductsPage } from '@/features/admin/pages/AdminProductsPage';
+import { AdminProductEditPage } from '@/features/admin/pages/AdminProductEditPage';
+import { AdminCategoriesPage } from '@/features/admin/pages/AdminCategoriesPage';
+import { AdminUsersPage } from '@/features/admin/pages/AdminUsersPage';
+import { AdminUserDetailPage } from '@/features/admin/pages/AdminUserDetailPage';
+import { AdminDashboardPage } from '@/features/admin/pages/AdminDashboardPage';
+import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
+import { AdminRoute } from '@/shared/components/AdminRoute';
+import { LoginPage } from '@/features/auth/pages/LoginPage';
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage';
+import { ProfilePage } from '@/features/auth/pages/ProfilePage';
+import { CheckoutPage } from '@/features/checkout/pages/CheckoutPage';
+import { OrderConfirmationPage } from '@/features/checkout/pages/OrderConfirmationPage';
+import { MyOrdersPage } from '@/features/orders/pages/MyOrdersPage';
+import { AdminOrdersPage } from '@/features/orders/pages/AdminOrdersPage';
+import { AdminOrderDetailPage } from '@/features/orders/pages/AdminOrderDetailPage';
+import { AdminPagesPage } from '@/features/admin/pages/AdminPagesPage';
+import { AdminVariationTypesPage } from '@/features/admin/pages/AdminVariationTypesPage';
+import { AdminHeroBannersPage } from '@/features/admin/pages/AdminHeroBannersPage';
+import { RootLayout } from '@/shared/components/RootLayout';
+import { HomePage } from '@/features/home/pages/HomePage';
+import { AboutPage } from '@/features/info/pages/AboutPage';
+import { ContactPage } from '@/features/info/pages/ContactPage';
+import { CgvPage } from '@/features/info/pages/CgvPage';
+import { MentionsLegalesPage } from '@/features/info/pages/MentionsLegalesPage';
 
 export const router = createBrowserRouter([
   {
@@ -142,6 +143,10 @@ export const router = createBrowserRouter([
           {
             path: '/admin/variation-types',
             element: <AdminVariationTypesPage />,
+          },
+          {
+            path: '/admin/hero-banners',
+            element: <AdminHeroBannersPage />,
           },
         ],
       },

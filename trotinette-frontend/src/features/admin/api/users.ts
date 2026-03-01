@@ -1,15 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../../../shared/api/client';
+import { apiClient } from '@/shared/api/client';
 import type { AdminUser, PaginatedUsers } from '../types';
 
 // ---- Query hooks ----
 
-export function useAdminUsers(page?: number) {
+export function useAdminUsers(page?: number, perPage?: number) {
   return useQuery<PaginatedUsers>({
-    queryKey: ['admin', 'users', page],
+    queryKey: ['admin', 'users', page, perPage],
     queryFn: async () => {
       const res = await apiClient.get('/admin/users', {
-        params: page ? { page } : undefined,
+        params: (page || perPage) ? { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}) } : undefined,
       });
       return res.data;
     },

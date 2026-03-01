@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../../../shared/api/client';
+import { apiClient } from '@/shared/api/client';
 import type { Order, PaginatedOrders } from '../types';
 
 // ---- Customer hooks ----
@@ -28,6 +28,7 @@ export interface AdminOrderFilters {
   'filter[date_from]'?: string;
   'filter[date_to]'?: string;
   page?: number;
+  per_page?: number;
   sort?: string;
 }
 

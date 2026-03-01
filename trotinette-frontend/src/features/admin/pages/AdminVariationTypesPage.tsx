@@ -19,6 +19,11 @@ import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
+import Pagination from '@mui/material/Pagination';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -219,6 +224,11 @@ export function AdminVariationTypesPage() {
 
   const types: VariationType[] = (data as VariationType[]) ?? [];
 
+  const [typePage, setTypePage] = useState(1);
+  const [typePerPage, setTypePerPage] = useState(10);
+  const typeTotalPages = Math.ceil(types.length / typePerPage);
+  const paginatedTypes = types.slice((typePage - 1) * typePerPage, typePage * typePerPage);
+
   const handleCreate = async (name: string, values: string[]) => {
     await createMutation.mutateAsync({ name, values });
     setFormOpen(false);
@@ -302,7 +312,7 @@ export function AdminVariationTypesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              types.map((type) => (
+              paginatedTypes.map((type) => (
                 <TableRow key={type.id} hover>
                   <TableCell>{type.name}</TableCell>
                   <TableCell>
@@ -341,6 +351,37 @@ export function AdminVariationTypesPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Pagination */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mt={2} flexWrap="wrap" gap={2}>
+        <Box display="flex" alignItems="center" gap={1}>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <InputLabel sx={{ fontSize: '0.8rem' }}>Lignes / page</InputLabel>
+            <Select
+              label="Lignes / page"
+              value={typePerPage}
+              onChange={(e) => { setTypePerPage(Number(e.target.value)); setTypePage(1); }}
+              sx={{ fontSize: '0.82rem' }}
+            >
+              <MenuItem value={5}>5 / page</MenuItem>
+              <MenuItem value={10}>10 / page</MenuItem>
+              <MenuItem value={25}>25 / page</MenuItem>
+            </Select>
+          </FormControl>
+          <Typography variant="body2" color="text.secondary">
+            {types.length} au total
+          </Typography>
+        </Box>
+        {typeTotalPages > 1 && (
+          <Pagination
+            count={typeTotalPages}
+            page={typePage}
+            onChange={(_e, p) => setTypePage(p)}
+            color="primary"
+            size="small"
+          />
+        )}
+      </Box>
 
       {/* Create / Edit Dialog — key forces remount so useState re-initializes */}
       <FormDialog
