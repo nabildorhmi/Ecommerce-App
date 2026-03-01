@@ -146,3 +146,14 @@ Plans:
 - [ ] 07-02-PLAN.md — Error code system: ErrorCode enum with AUTH/ORD/PROD/VAL/SYS categories, RFC 7807 Problem Details rendering in bootstrap/app.php
 - [ ] 07-03-PLAN.md — Performance optimization: database index migration for all foreign keys and filter columns, eager loading audit across all controllers
 - [ ] 07-04-PLAN.md — Architecture refactoring: extract OrderService into Action classes (CheckDuplicate, ValidateStock, CalculateTotal, DecrementStock), CreateOrderDTO with readonly properties
+
+### Phase 8: Frontend Refactoring — Code Architecture, Performance Optimization, and Cleanup
+
+**Goal:** The frontend codebase is cleaned of dead code, has zero TypeScript errors, uses @/ path aliases instead of deep relative imports, and achieves under 1MB initial bundle via route-level lazy loading with optimized vendor chunk splitting
+**Depends on:** Phase 7
+**Plans:** 3 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Dead code removal, TypeScript error fixes, CSS keyframe consolidation, `any` type elimination
+- [ ] 08-02-PLAN.md — Path alias configuration (tsconfig + Vite) and conversion of all deep relative imports to @/ aliases
+- [ ] 08-03-PLAN.md — Route-level lazy loading with React.lazy + Suspense, optimized Vite manual chunks for vendor splitting
