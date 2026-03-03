@@ -8,16 +8,10 @@ use App\Actions\Order\DecrementStockAction;
 use App\Actions\Order\ValidateStockAction;
 use App\DTOs\CreateOrderDTO;
 use App\Enums\OrderStatus;
-use App\Mail\NewOrderAdmin;
-use App\Mail\NewOrderCustomer;
-use App\Mail\OrderCancelled;
-use App\Mail\OrderConfirmed;
-use App\Mail\OrderDelivered;
-use App\Mail\OrderDispatched;
+use App\Events\OrderPlaced;
+use App\Events\OrderStatusChanged;
 use App\Models\Order;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 
 class OrderService
 {
@@ -82,18 +76,8 @@ class OrderService
             return $order->load(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
         });
 
-        // k. Send emails AFTER successful DB transaction
-        if ($order->user && $order->user->email) {
-            Mail::to($order->user->email)->send(new NewOrderCustomer($order));
-        }
-
-        // l. Notify all admin users about the new order
-        $admins = User::role(['admin', 'global_admin'])->get();
-        foreach ($admins as $admin) {
-            if ($admin->email) {
-                Mail::to($admin->email)->send(new NewOrderAdmin($order));
-            }
-        }
+        // k. Dispatch event AFTER successful DB transaction - listeners will send emails asynchronously
+        OrderPlaced::dispatch($order);
 
         return $order;
     }
@@ -126,20 +110,8 @@ class OrderService
 
         $order = $order->fresh(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
 
-        // Dispatch queued email to the customer AFTER successful DB transaction
-        if ($order->user && $order->user->email) {
-            $mail = match ($newStatus) {
-                OrderStatus::Confirmed  => new OrderConfirmed($order),
-                OrderStatus::Dispatched => new OrderDispatched($order),
-                OrderStatus::Delivered  => new OrderDelivered($order),
-                OrderStatus::Cancelled  => new OrderCancelled($order, $note),
-                default                 => null,
-            };
-
-            if ($mail) {
-                Mail::to($order->user->email)->send($mail);
-            }
-        }
+        // Dispatch event AFTER successful DB transaction - listener will send status-specific email asynchronously
+        OrderStatusChanged::dispatch($order, $newStatus, $note);
 
         return $order;
     }
