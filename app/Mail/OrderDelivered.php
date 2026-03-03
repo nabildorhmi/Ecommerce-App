@@ -6,11 +6,9 @@ use App\Models\Order;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Queue\SerializesModels;
 
 class OrderDelivered extends Mailable
 {
-    use SerializesModels;
 
     /**
      * Create a new message instance.

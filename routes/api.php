@@ -34,6 +34,7 @@ Route::get('/products',        [ProductController::class, 'index']);
 Route::get('/products/{slug}', [ProductController::class, 'show']);
 Route::get('/categories',      [CategoryController::class, 'index']);
 Route::get('/delivery-zones',  [DeliveryZoneController::class, 'index']);
+Route::get('/pages',           [PageController::class, 'index']);
 Route::get('/pages/{page}',    [PageController::class, 'show']);
 Route::get('/hero-banners',    [HeroBannerController::class, 'index']);
 
