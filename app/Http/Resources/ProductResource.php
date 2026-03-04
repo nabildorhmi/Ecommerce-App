@@ -80,6 +80,7 @@ class ProductResource extends JsonResource
             'is_active'       => $this->is_active,
             'is_featured'     => $this->is_featured,
             'promo_price'     => $this->promo_price,
+            'discount_percentage' => $this->discount_percentage,
             'is_new'          => (bool) $this->is_new,
             'is_on_sale'      => $isOnSale,
             'category'        => $this->whenLoaded('category', fn () =>

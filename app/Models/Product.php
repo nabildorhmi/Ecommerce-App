@@ -23,6 +23,7 @@ class Product extends Model implements HasMedia
         'description',
         'price',
         'promo_price',
+        'discount_percentage',
         'stock_quantity',
         'attributes',
         'category_id',
@@ -32,13 +33,14 @@ class Product extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'attributes'     => 'array',
-        'is_active'      => 'boolean',
-        'is_featured'    => 'boolean',
-        'stock_quantity' => 'integer',
-        'price'          => 'integer',
-        'promo_price'    => 'integer',
-        'is_new'         => 'boolean',
+        'attributes'          => 'array',
+        'is_active'           => 'boolean',
+        'is_featured'         => 'boolean',
+        'stock_quantity'      => 'integer',
+        'price'               => 'integer',
+        'promo_price'         => 'integer',
+        'discount_percentage' => 'integer',
+        'is_new'              => 'boolean',
     ];
 
     public function registerMediaCollections(): void

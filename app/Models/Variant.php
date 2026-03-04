@@ -14,17 +14,19 @@ class Variant extends Model
         'sku',
         'price',
         'promo_price',
+        'discount_percentage',
         'stock',
         'is_active',
         'is_default',
     ];
 
     protected $casts = [
-        'price'       => 'integer',
-        'promo_price' => 'integer',
-        'stock'       => 'integer',
-        'is_active'   => 'boolean',
-        'is_default'  => 'boolean',
+        'price'               => 'integer',
+        'promo_price'         => 'integer',
+        'discount_percentage' => 'integer',
+        'stock'               => 'integer',
+        'is_active'           => 'boolean',
+        'is_default'          => 'boolean',
     ];
 
     public function product(): BelongsTo
