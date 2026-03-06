@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -74,7 +75,7 @@ export function MyOrdersPage() {
   return (
     <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
       <PageDecor variant="orders" />
-      <Box p={3} maxWidth="md" mx="auto" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ py: 3, position: 'relative', zIndex: 1 }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
         {"Mes commandes"}
       </Typography>
@@ -199,7 +200,7 @@ export function MyOrdersPage() {
           )}
         </>
       )}
-    </Box>
+    </Container>
     </Box>
   );
 }

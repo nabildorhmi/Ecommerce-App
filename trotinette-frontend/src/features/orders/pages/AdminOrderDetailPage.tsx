@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -90,11 +91,11 @@ export function AdminOrderDetailPage() {
 
   if (isLoading) {
     return (
-      <Box p={3} maxWidth="lg" mx="auto">
+      <Container maxWidth="xl" sx={{ py: 3 }}>
         <Skeleton variant="text" width={200} height={40} sx={{ mb: 2 }} />
         <Skeleton variant="rectangular" height={200} sx={{ mb: 2 }} />
         <Skeleton variant="rectangular" height={300} />
-      </Box>
+      </Container>
     );
   }
 
@@ -107,7 +108,7 @@ export function AdminOrderDetailPage() {
   }
 
   return (
-    <Box p={3} maxWidth="lg" mx="auto">
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => void navigate('/admin/orders')}
@@ -411,6 +412,6 @@ export function AdminOrderDetailPage() {
           </TableContainer>
         </Paper>
       )}
-    </Box>
+    </Container>
   );
 }

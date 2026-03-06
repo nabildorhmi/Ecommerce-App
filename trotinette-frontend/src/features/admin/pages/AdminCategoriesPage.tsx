@@ -23,6 +23,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import Container from '@mui/material/Container';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -153,7 +154,7 @@ export function AdminCategoriesPage() {
   }
 
   return (
-    <Box p={3}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -293,6 +294,6 @@ export function AdminCategoriesPage() {
         isDeleting={deleteMutation.isPending}
         deleteError={deleteMutation.error}
       />
-    </Box>
+    </Container>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -276,7 +277,7 @@ export function AdminVariationTypesPage() {
   }
 
   return (
-    <Box p={3}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box
         display="flex"
         justifyContent="space-between"
@@ -410,6 +411,6 @@ export function AdminVariationTypesPage() {
         isDeleting={deleteMutation.isPending}
         deleteError={deleteMutation.error}
       />
-    </Box>
+    </Container>
   );
 }

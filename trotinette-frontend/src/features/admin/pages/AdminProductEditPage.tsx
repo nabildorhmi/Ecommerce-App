@@ -1,5 +1,6 @@
 import { useNavigate, useParams } from 'react-router';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -29,7 +30,7 @@ export function AdminProductEditPage() {
   };
 
   return (
-    <Box p={2} maxWidth={1400} mx="auto">
+    <Container maxWidth="xl" sx={{ py: 2 }}>
       <Box display="flex" alignItems="center" gap={2} mb={2}>
         <Button
           startIcon={<ArrowBackIcon />}
@@ -71,6 +72,6 @@ export function AdminProductEditPage() {
           )}
         </Box>
       )}
-    </Box>
+    </Container>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -127,7 +128,7 @@ export function AdminUsersPage() {
   }
 
   return (
-    <Box p={3}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" fontWeight="bold">
           Utilisateurs
@@ -285,6 +286,6 @@ export function AdminUsersPage() {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 }

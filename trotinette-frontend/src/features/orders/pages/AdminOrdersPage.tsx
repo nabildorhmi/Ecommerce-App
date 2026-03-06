@@ -1,5 +1,6 @@
 import { useSearchParams, useNavigate } from 'react-router';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -98,7 +99,7 @@ export function AdminOrdersPage() {
   }
 
   return (
-    <Box p={3}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
         {"Gestion des commandes"}
       </Typography>
@@ -255,6 +256,6 @@ export function AdminOrdersPage() {
           }}
         />
       )}
-    </Box>
+    </Container>
   );
 }

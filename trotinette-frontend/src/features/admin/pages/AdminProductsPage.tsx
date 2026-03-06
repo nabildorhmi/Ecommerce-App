@@ -28,6 +28,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Container from '@mui/material/Container';
 import AddIcon from '@mui/icons-material/Add';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -57,19 +58,17 @@ function DeleteDialog({
 }: DeleteDialogProps) {
   return (
     <Dialog open={Boolean(product)} onClose={onClose}>
-      <DialogTitle>Supprimer le produit / Delete product</DialogTitle>
+      <DialogTitle>Supprimer le produit</DialogTitle>
       <DialogContent>
         <DialogContentText>
           Etes-vous sur de vouloir supprimer{' '}
           <strong>{product?.name ?? product?.sku}</strong>
           {' '}? Cette action est irreversible.
-          <br />
-          Are you sure you want to delete this product? This action cannot be undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isDeleting}>
-          Annuler / Cancel
+          Annuler
         </Button>
         <Button
           color="error"
@@ -77,8 +76,9 @@ function DeleteDialog({
           onClick={() => product && onConfirm(product.id)}
           disabled={isDeleting}
           startIcon={isDeleting ? <CircularProgress size={16} /> : undefined}
+          sx={{ borderRadius: '8px' }}
         >
-          Supprimer / Delete
+          Supprimer
         </Button>
       </DialogActions>
     </Dialog>
@@ -137,23 +137,35 @@ export function AdminProductsPage() {
   };
 
   return (
-    <Box p={3}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={2}
+        mb={3}
       >
-        <Typography variant="h5" fontWeight="bold">
-          Produits / Products
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h5" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Produits
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.7rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            製品管理
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           component={Link}
           to="/admin/products/create"
+          sx={{
+            borderRadius: '10px',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+            '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 20px rgba(0,194,255,0.25)' },
+            transition: 'all 0.2s ease',
+          }}
         >
-          Ajouter un produit / Add product
+          Ajouter un produit
         </Button>
       </Box>
 
@@ -217,10 +229,10 @@ export function AdminProductsPage() {
         </Alert>
       )}
 
-      <TableContainer component={Paper} elevation={0} sx={{ background: 'transparent', position: 'relative' }}>
+      <TableContainer component={Paper} elevation={0} className="mirai-glass" sx={{ borderRadius: '16px', position: 'relative' }}>
         {/* Loading overlay — shown during refetches without hiding filters */}
         {isFetching && (
-          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(11,11,14,0.55)', zIndex: 10, borderRadius: 1, backdropFilter: 'blur(2px)' }}>
+          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(12,12,20,0.55)', zIndex: 10, borderRadius: 1, backdropFilter: 'blur(2px)' }}>
             <CircularProgress size={32} />
           </Box>
         )}
@@ -304,7 +316,7 @@ export function AdminProductsPage() {
                           <Typography sx={{ fontSize: '0.72rem', color: 'text.disabled', textDecoration: 'line-through' }}>
                             {formatPrice(product.price)}
                           </Typography>
-                          <Typography sx={{ fontSize: '0.82rem', color: '#FF6B35', fontWeight: 600 }}>
+                          <Typography sx={{ fontSize: '0.82rem', color: '#D97A50', fontWeight: 600 }}>
                             {formatPrice(product.default_variant.promo_price)}
                           </Typography>
                         </Box>
@@ -319,8 +331,8 @@ export function AdminProductsPage() {
                       <Chip
                         label={
                           product.is_active
-                            ? 'Actif / Active'
-                            : 'Inactif / Inactive'
+                            ? 'Actif'
+                            : 'Inactif'
                         }
                         color={product.is_active ? 'success' : 'default'}
                         size="small"
@@ -331,7 +343,7 @@ export function AdminProductsPage() {
                     <TableCell>
                       <IconButton
                         size="small"
-                        title={product.is_featured ? 'Retirer de la vedette / Unfeature' : 'Mettre en vedette / Feature'}
+                        title={product.is_featured ? 'Retirer de la vedette' : 'Mettre en vedette'}
                         onClick={() => void handleToggleFeatured(product)}
                         sx={{ color: product.is_featured ? '#F59E0B' : 'text.disabled' }}
                       >
@@ -341,9 +353,9 @@ export function AdminProductsPage() {
                     <TableCell>
                       <IconButton
                         size="small"
-                        title={product.is_new ? 'Retirer nouveau / Remove new' : 'Marquer nouveau / Mark new'}
+                        title={product.is_new ? 'Retirer nouveau' : 'Marquer nouveau'}
                         onClick={() => void handleToggleNew(product)}
-                        sx={{ color: product.is_new ? '#00C853' : 'text.disabled' }}
+                        sx={{ color: product.is_new ? '#2EAD5F' : 'text.disabled' }}
                       >
                         {product.is_new ? <NewReleasesIcon fontSize="small" /> : <NewReleasesOutlinedIcon fontSize="small" />}
                       </IconButton>
@@ -353,14 +365,14 @@ export function AdminProductsPage() {
                         component={Link}
                         to={`/admin/products/${product.id}/edit`}
                         size="small"
-                        title="Modifier / Edit"
+                        title="Modifier"
                       >
                         <EditIcon fontSize="small" />
                       </IconButton>
                       <IconButton
                         size="small"
                         color="error"
-                        title="Supprimer / Delete"
+                        title="Supprimer"
                         onClick={() => setDeleteTarget(product)}
                       >
                         <DeleteIcon fontSize="small" />
@@ -406,6 +418,6 @@ export function AdminProductsPage() {
           />
         )}
       </Box>
-    </Box>
+    </Container>
   );
 }
