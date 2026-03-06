@@ -20,6 +20,7 @@ import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
 import Paper from '@mui/material/Paper';
+import Chip from '@mui/material/Chip';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -29,6 +30,9 @@ import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { useCartStore } from '../../cart/store';
 import { useAuthStore } from '../../auth/store';
 import { usePlaceOrder } from '../api/orders';
@@ -182,291 +186,380 @@ export function CheckoutPage() {
   return (
     <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
       <PageDecor variant="checkout" />
-      <Container maxWidth="md" sx={{ py: 4, position: 'relative', zIndex: 1 }}>
-      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 3 }}>
-        <Typography variant="h4" fontWeight={800} color="var(--mirai-white)">
-          Commande
-        </Typography>
-        <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.7rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
-          注文
-        </Typography>
-      </Box>
+      <Container maxWidth="xl" sx={{ py: 4, position: 'relative', zIndex: 1 }}>
+        {/* Page header */}
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 1.5 }}>
+          <Typography variant="h4" fontWeight={800} color="var(--mirai-white)">
+            Commande
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.7rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            注文
+          </Typography>
+        </Box>
 
-      <Stack spacing={3}>
-        {/* Guest section */}
-        {!user && (
-          <Paper
-            elevation={0}
-            className="mirai-glass"
-            sx={{
-              p: 3,
-              borderRadius: '20px',
-              position: 'relative',
-              overflow: 'hidden',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 2,
-                background: 'linear-gradient(90deg, #00C2FF, #0099CC, transparent)',
-              },
-            }}
-          >
-            <Typography variant="h6" gutterBottom fontWeight={600}>
-              Entrez vos informations
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={2}>
-              Créez votre compte pour passer la commande  vos infos de livraison seront sauvegardées.
-            </Typography>
-            <RegisterForm onSubmit={handleRegister} error={registerError} />
-          </Paper>
-        )}
-
-        {/* Delivery info card */}
-        {user && (
-          <Paper
-            elevation={0}
-            className="mirai-glass"
-            sx={{
-              p: 2.5,
-              borderRadius: '20px',
-            }}
-          >
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={editingDelivery ? 2 : 1.5}>
-              <Typography variant="subtitle1" fontWeight={700}>
-                Informations de livraison
-              </Typography>
-              {!editingDelivery && (
-                <IconButton size="small" onClick={handleStartEdit} sx={{ color: 'text.secondary' }}>
-                  <EditOutlinedIcon fontSize="small" />
-                </IconButton>
-              )}
-            </Stack>
-
-            {!editingDelivery ? (
-              <Stack spacing={1.5}>
-                <InfoRow icon={<PersonOutlineIcon fontSize="small" />} label="Nom" value={user.name} />                <InfoRow icon={<EmailOutlinedIcon fontSize="small" />} label="Email" value={user.email} />                <InfoRow icon={<PhoneOutlinedIcon fontSize="small" />} label="Téléphone" value={user.phone} />
-                <InfoRow
-                  icon={<LocationOnOutlinedIcon fontSize="small" />}
-                  label="Pays / Ville"
-                  value={`Maroc${user.address_city ? `  ${user.address_city}` : ''}`}
-                />
-                <InfoRow icon={<HomeOutlinedIcon fontSize="small" />} label="Adresse" value={user.address_street} />
-              </Stack>
-            ) : (
-              <Box component="form" onSubmit={handleDeliverySubmit(onSaveDelivery)} noValidate>
-                <Stack spacing={2}>
-                  {saveError && <Alert severity="error">{saveError}</Alert>}
-
-                  <TextField
-                    label="Nom complet"
-                    size="small"
-                    fullWidth
-                    error={Boolean(deliveryErrors.name)}
-                    helperText={deliveryErrors.name?.message}
-                    {...registerDelivery('name')}
-                  />
-
-                  <TextField
-                    label="Adresse e-mail"
-                    type="email"
-                    size="small"
-                    fullWidth
-                    error={Boolean(deliveryErrors.email)}
-                    helperText={deliveryErrors.email?.message}
-                    {...registerDelivery('email')}
-                  />
-
-                  <TextField
-                    label="Téléphone"
-                    type="tel"
-                    size="small"
-                    fullWidth
-                    error={Boolean(deliveryErrors.phone)}
-                    helperText={deliveryErrors.phone?.message}
-                    {...registerDelivery('phone')}
-                  />
-
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Pays</InputLabel>
-                    <Select label="Pays" value="Maroc" readOnly>
-                      <MenuItem value="Maroc">Maroc</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <Controller
-                    name="address_city"
-                    control={deliveryControl}
-                    render={({ field }) => (
-                      <FormControl fullWidth size="small" error={Boolean(deliveryErrors.address_city)}>
-                        <InputLabel>Ville</InputLabel>
-                        <Select
-                          {...field}
-                          label="Ville"
-                          MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-                        >
-                          <MenuItem value="" disabled><em>Choisir une ville</em></MenuItem>
-                          {MOROCCAN_CITIES.map((city) => (
-                            <MenuItem key={city} value={city}>{city}</MenuItem>
-                          ))}
-                        </Select>
-                        {deliveryErrors.address_city && (
-                          <FormHelperText>{deliveryErrors.address_city.message}</FormHelperText>
-                        )}
-                      </FormControl>
-                    )}
-                  />
-
-                  <TextField
-                    label="Adresse"
-                    size="small"
-                    fullWidth
-                    error={Boolean(deliveryErrors.address_street)}
-                    helperText={deliveryErrors.address_street?.message}
-                    {...registerDelivery('address_street')}
-                  />
-
-                  <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Button
-                      size="small"
-                      startIcon={<CloseIcon fontSize="small" />}
-                      onClick={() => setEditingDelivery(false)}
-                      sx={{ color: 'text.secondary' }}
-                    >
-                      Annuler
-                    </Button>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      size="small"
-                      startIcon={
-                        saveMutation.isPending
-                          ? <CircularProgress size={12} color="inherit" />
-                          : <CheckIcon fontSize="small" />
-                      }
-                      disabled={saveMutation.isPending}
-                    >
-                      Enregistrer
-                    </Button>
-                  </Stack>
-                </Stack>
+        {/* Progress stepper */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, mb: 4, maxWidth: 480 }}>
+          {[
+            { step: 1, label: 'Informations' },
+            { step: 2, label: 'Livraison' },
+            { step: 3, label: 'Confirmation' },
+          ].map(({ step, label }, i) => (
+            <>
+              <Box key={step} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+                <Box sx={{
+                  width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  bgcolor: step === 1 ? '#00C2FF' : 'rgba(255,255,255,0.07)',
+                  border: step <= 2 ? '1px solid rgba(0,194,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: step === 1 ? '0 0 12px rgba(0,194,255,0.3)' : 'none',
+                }}>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: step === 1 ? '#0c0c14' : 'text.disabled' }}>{step}</Typography>
+                </Box>
+                <Typography sx={{ fontSize: '0.6rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#00C2FF' : 'text.disabled', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{label}</Typography>
               </Box>
-            )}
-          </Paper>
-        )}
+              {i < 2 && <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255,255,255,0.08)', mx: 1, mb: 2.5 }} />}
+            </>
+          ))}
+        </Box>
 
-        {/* Order form */}
-        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          <Stack spacing={3}>
-            <Alert severity="info">Paiement à la livraison</Alert>
+        {/* Security reassurance strip */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3, px: 2, py: 1.5, borderRadius: '12px', background: 'rgba(0,194,255,0.04)', border: '1px solid rgba(0,194,255,0.1)', flexWrap: 'wrap' }}>
+          {[
+            { icon: <LockOutlinedIcon sx={{ fontSize: '0.9rem', color: '#00C2FF' }} />, label: 'Paiement sécurisé' },
+            { icon: <LocalShippingOutlinedIcon sx={{ fontSize: '0.9rem', color: '#2EAD5F' }} />, label: 'Livraison express' },
+            { icon: <VerifiedUserOutlinedIcon sx={{ fontSize: '0.9rem', color: '#D4A43A' }} />, label: 'Garantie 2 ans' },
+          ].map(({ icon, label }) => (
+            <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+              {icon}
+              <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 500 }}>{label}</Typography>
+            </Box>
+          ))}
+        </Box>
 
-            {/* Order items */}
+        <Stack spacing={3}>
+          {/* Guest section */}
+          {!user && (
             <Paper
               elevation={0}
               className="mirai-glass"
               sx={{
-                p: 2,
+                p: 3,
+                borderRadius: '20px',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: 'linear-gradient(90deg, #00C2FF, transparent)',
+                },
+              }}
+            >
+              <Typography variant="h6" gutterBottom fontWeight={600}>
+                Entrez vos informations
+              </Typography>
+              <Typography variant="body2" color="text.secondary" mb={2}>
+                Créez votre compte pour passer la commande  vos infos de livraison seront sauvegardées.
+              </Typography>
+              <RegisterForm onSubmit={handleRegister} error={registerError} />
+            </Paper>
+          )}
+
+          {/* Delivery info card */}
+          {user && (
+            <Paper
+              elevation={0}
+              className="mirai-glass"
+              sx={{
+                p: 2.5,
                 borderRadius: '20px',
               }}
             >
-              <Typography variant="h6" fontWeight={600} gutterBottom>
-                Récapitulatif de commande
-              </Typography>
-              <Stack spacing={1} divider={<Divider />}>
-                {items.map((item) => (
-                  <Stack
-                    key={item.productId}
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Box>
-                      <Typography variant="body2" fontWeight={500}>{item.name}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        Qté: {item.quantity} &times; {formatCurrency(item.price)}
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mb={editingDelivery ? 2 : 1.5}>
+                <Typography variant="subtitle1" fontWeight={700}>
+                  Informations de livraison
+                </Typography>
+                {!editingDelivery && (
+                  <IconButton size="small" onClick={handleStartEdit} sx={{ color: 'text.secondary' }}>
+                    <EditOutlinedIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Stack>
+
+              {!editingDelivery ? (
+                <Stack spacing={1.5}>
+                  <InfoRow icon={<PersonOutlineIcon fontSize="small" />} label="Nom" value={user.name} />                <InfoRow icon={<EmailOutlinedIcon fontSize="small" />} label="Email" value={user.email} />                <InfoRow icon={<PhoneOutlinedIcon fontSize="small" />} label="Téléphone" value={user.phone} />
+                  <InfoRow
+                    icon={<LocationOnOutlinedIcon fontSize="small" />}
+                    label="Pays / Ville"
+                    value={`Maroc${user.address_city ? `  ${user.address_city}` : ''}`}
+                  />
+                  <InfoRow icon={<HomeOutlinedIcon fontSize="small" />} label="Adresse" value={user.address_street} />
+                </Stack>
+              ) : (
+                <Box component="form" onSubmit={handleDeliverySubmit(onSaveDelivery)} noValidate>
+                  <Stack spacing={2}>
+                    {saveError && <Alert severity="error">{saveError}</Alert>}
+
+                    <TextField
+                      label="Nom complet"
+                      size="small"
+                      fullWidth
+                      error={Boolean(deliveryErrors.name)}
+                      helperText={deliveryErrors.name?.message}
+                      {...registerDelivery('name')}
+                    />
+
+                    <TextField
+                      label="Adresse e-mail"
+                      type="email"
+                      size="small"
+                      fullWidth
+                      error={Boolean(deliveryErrors.email)}
+                      helperText={deliveryErrors.email?.message}
+                      {...registerDelivery('email')}
+                    />
+
+                    <TextField
+                      label="Téléphone"
+                      type="tel"
+                      size="small"
+                      fullWidth
+                      error={Boolean(deliveryErrors.phone)}
+                      helperText={deliveryErrors.phone?.message}
+                      {...registerDelivery('phone')}
+                    />
+
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Pays</InputLabel>
+                      <Select label="Pays" value="Maroc" readOnly>
+                        <MenuItem value="Maroc">Maroc</MenuItem>
+                      </Select>
+                    </FormControl>
+
+                    <Controller
+                      name="address_city"
+                      control={deliveryControl}
+                      render={({ field }) => (
+                        <FormControl fullWidth size="small" error={Boolean(deliveryErrors.address_city)}>
+                          <InputLabel>Ville</InputLabel>
+                          <Select
+                            {...field}
+                            label="Ville"
+                            MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+                          >
+                            <MenuItem value="" disabled><em>Choisir une ville</em></MenuItem>
+                            {MOROCCAN_CITIES.map((city) => (
+                              <MenuItem key={city} value={city}>{city}</MenuItem>
+                            ))}
+                          </Select>
+                          {deliveryErrors.address_city && (
+                            <FormHelperText>{deliveryErrors.address_city.message}</FormHelperText>
+                          )}
+                        </FormControl>
+                      )}
+                    />
+
+                    <TextField
+                      label="Adresse"
+                      size="small"
+                      fullWidth
+                      error={Boolean(deliveryErrors.address_street)}
+                      helperText={deliveryErrors.address_street?.message}
+                      {...registerDelivery('address_street')}
+                    />
+
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button
+                        size="small"
+                        startIcon={<CloseIcon fontSize="small" />}
+                        onClick={() => setEditingDelivery(false)}
+                        sx={{ color: 'text.secondary' }}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        size="small"
+                        startIcon={
+                          saveMutation.isPending
+                            ? <CircularProgress size={12} color="inherit" />
+                            : <CheckIcon fontSize="small" />
+                        }
+                        disabled={saveMutation.isPending}
+                      >
+                        Enregistrer
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Box>
+              )}
+            </Paper>
+          )}
+
+          {/* Order form */}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Stack spacing={3}>
+              <Alert
+                severity="info"
+                icon={<LockOutlinedIcon />}
+                sx={{ borderRadius: '12px' }}
+              >
+                <Box>
+                  <Typography sx={{ fontSize: '0.85rem', fontWeight: 700 }}>Paiement à la livraison</Typography>
+                  <Typography sx={{ fontSize: '0.78rem', opacity: 0.85 }}>Réglez en cash lors de la réception — livraison sous 2 à 5 jours ouvrés</Typography>
+                </Box>
+              </Alert>
+
+              {/* Order items */}
+              <Paper
+                elevation={0}
+                className="mirai-glass"
+                sx={{
+                  p: 2,
+                  borderRadius: '20px',
+                }}
+              >
+                <Typography variant="h6" fontWeight={600} gutterBottom>
+                  Récapitulatif de commande
+                </Typography>
+                <Stack spacing={1} divider={<Divider />}>
+                  {items.map((item) => (
+                    <Stack
+                      key={item.productId}
+                      direction="row"
+                      justifyContent="space-between"
+                      alignItems="center"
+                      spacing={1.5}
+                    >
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flex: 1, minWidth: 0 }}>
+                        {/* Order item thumbnail */}
+                        {item.thumbnailUrl && (
+                          <Box
+                            component="img"
+                            src={item.thumbnailUrl}
+                            alt={item.name}
+                            sx={{
+                              width: 44, height: 44, objectFit: 'cover',
+                              borderRadius: '8px', flexShrink: 0,
+                              border: '1px solid rgba(255,255,255,0.07)',
+                            }}
+                          />
+                        )}
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body2" fontWeight={500} noWrap>{item.name}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Qté: {item.quantity} &times; {formatCurrency(item.price)}
+                          </Typography>
+                        </Box>
+                      </Box>
+                      <Typography variant="body2" fontWeight={600} sx={{ flexShrink: 0 }}>
+                        {formatCurrency(item.price * item.quantity)}
                       </Typography>
-                    </Box>
-                    <Typography variant="body2" fontWeight={600}>
-                      {formatCurrency(item.price * item.quantity)}
+                    </Stack>
+                  ))}
+                </Stack>
+              </Paper>
+
+              {/* Pricing */}
+              <Paper
+                elevation={0}
+                className="mirai-glass"
+                sx={{
+                  p: 2,
+                  borderRadius: '20px',
+                }}
+              >
+                <Stack spacing={1}>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2">Sous-total</Typography>
+                    <Typography variant="body2">{formatCurrency(subtotalCentimes)}</Typography>
+                  </Stack>
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body2">Frais de livraison</Typography>
+                    <Typography variant="body2" color="success.main">Gratuit</Typography>
+                  </Stack>
+                  <Divider />
+                  <Stack direction="row" justifyContent="space-between">
+                    <Typography variant="body1" fontWeight={700}>Total</Typography>
+                    <Typography variant="body1" fontWeight={700} color="primary">
+                      {formatCurrency(subtotalCentimes)}
                     </Typography>
                   </Stack>
-                ))}
-              </Stack>
-            </Paper>
+                </Stack>
+              </Paper>
 
-            {/* Pricing */}
-            <Paper
-              elevation={0}
-              className="mirai-glass"
-              sx={{
-                p: 2,
-                borderRadius: '20px',
-              }}
-            >
-              <Stack spacing={1}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2">Sous-total</Typography>
-                  <Typography variant="body2">{formatCurrency(subtotalCentimes)}</Typography>
-                </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body2">Frais de livraison</Typography>
-                  <Typography variant="body2" color="success.main">Gratuit</Typography>
-                </Stack>
-                <Divider />
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography variant="body1" fontWeight={700}>Total</Typography>
-                  <Typography variant="body1" fontWeight={700} color="primary">
-                    {formatCurrency(subtotalCentimes)}
+              {/* Note */}
+              <TextField
+                label="Note (optionnel)"
+                placeholder="Instructions de livraison, code d'accès..."
+                multiline
+                rows={3}
+                fullWidth
+                error={Boolean(noteErrors.note)}
+                helperText={noteErrors.note?.message}
+                inputProps={{ maxLength: 500 }}
+                {...registerNote('note')}
+              />
+
+              {apiErrorMessage && <Alert severity="error">{apiErrorMessage}</Alert>}
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                fullWidth
+                disabled={isPending || !user || editingDelivery}
+                startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
+                sx={{
+                  py: 2,
+                  borderRadius: '14px',
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  letterSpacing: '0.06em',
+                  bgcolor: '#00C2FF',
+                  boxShadow: '0 4px 14px rgba(0,194,255,0.25)',
+                  '&:hover': { bgcolor: '#33CFFF', transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(0,194,255,0.35)' },
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                {isPending ? 'Envoi en cours...' : `Confirmer — ${formatCurrency(subtotalCentimes)}`}
+              </Button>
+
+              {/* Final reassurance */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mt: 0.5 }}>
+                <LockOutlinedIcon sx={{ fontSize: '0.85rem', color: 'text.disabled' }} />
+                <Typography sx={{ fontSize: '0.7rem', color: 'text.disabled', textAlign: 'center' }}>
+                  Vos données sont protégées · Retour gratuit 30 jours
+                </Typography>
+              </Box>
+
+              {/* Delivery estimate */}
+              {user && !editingDelivery && (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                  <LocalShippingOutlinedIcon sx={{ fontSize: '0.85rem', color: '#2EAD5F' }} />
+                  <Typography sx={{ fontSize: '0.72rem', color: '#2EAD5F', fontWeight: 600 }}>
+                    Livraison estimée sous 2-5 jours ouvrés
                   </Typography>
-                </Stack>
-              </Stack>
-            </Paper>
+                </Box>
+              )}
 
-            {/* Note */}
-            <TextField
-              label="Note (optionnel)"
-              placeholder="Instructions de livraison, code d'accès..."
-              multiline
-              rows={3}
-              fullWidth
-              error={Boolean(noteErrors.note)}
-              helperText={noteErrors.note?.message}
-              inputProps={{ maxLength: 500 }}
-              {...registerNote('note')}
-            />
-
-            {apiErrorMessage && <Alert severity="error">{apiErrorMessage}</Alert>}
-
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={isPending || !user || editingDelivery}
-              startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
-              sx={{
-                py: 1.75,
-                borderRadius: '12px',
-                fontWeight: 700,
-                background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
-                '&:hover': { transform: 'translateY(-2px)' },
-                transition: 'transform 0.2s',
-              }}
-            >
-              {isPending ? 'Envoi en cours...' : 'Confirmer la commande'}
-            </Button>
-
-            {!user && (
-              <Typography variant="body2" color="text.secondary" textAlign="center">
-                Veuillez renseigner vos informations ci-dessus pour continuer
-              </Typography>
-            )}
-          </Stack>
-        </Box>
-      </Stack>
-    </Container>
+              {!user && (
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                  <Chip
+                    size="small"
+                    label="Créez votre compte pour continuer"
+                    sx={{ fontSize: '0.72rem', bgcolor: 'rgba(0,194,255,0.08)', color: '#00C2FF', border: '1px solid rgba(0,194,255,0.2)' }}
+                  />
+                </Box>
+              )}
+            </Stack>
+          </Box>
+        </Stack>
+      </Container>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-﻿import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -6,471 +6,421 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import IconButton from '@mui/material/IconButton';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import ElectricScooterIcon from '@mui/icons-material/ElectricScooter';
-import { useFeaturedProducts } from '../../catalog/api/products';
-import { useCategories } from '../../catalog/api/categories';
-import { formatCurrency } from '@/shared/utils/formatCurrency';
+import { motion } from 'framer-motion';
+import CountUp from 'react-countup';
+
+import { useFeaturedProducts, useProducts } from '../../catalog/api/products';
+import { ProductCard } from '../../catalog/components/ProductCard';
+import { HeroSection } from '../components/HeroSection';
+import { TrustBadgesSection } from '../components/TrustBadgesSection';
+import { TestimonialsSection } from '../components/TestimonialsSection';
+import { WhyChooseUsSection } from '../components/WhyChooseUsSection';
+import { AnimatedSection } from '@/shared/components/AnimatedSection';
 import type { Product } from '../../catalog/types';
-import { HeroCarousel } from '../components/HeroCarousel';
-import { HeroSideDecor } from '../components/HeroSideDecor';
 
 /* ════════════════════════════════════════════════════════════════════
-   HERO BANNER — Immersive full-screen with animated orbs & stats
+   SECTION HEADER
    ════════════════════════════════════════════════════════════════════ */
-function HeroBanner() {
-
-
-  return (
-    <Box
-      component="section"
-      sx={{
-        position: 'relative',
-        bgcolor: 'background.default',
-        py: { xs: 3, md: 4 },
-        overflow: 'hidden',
-      }}
-    >
-      {/* Futuristic / Japanese side decorations */}
-      <HeroSideDecor />
-
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-        <HeroCarousel />
-      </Container>
-    </Box>
-  );
+interface SectionHeaderProps {
+  subLabel: string;
+  title: string;
+  linkText?: string;
+  linkTo?: string;
+  onPrev?: () => void;
+  onNext?: () => void;
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   CATEGORIES STRIP — Pill-style interactive chips
-   ════════════════════════════════════════════════════════════════════ */
-function CategoriesStrip() {
-  const { data } = useCategories();
-  const categories = data?.data ?? [];
-
-  if (categories.length === 0) return null;
-
+function SectionHeader({ subLabel, title, linkText, linkTo, onPrev, onNext }: SectionHeaderProps) {
   return (
-    <Box component="section" sx={{
-      bgcolor: 'background.paper',
-      borderBottom: '1px solid',
-      borderColor: 'divider',
-      background: (theme) => theme.palette.mode === 'dark'
-        ? 'linear-gradient(to right, rgba(0,194,255,0.02), transparent 30%, transparent 70%, rgba(0,194,255,0.02))'
-        : 'background.paper',
-    }}>
-      <Container maxWidth="xl">
-        <Box sx={{ py: 2.5, display: 'flex', alignItems: 'center', gap: 1.5, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' } }}>
-          <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.12em', color: 'text.secondary', textTransform: 'uppercase', whiteSpace: 'nowrap', mr: 2, flexShrink: 0 }}>
-            NOS MODÈLES
-          </Typography>
-          <Box sx={{ width: 1, height: 24, bgcolor: 'divider', flexShrink: 0, mr: 1 }} />
-
-          {categories.map((cat) => (
-            <Chip
-              key={cat.id}
-              component={Link}
-              to={`/products?filter[category_id]=${cat.id}`}
-              label={cat.name}
-              icon={<ElectricScooterIcon sx={{ fontSize: '0.85rem !important' }} />}
-              clickable
-              sx={{
-                fontSize: '0.72rem',
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                color: 'text.secondary',
-                backgroundColor: 'transparent',
-                border: '1px solid',
-                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'divider',
-                borderRadius: '20px',
-                px: 1,
-                height: 34,
-                flexShrink: 0,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  color: '#00C2FF',
-                  borderColor: 'rgba(0,194,255,0.4)',
-                  backgroundColor: 'rgba(0,194,255,0.06)',
-                  boxShadow: '0 0 16px rgba(0,194,255,0.12)',
-                },
-                '& .MuiChip-icon': { color: 'inherit' },
-              }}
-            />
-          ))}
-
-          <Box sx={{ ml: 'auto', flexShrink: 0, pl: 2 }}>
-            <Button component={Link} to="/products" size="small" sx={{ fontSize: '0.68rem', color: 'primary.main', letterSpacing: '0.08em' }} endIcon={<KeyboardArrowRightIcon fontSize="small" />}>
-              TOUT VOIR
-            </Button>
+    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6, mt: { xs: 6, md: 10 } }}>
+      <Box>
+        <Typography
+          sx={{
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            letterSpacing: '0.2em',
+            color: '#00C2FF',
+            textTransform: 'uppercase',
+            mb: 1,
+            fontFamily: '"Orbitron", sans-serif'
+          }}
+        >
+          {subLabel}
+        </Typography>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: '1.6rem', md: '2.2rem' },
+            color: '#E8ECF2',
+            letterSpacing: '0.02em',
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            fontFamily: '"Orbitron", sans-serif'
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        {linkText && linkTo && (
+          <Button
+            component={Link}
+            to={linkTo}
+            endIcon={<ArrowForwardIcon sx={{ fontSize: '1rem' }} />}
+            sx={{
+              color: '#00C2FF',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              textTransform: 'none',
+              '&:hover': { background: 'transparent', color: '#E8ECF2' },
+              p: 0,
+              minWidth: 'auto',
+              display: { xs: 'none', sm: 'inline-flex' }
+            }}
+          >
+            {linkText}
+          </Button>
+        )}
+        {(onPrev || onNext) && (
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <IconButton onClick={onPrev} sx={{ border: '1px solid rgba(0,194,255,0.2)', color: '#00C2FF', '&:hover': { bgcolor: 'rgba(0,194,255,0.1)' } }}>
+              <KeyboardArrowLeftIcon />
+            </IconButton>
+            <IconButton onClick={onNext} sx={{ border: '1px solid rgba(0,194,255,0.2)', color: '#00C2FF', '&:hover': { bgcolor: 'rgba(0,194,255,0.1)' } }}>
+              <KeyboardArrowRightIcon />
+            </IconButton>
           </Box>
-        </Box>
-      </Container>
+        )}
+      </Box>
     </Box>
   );
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   CATEGORY FEATURED ROW — Horizontal scrolling product cards
+   PRODUCT CAROUSEL — Shared for Featured & Nouveautés
    ════════════════════════════════════════════════════════════════════ */
-interface CategoryFeaturedRowProps {
-  categoryId: number;
-  categoryName: string;
+interface ProductCarouselProps {
+  subLabel: string;
+  title: string;
+  linkTo: string;
   products: Product[];
+  isLoading: boolean;
 }
 
-function CategoryFeaturedRow({ categoryId, categoryName, products }: CategoryFeaturedRowProps) {
+function ProductCarouselSection({ subLabel, title, linkTo, products, isLoading }: ProductCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  if (!isLoading && products.length === 0) return null;
+
   const scroll = (dir: 'left' | 'right') => {
-    scrollRef.current?.scrollBy({ left: dir === 'left' ? -320 : 320, behavior: 'smooth' });
+    scrollRef.current?.scrollBy({ left: dir === 'left' ? -350 : 350, behavior: 'smooth' });
   };
 
   return (
-    <Box sx={{ mb: 7 }}>
-      {/* Section header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3.5 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Box sx={{ width: 4, height: 32, background: 'linear-gradient(to bottom, #00C2FF, #0099CC)', borderRadius: 2, boxShadow: '0 0 12px rgba(0,194,255,0.3)' }} />
-          <Box>
-            <Typography sx={{ fontSize: '0.62rem', letterSpacing: '0.25em', color: 'primary.main', fontWeight: 600, textTransform: 'uppercase', mb: 0.5 }}>
-              精選モデル — HANDPICKED
-            </Typography>
-            <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.4rem', md: '1.7rem' }, color: 'text.primary', letterSpacing: '-0.01em', lineHeight: 1 }}>
-              NOS {categoryName.toUpperCase()} EN VEDETTE
-            </Typography>
-          </Box>
-        </Box>
-        <Stack direction="row" spacing={1}>
-          {['left', 'right'].map((dir) => (
-            <IconButton
-              key={dir}
-              onClick={() => scroll(dir as 'left' | 'right')}
-              size="small"
-              sx={{
-                border: '1px solid',
-                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'divider',
-                color: 'text.secondary',
-                width: 36, height: 36,
-                transition: 'all 0.3s ease',
-                '&:hover': { borderColor: 'primary.main', color: 'primary.main', bgcolor: 'rgba(0,194,255,0.07)', boxShadow: '0 0 12px rgba(0,194,255,0.15)' }
-              }}
-            >
-              {dir === 'left' ? <KeyboardArrowLeftIcon fontSize="small" /> : <KeyboardArrowRightIcon fontSize="small" />}
-            </IconButton>
-          ))}
-        </Stack>
-      </Box>
-
-      {/* Scrollable product cards */}
-      <Box
-        ref={scrollRef}
-        sx={{ display: 'flex', gap: 2.5, overflowX: 'auto', scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' }, pb: 1 }}
-      >
-        {products.map((product) => {
-          const PLACEHOLDER = 'https://placehold.co/600x400/111116/00C2FF?text=MiraiTech';
-          const imageUrl = product.images.length > 0 ? product.images[0].card : PLACEHOLDER;
-          return (
-            <Box
-              key={product.id}
-              component={Link}
-              to={`/products/${product.slug}`}
-              sx={{
-                flexShrink: 0,
-                width: { xs: 250, sm: 270, md: 290 },
-                textDecoration: 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                bgcolor: 'background.paper',
-                backgroundImage: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.15))',
-                border: '1px solid',
-                borderColor: 'rgba(255, 255, 255, 0.05)',
-                borderRadius: '14px',
-                overflow: 'hidden',
-                transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                position: 'relative',
-                /* Shimmer overlay */
-                '&::after': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0, left: 0,
-                  width: '100%', height: '100%',
-                  background: 'linear-gradient(105deg, transparent 40%, rgba(0,194,255,0.04) 45%, rgba(0,194,255,0.08) 50%, rgba(0,194,255,0.04) 55%, transparent 60%)',
-                  transform: 'translateX(-100%)',
-                  pointerEvents: 'none',
-                  zIndex: 2,
-                },
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: 0, left: 0, right: 0, bottom: 0,
-                  borderRadius: '14px',
-                  padding: '1px',
-                  background: 'linear-gradient(135deg, rgba(0,194,255,0.4) 0%, transparent 50%, rgba(0,194,255,0.1) 100%)',
-                  WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'xor',
-                  maskComposite: 'exclude',
-                  opacity: 0,
-                  transition: 'opacity 0.3s ease',
-                  pointerEvents: 'none',
-                },
-                '&:hover': {
-                  borderColor: 'transparent',
-                  transform: 'translateY(-8px)',
-                  boxShadow: '0 16px 40px rgba(0,194,255,0.12), 0 0 0 1px rgba(0,194,255,0.2)',
-                  '&::before': { opacity: 1 },
-                  '&::after': { animation: 'shimmer 0.8s ease-out forwards' },
-                  '& .feat-img': {
-                    transform: 'scale(1.06)',
-                  },
-                  '& .quick-view-overlay': {
-                    opacity: 1,
-                  },
-                },
-              }}
-            >
-              <Box sx={{ position: 'relative', bgcolor: 'action.hover', aspectRatio: '1 / 1', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <Stack spacing={0.5} sx={{ position: 'absolute', top: 10, left: 10, zIndex: 1 }}>
-                  <Chip
-                    label="Vedette"
-                    size="small"
-                    sx={{ bgcolor: 'rgba(0,194,255,0.14)', color: '#00C2FF', border: '1px solid rgba(0,194,255,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 22, borderRadius: '6px' }}
-                  />
-                  {product.is_on_sale && (
-                    <Chip
-                      label="PROMO"
-                      size="small"
-                      sx={{ bgcolor: 'rgba(255,107,53,0.15)', color: '#FF6B35', border: '1px solid rgba(255,107,53,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 22, borderRadius: '6px' }}
-                    />
-                  )}
-                  {product.is_new && (
-                    <Chip
-                      label="NOUVEAU"
-                      size="small"
-                      sx={{ bgcolor: 'rgba(0,200,83,0.15)', color: '#00C853', border: '1px solid rgba(0,200,83,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 22, borderRadius: '6px' }}
-                    />
-                  )}
-                </Stack>
-                {!product.in_stock && (
-                  <Chip
-                    label="Rupture"
-                    size="small"
-                    sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1, bgcolor: 'rgba(230,57,70,0.14)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)', fontSize: '0.6rem', fontWeight: 700, height: 22, borderRadius: '6px' }}
-                  />
-                )}
-                {/* Vignette */}
-                <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 30%, rgba(11,11,14,0.5) 110%)', pointerEvents: 'none', zIndex: 0 }} />
-                {/* Quick-view overlay */}
-                <Box className="quick-view-overlay" sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,194,255,0.15), transparent 60%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', pb: 2, opacity: 0, transition: 'opacity 0.3s ease', zIndex: 1 }}>
-                  <Typography sx={{ fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.15em', color: '#F5F7FA', textTransform: 'uppercase', bgcolor: 'rgba(0,194,255,0.2)', backdropFilter: 'blur(8px)', px: 2, py: 0.5, borderRadius: '6px', border: '1px solid rgba(0,194,255,0.3)' }}>
-                    VOIR LE PRODUIT
-                  </Typography>
+    <AnimatedSection>
+      <Box component="section" sx={{ bgcolor: '#0c0c14', pt: { xs: 4, md: 6 }, pb: 4, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <Container maxWidth="xl">
+          <SectionHeader
+            subLabel={subLabel}
+            title={title}
+            linkText="Tout voir >"
+            linkTo={linkTo}
+            onPrev={() => scroll('left')}
+            onNext={() => scroll('right')}
+          />
+          {isLoading ? (
+            <Box sx={{ display: 'flex', gap: 3, pb: 2 }}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Box key={i} sx={{ flexShrink: 0, width: { xs: 280, sm: 300, md: 320 } }}>
+                  <Skeleton variant="rectangular" height={280} sx={{ borderRadius: '16px', mb: 2 }} />
+                  <Skeleton height={24} sx={{ mb: 1 }} />
+                  <Skeleton height={20} width="60%" />
                 </Box>
-                <Box className="feat-img" sx={{ height: '100%', width: '100%', backgroundImage: `url("${imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)' }} />
-              </Box>
-              <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <Typography sx={{ fontSize: '0.65rem', letterSpacing: '0.08em', color: 'primary.main', textTransform: 'uppercase', fontWeight: 600, mb: 0.5 }}>
-                  {product.category?.name ?? 'Scooter'}
-                </Typography>
-                <Typography sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.92rem', mb: 1.5, flex: 1, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: 1.4 }}>
-                  {product.name}
-                </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  {/* Price badge */}
-                  {product.is_on_sale && product.default_variant?.promo_price != null ? (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-                      <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', textDecoration: 'line-through', fontWeight: 500 }}>
-                        {formatCurrency(product.price)}
-                      </Typography>
-                      <Box sx={{
-                        display: 'inline-flex', alignItems: 'center',
-                        bgcolor: 'rgba(255,107,53,0.08)',
-                        border: '1px solid rgba(255,107,53,0.2)',
-                        borderRadius: '8px', px: 1.25, py: 0.4,
-                      }}>
-                        <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#FF6B35', letterSpacing: '-0.02em' }}>
-                          {formatCurrency(product.default_variant.promo_price)}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ) : (
-                    <Box sx={{
-                      display: 'inline-flex', alignItems: 'center',
-                      bgcolor: 'rgba(0,194,255,0.08)',
-                      border: '1px solid rgba(0,194,255,0.2)',
-                      borderRadius: '8px', px: 1.25, py: 0.4,
-                    }}>
-                      <Typography sx={{ fontWeight: 800, fontSize: '1rem', color: '#00C2FF', letterSpacing: '-0.02em' }}>
-                        {formatCurrency(product.price)}
-                      </Typography>
-                    </Box>
-                  )}
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                    <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: product.in_stock ? '#00C853' : '#E63946', boxShadow: product.in_stock ? '0 0 8px #00C853' : 'none', animation: product.in_stock ? 'pulse-dot 2s ease infinite' : 'none' }} />
-                    <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', fontWeight: 500 }}>
-                      {product.in_stock ? 'En stock' : 'Épuisé'}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+              ))}
             </Box>
-          );
-        })}
+          ) : (
+            <Box
+              ref={scrollRef}
+              sx={{
+                display: 'flex', gap: 3, overflowX: 'auto',
+                scrollSnapType: 'x mandatory',
+                scrollbarWidth: 'none', '&::-webkit-scrollbar': { display: 'none' },
+                pb: 2,
+              }}
+            >
+              {products.map((product) => (
+                <Box key={product.id} sx={{ flexShrink: 0, width: { xs: 280, sm: 300, md: 320 }, scrollSnapAlign: 'start' }}>
+                  <ProductCard product={product} />
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Container>
       </Box>
-
-      {/* Per-category button */}
-      <Box sx={{ textAlign: 'center', mt: 4 }}>
-        <Button
-          component={Link}
-          to={`/products?filter[category_id]=${categoryId}`}
-          variant="outlined"
-          sx={{ px: 5, py: 1.25, fontSize: '0.78rem', letterSpacing: '0.1em' }}
-        >
-          VOIR TOUS LES MODÈLES
-        </Button>
-      </Box>
-    </Box>
+    </AnimatedSection>
   );
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   FEATURED SECTION — Products grouped by category
+   FEATURED SECTION
    ════════════════════════════════════════════════════════════════════ */
 function FeaturedSection() {
   const { data, isLoading } = useFeaturedProducts();
   const products = data?.data ?? [];
 
-  const categoryGroups = products.reduce((acc, product) => {
-    const categoryId = product.category?.id ?? 0;
-    const categoryName = product.category?.name ?? 'Autres';
-
-    if (!acc.has(categoryId)) {
-      acc.set(categoryId, { categoryName, products: [] });
-    }
-    acc.get(categoryId)!.products.push(product);
-
-    return acc;
-  }, new Map<number, { categoryName: string; products: Product[] }>());
-
   return (
-    <Box component="section" sx={{ bgcolor: 'background.default', py: { xs: 6, md: 8 } }}>
-      <Container maxWidth="xl">
-        {isLoading ? (
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-              <Skeleton width={4} height={28} />
-              <Box sx={{ flex: 1 }}>
-                <Skeleton width={200} height={16} sx={{ mb: 0.5 }} />
-                <Skeleton width={300} height={28} />
-              </Box>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 2, pb: 1 }}>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Box key={i} sx={{ flexShrink: 0, width: { xs: 220, sm: 250, md: 270 } }}>
-                  <Skeleton variant="rectangular" height={220} sx={{ borderRadius: '14px', mb: 1.5 }} />
-                  <Skeleton height={22} sx={{ mb: 0.5 }} />
-                  <Skeleton height={18} width="55%" />
-                </Box>
-              ))}
-            </Box>
-          </Box>
-        ) : products.length === 0 ? (
-          <Box sx={{ py: 8, textAlign: 'center', width: '100%' }}>
-            <ElectricScooterIcon sx={{ fontSize: 56, color: 'text.disabled', mb: 2 }} />
-            <Typography sx={{ color: 'text.secondary', fontSize: '0.95rem' }}>
-              No featured products yet. Toggle products in the admin panel.
-            </Typography>
-          </Box>
-        ) : (
-          <>
-            {Array.from(categoryGroups.entries()).map(([categoryId, { categoryName, products: categoryProducts }]) => (
-              categoryProducts.length > 0 && (
-                <CategoryFeaturedRow
-                  key={categoryId}
-                  categoryId={categoryId}
-                  categoryName={categoryName}
-                  products={categoryProducts}
-                />
-              )
-            ))}
-          </>
-        )}
-      </Container>
-    </Box>
+    <ProductCarouselSection
+      subLabel="SÉLECTION"
+      title="NOS MEILLEURES VENTES"
+      linkTo="/products"
+      products={products}
+      isLoading={isLoading}
+    />
   );
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   PROMO BANNERS — Animated gradient borders & pulse effects
+   NOUVEAUTÉS SECTION
    ════════════════════════════════════════════════════════════════════ */
-function PromoBanners() {
-  const banners = [
-    { label: 'NOUVELLE COLLECTION', title: 'Scooters Urbains', sub: 'Conçus pour la ville, pensés pour vous', accent: '#00C2FF', bg: 'linear-gradient(135deg, #0d1a24 0%, #0B0B0E 100%)' },
-    { label: 'BEST SELLER', title: 'Prix Imbattables', sub: 'Livraison rapide partout au Maroc', accent: '#E63946', bg: 'linear-gradient(135deg, #1a0d0e 0%, #0B0B0E 100%)' },
-  ];
+function NouveauteSection() {
+  const { data, isLoading } = useProducts({ 'filter[is_new]': '1', per_page: 8 });
+  const products = data?.data ?? [];
 
   return (
-    <Box component="section" sx={{ py: { xs: 3, md: 5 }, bgcolor: 'background.default' }}>
-      <Container maxWidth="xl">
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
-          {banners.map(({ label, title, sub, accent, bg }) => (
-            <Box
-              key={title}
-              component={Link}
-              to="/products"
-              sx={{
-                display: 'block',
-                textDecoration: 'none',
-                borderRadius: '18px',
-                border: '1px solid',
-                borderColor: `${accent}25`,
-                animation: 'border-glow 4s ease-in-out infinite',
-                overflow: 'hidden',
-                background: bg,
-                backdropFilter: 'blur(12px)',
-                p: { xs: 4, md: 5.5 },
-                position: 'relative',
-                minHeight: 200,
-                transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  inset: 0,
-                  background: `linear-gradient(135deg, transparent 30%, ${accent}15 100%)`,
-                  opacity: 0,
-                  transition: 'opacity 0.4s ease',
-                  pointerEvents: 'none',
-                },
-                '&:hover': {
-                  transform: 'translateY(-6px)',
-                  boxShadow: `0 20px 50px ${accent}25`,
-                  borderColor: `${accent}50`,
-                  '&::before': { opacity: 1 },
-                },
-              }}
-            >
-              {/* Decorative glow */}
-              <Box sx={{ position: 'absolute', bottom: -20, right: -20, width: 200, height: 200, borderRadius: '50%', background: `radial-gradient(circle, ${accent}15 0%, transparent 70%)`, pointerEvents: 'none' }} />
-              {/* Scooter watermark */}
-              <ElectricScooterIcon sx={{ position: 'absolute', right: 30, bottom: 20, fontSize: 120, color: accent, opacity: 0.04, transform: 'rotate(-15deg)' }} />
+    <ProductCarouselSection
+      subLabel="NOUVELLE COLLECTION"
+      title="NOS DERNIERS MODÈLES"
+      linkTo="/products?filter[is_new]=1"
+      products={products}
+      isLoading={isLoading}
+    />
+  );
+}
 
+/* ════════════════════════════════════════════════════════════════════
+   PROMO BANNER SECTION — with countdown timer
+   ════════════════════════════════════════════════════════════════════ */
+function useCountdown() {
+  // Countdown to end of current month as the promo deadline
+  const getTarget = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
+  };
+
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const diff = getTarget() - Date.now();
+    return diff > 0 ? diff : 0;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const diff = getTarget() - Date.now();
+      setTimeLeft(diff > 0 ? diff : 0);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
+  const seconds = Math.floor((timeLeft / 1000) % 60);
+
+  return { days, hours, minutes, seconds };
+}
+
+function CountdownBox({ value, label }: { value: number; label: string }) {
+  return (
+    <Box sx={{ textAlign: 'center', minWidth: 52 }}>
+      <Box sx={{
+        bgcolor: 'rgba(199,64,77,0.12)',
+        border: '1px solid rgba(199,64,77,0.25)',
+        borderRadius: '10px',
+        px: 1.5, py: 0.75,
+        mb: 0.5,
+      }}>
+        <Typography sx={{
+          fontFamily: '"Orbitron", sans-serif',
+          fontWeight: 800, fontSize: '1.2rem', color: '#E8ECF2',
+          lineHeight: 1,
+        }}>
+          {String(value).padStart(2, '0')}
+        </Typography>
+      </Box>
+      <Typography sx={{ fontSize: '0.6rem', color: '#8A919D', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+        {label}
+      </Typography>
+    </Box>
+  );
+}
+
+function PromoSection() {
+  const countdown = useCountdown();
+
+  return (
+    <AnimatedSection>
+      <Box component="section" sx={{ bgcolor: '#0c0c14', pt: 4, pb: 8 }}>
+        <Container maxWidth="xl">
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 4,
+              p: { xs: 4, md: 6 },
+              borderRadius: '16px',
+              border: '1px solid rgba(217,122,80,0.15)',
+              background: 'linear-gradient(135deg, rgba(16,16,20,0.8) 0%, rgba(20,10,12,0.9) 100%)',
+              boxShadow: '0 20px 40px rgba(199,64,77,0.05)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            {/* Subtle red glow blob */}
+            <Box sx={{ position: 'absolute', right: -100, top: -100, width: 300, height: 300, background: 'radial-gradient(circle, rgba(199,64,77,0.15) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
+
+            <Box sx={{ flex: 1, zIndex: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: accent, animation: 'pulse-dot 2s ease infinite' }} />
-                <Typography sx={{ fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.15em', color: accent, textTransform: 'uppercase' }}>{label}</Typography>
+                <AccessTimeIcon sx={{ fontSize: '1rem', color: '#C7404D' }} />
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em', color: '#C7404D', textTransform: 'uppercase' }}>
+                  OFFRE LIMITÉE
+                </Typography>
               </Box>
-              <Typography sx={{ fontWeight: 800, fontSize: { xs: '1.5rem', md: '1.8rem' }, color: '#F5F7FA', lineHeight: 1.15, mb: 1, textTransform: 'uppercase' }}>{title}</Typography>
-              <Typography sx={{ fontSize: '0.85rem', color: '#9CA3AF', mb: 3, maxWidth: 280 }}>{sub}</Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, color: accent, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Découvrir</Typography>
-                <KeyboardArrowRightIcon sx={{ fontSize: '1rem', color: accent, transition: 'transform 0.3s', '.MuiBox-root:hover &': { transform: 'translateX(4px)' } }} />
+              <Typography
+                sx={{
+                  fontWeight: 900,
+                  fontSize: { xs: '2.5rem', md: '3.5rem' },
+                  lineHeight: 1,
+                  mb: 2,
+                  color: '#E8ECF2',
+                  fontFamily: '"Orbitron", sans-serif',
+                  textTransform: 'uppercase',
+                }}
+              >
+                JUSQU'À <Box component="span" sx={{ color: '#00C2FF' }}>
+                  -<CountUp end={30} duration={2} />%
+                </Box>
+              </Typography>
+              <Typography sx={{ fontSize: '0.95rem', color: '#8A919D', maxWidth: 450, lineHeight: 1.6, mb: 3 }}>
+                Ne manquez pas ces prix exceptionnels sur nos trottinettes les plus populaires. Une fois le stock écoulé, les prix remontent.
+              </Typography>
+
+              {/* Countdown timer */}
+              <Box sx={{ display: 'flex', gap: 1, mb: { xs: 2, md: 0 } }}>
+                <CountdownBox value={countdown.days} label="Jours" />
+                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
+                <CountdownBox value={countdown.hours} label="Heures" />
+                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
+                <CountdownBox value={countdown.minutes} label="Min" />
+                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
+                <CountdownBox value={countdown.seconds} label="Sec" />
               </Box>
             </Box>
-          ))}
-        </Box>
-      </Container>
-    </Box>
+
+            <Box sx={{ flexShrink: 0, zIndex: 1 }}>
+              <Button
+                component={Link}
+                to="/products?filter[is_on_sale]=1"
+                variant="contained"
+                endIcon={<ArrowForwardIcon />}
+                sx={{
+                  px: 4, py: 1.75, fontSize: '0.9rem',
+                  bgcolor: '#C7404D',
+                  color: '#fff', fontWeight: 800,
+                  boxShadow: '0 4px 14px rgba(199,64,77,0.3)',
+                  '&:hover': {
+                    bgcolor: '#D44E5A',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 20px rgba(199,64,77,0.4)',
+                  }
+                }}
+              >
+                VOIR LES PROMOS
+              </Button>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
+    </AnimatedSection>
+  );
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   FOOTER CTA — with dot grid background and pulse-glow
+   ════════════════════════════════════════════════════════════════════ */
+function FooterCTA() {
+  return (
+    <AnimatedSection>
+      <Box component="section" sx={{
+        bgcolor: '#0c0c14', pt: { xs: 8, md: 12 }, pb: { xs: 8, md: 12 },
+        textAlign: 'center', position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Dot grid pattern */}
+        <Box sx={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          backgroundImage: 'radial-gradient(rgba(0,194,255,0.08) 1px, transparent 1px)',
+          backgroundSize: '24px 24px',
+          maskImage: 'radial-gradient(ellipse 50% 60% at 50% 50%, black 30%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 50% 60% at 50% 50%, black 30%, transparent 100%)',
+        }} />
+
+        <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography sx={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.2)', mb: 2, fontFamily: '"Noto Serif JP", serif', letterSpacing: '0.4em' }}>
+            未来テック
+          </Typography>
+          <Typography
+            sx={{
+              fontWeight: 800,
+              fontSize: { xs: '2rem', md: '3.5rem' },
+              color: '#E8ECF2',
+              letterSpacing: '0.02em',
+              lineHeight: 1.1,
+              mb: 3,
+              textTransform: 'uppercase',
+              fontFamily: '"Orbitron", sans-serif'
+            }}
+          >
+            REJOIGNEZ <Box component="span" sx={{ color: '#00C2FF', textShadow: '0 0 16px rgba(0,194,255,0.2)' }}>500+ PROPRIÉTAIRES</Box>
+          </Typography>
+          <Typography sx={{ fontSize: '1rem', color: '#8A919D', maxWidth: 600, mx: 'auto', mb: 2, lineHeight: 1.6 }}>
+            Garantie 2 ans, livraison express, retour 30 jours. Zéro risque, que du plaisir.
+          </Typography>
+          <Typography sx={{ fontSize: '0.78rem', color: '#D4A43A', fontWeight: 600, mb: 5 }}>
+            Livraison gratuite dès 2000 MAD — Offre en cours
+          </Typography>
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{ display: 'inline-block' }}
+          >
+            <Button
+              component={Link}
+              to="/products"
+              variant="contained"
+              size="large"
+              sx={{
+                px: 5, py: 1.75, fontSize: '0.95rem',
+                bgcolor: '#00C2FF',
+                color: '#0c0c14', fontWeight: 800,
+                boxShadow: '0 4px 14px rgba(0,194,255,0.25)',
+                animation: 'pulse-glow 3s ease-in-out infinite',
+                '&:hover': {
+                  bgcolor: '#33CFFF',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 20px rgba(0,194,255,0.35)',
+                }
+              }}
+            >
+              TROUVER MON MODÈLE
+            </Button>
+          </motion.div>
+        </Container>
+      </Box>
+    </AnimatedSection>
   );
 }
 
@@ -479,11 +429,15 @@ function PromoBanners() {
    ════════════════════════════════════════════════════════════════════ */
 export function HomePage() {
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
-      <HeroBanner />
-      <CategoriesStrip />
+    <Box sx={{ bgcolor: '#0c0c14', minHeight: '100vh' }}>
+      <HeroSection />
+      <TrustBadgesSection />
       <FeaturedSection />
-      <PromoBanners />
+      <NouveauteSection />
+      <WhyChooseUsSection />
+      <PromoSection />
+      <TestimonialsSection />
+      <FooterCTA />
     </Box>
   );
 }

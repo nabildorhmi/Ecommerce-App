@@ -53,7 +53,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   if (error || !page) {
     return (
-      <Container maxWidth="md" sx={{ py: 6 }}>
+      <Container maxWidth="xl" sx={{ py: 6 }}>
         <Alert severity="error">Page non disponible</Alert>
       </Container>
     );
@@ -82,7 +82,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
   return (
     <Box sx={{ position: 'relative', overflow: 'hidden' }}>
       <PageDecor variant="info" />
-      <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 1 }}>
       <Box sx={{ py: 6, minHeight: '100vh' }}>
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={4}>
           <Typography variant="h3" fontWeight="bold" color="text.primary">
