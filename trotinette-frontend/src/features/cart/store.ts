@@ -172,14 +172,22 @@ export const useCartStore = create<CartState>()(
       syncWithServer: async () => {
         const { items } = get();
         try {
-          const localItems = items.map((i) => ({
-            product_id: i.productId,
-            variant_id: i.variantId ?? null,
-            quantity: i.quantity,
-          }));
-          if (localItems.length === 0) return;
-          const serverItems = await syncCart(localItems);
-          set({ items: serverItems.map(mapServerToLocal) });
+          if (items.length === 0) {
+            // No local items — load from server (e.g. new browser/device)
+            const serverItems = await fetchCart();
+            if (serverItems.length > 0) {
+              set({ items: serverItems.map(mapServerToLocal) });
+            }
+          } else {
+            // Has local items — merge with server cart
+            const localItems = items.map((i) => ({
+              product_id: i.productId,
+              variant_id: i.variantId ?? null,
+              quantity: i.quantity,
+            }));
+            const serverItems = await syncCart(localItems);
+            set({ items: serverItems.map(mapServerToLocal) });
+          }
         } catch (err) {
           console.error('Cart sync failed:', err);
         }
