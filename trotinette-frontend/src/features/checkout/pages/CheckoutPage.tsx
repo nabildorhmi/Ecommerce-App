@@ -85,8 +85,9 @@ export function CheckoutPage() {
 
   const registerMutation = useMutation({
     mutationFn: registerApi,
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       useAuthStore.getState().setAuth(data.token, data.user);
+      await useCartStore.getState().syncWithServer();
       setRegisterError(null);
     },
     onError: (error: unknown) => {

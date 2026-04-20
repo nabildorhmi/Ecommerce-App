@@ -11,6 +11,7 @@ import { LoginForm } from '../components/LoginForm';
 import { RegisterForm } from '../components/RegisterForm';
 import { loginApi, registerApi } from '../api/auth';
 import { useAuthStore } from '../store';
+import { useCartStore } from '@/features/cart/store';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { PageDecor } from '@/shared/components/PageDecor';
 
@@ -37,39 +38,29 @@ export function LoginPage() {
   const loginMutation = useMutation({
     mutationFn: ({ email, password }: { email: string; password: string }) =>
       loginApi(email, password),
-    onSuccess: ({ token, user: loggedInUser }) => {
-      useAuthStore.getState().setAuth(token, loggedInUser);
-      if (loggedInUser.role === 'admin') {
-        void navigate('/admin/products');
-      } else {
-        void navigate('/products');
-      }
-    },
-    onError: (err: unknown) => {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? "Identifiants incorrects";
-      setLoginError(message);
-    },
   });
 
   const registerMutation = useMutation({
     mutationFn: registerApi,
-    onSuccess: ({ token, user: newUser }) => {
-      useAuthStore.getState().setAuth(token, newUser);
-      void navigate('/products');
-    },
-    onError: (err: unknown) => {
-      const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message ?? "Erreur lors de l'inscription";
-      setRegisterError(message);
-    },
   });
 
   const handleLogin = async (data: { email: string; password: string }) => {
     setLoginError(null);
-    await loginMutation.mutateAsync(data);
+    try {
+      const { token, user: loggedInUser } = await loginMutation.mutateAsync(data);
+      useAuthStore.getState().setAuth(token, loggedInUser);
+      await useCartStore.getState().syncWithServer();
+      if (loggedInUser.role === 'admin' || loggedInUser.role === 'global_admin') {
+        void navigate('/admin');
+      } else {
+        void navigate('/products');
+      }
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? "Identifiants incorrects";
+      setLoginError(message);
+    }
   };
 
   const handleRegister = async (data: {
@@ -80,7 +71,17 @@ export function LoginPage() {
     password_confirmation: string;
   }) => {
     setRegisterError(null);
-    await registerMutation.mutateAsync(data);
+    try {
+      const { token, user: newUser } = await registerMutation.mutateAsync(data);
+      useAuthStore.getState().setAuth(token, newUser);
+      await useCartStore.getState().syncWithServer();
+      void navigate('/products');
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? "Erreur lors de l'inscription";
+      setRegisterError(message);
+    }
   };
 
   return (
@@ -95,14 +96,14 @@ export function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'radial-gradient(circle at 50% 50%, rgba(0,194,255,0.05) 0%, rgba(11,11,14,1) 70%)',
+        background: 'radial-gradient(circle at 50% 50%, rgba(0,194,255,0.05) 0%, rgba(12,12,20,1) 70%)',
         backgroundSize: '200% 200%',
         overflow: 'hidden'
       }}
     >
       {/* Decorative floating blurs */}
       <Box sx={{ position: 'absolute', top: '10%', left: '20%', width: 300, height: 300, background: 'rgba(0,194,255,0.05)', filter: 'blur(80px)', borderRadius: '50%' }} />
-      <Box sx={{ position: 'absolute', bottom: '10%', right: '20%', width: 400, height: 400, background: 'rgba(230,57,70,0.03)', filter: 'blur(100px)', borderRadius: '50%' }} />
+      <Box sx={{ position: 'absolute', bottom: '10%', right: '20%', width: 400, height: 400, background: 'rgba(199,64,77,0.03)', filter: 'blur(100px)', borderRadius: '50%' }} />
 
       <PageDecor variant="auth" />
 
@@ -137,7 +138,7 @@ export function LoginPage() {
                 '& .MuiTab-root': {
                   fontWeight: 600, color: 'var(--mirai-gray)', textTransform: 'none', fontSize: '1rem',
                   transition: 'color 0.3s',
-                  '&.Mui-selected': { color: 'var(--mirai-white)', textShadow: '0 0 10px rgba(0,194,255,0.3)' }
+                  '&.Mui-selected': { color: 'var(--mirai-white)', textShadow: '0 0 8px rgba(0,194,255,0.15)' }
                 }
               }}
             >

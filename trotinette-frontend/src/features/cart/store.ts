@@ -2,14 +2,67 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { CartItem } from './types';
 import type { Product, ProductVariantDisplay } from '../catalog/types';
+import { useAuthStore } from '@/features/auth/store';
+import {
+  syncCart,
+  fetchCart,
+  clearCartApi,
+  type ServerCartItem,
+} from './api/cart';
+
+function isAuthenticated(): boolean {
+  return useAuthStore.getState().token !== null;
+}
+
+function mapServerToLocal(item: ServerCartItem): CartItem {
+  return {
+    productId: item.product_id,
+    sku: item.sku,
+    name: item.name,
+    price: item.price,
+    thumbnailUrl: item.thumbnail_url,
+    quantity: item.quantity,
+    stockQuantity: item.stock_quantity,
+    variantId: item.variant_id ?? undefined,
+    variantSku: item.sku,
+    variantLabel: item.variant_label ?? undefined,
+  };
+}
+
+let syncTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function debouncedSync(items: CartItem[]) {
+  if (!isAuthenticated()) return;
+  if (syncTimeout) clearTimeout(syncTimeout);
+  syncTimeout = setTimeout(() => {
+    syncCart(
+      items.map((i) => ({
+        product_id: i.productId,
+        variant_id: i.variantId ?? null,
+        quantity: i.quantity,
+      }))
+    ).catch(() => {});
+  }, 500);
+}
 
 interface CartState {
   items: CartItem[];
   // Actions
-  addItem: (product: Product, localeName: string, variant?: ProductVariantDisplay | null) => void;
-  updateQuantity: (productId: number, quantity: number, variantId?: number) => void;
+  addItem: (
+    product: Product,
+    localeName: string,
+    variant?: ProductVariantDisplay | null
+  ) => void;
+  updateQuantity: (
+    productId: number,
+    quantity: number,
+    variantId?: number
+  ) => void;
   removeItem: (productId: number, variantId?: number) => void;
   clearCart: () => void;
+  // Server sync
+  syncWithServer: () => Promise<void>;
+  loadFromServer: () => Promise<void>;
   // Computed
   totalItems: () => number;
   subtotalCentimes: () => number;
@@ -27,14 +80,17 @@ export const useCartStore = create<CartState>()(
 
         const { items } = get();
         // Unique key: productId + variantId (so same product different variant = different cart row)
-        const existing = items.find((i) =>
-          i.productId === product.id && (i.variantId ?? null) === (variant?.id ?? null)
+        const existing = items.find(
+          (i) =>
+            i.productId === product.id &&
+            (i.variantId ?? null) === (variant?.id ?? null)
         );
 
         if (existing) {
           set({
             items: items.map((i) =>
-              i.productId === product.id && (i.variantId ?? null) === (variant?.id ?? null)
+              i.productId === product.id &&
+              (i.variantId ?? null) === (variant?.id ?? null)
                 ? { ...i, quantity: Math.min(i.quantity + 1, i.stockQuantity) }
                 : i
             ),
@@ -63,27 +119,79 @@ export const useCartStore = create<CartState>()(
 
           set({ items: [...items, newItem] });
         }
+
+        debouncedSync(get().items);
       },
 
       updateQuantity: (productId, quantity, variantId) => {
         if (quantity <= 0) {
-          set({ items: get().items.filter((i) => !(i.productId === productId && (i.variantId ?? null) === (variantId ?? null))) });
+          set({
+            items: get().items.filter(
+              (i) =>
+                !(
+                  i.productId === productId &&
+                  (i.variantId ?? null) === (variantId ?? null)
+                )
+            ),
+          });
         } else {
           set({
             items: get().items.map((i) =>
-              i.productId === productId && (i.variantId ?? null) === (variantId ?? null)
+              i.productId === productId &&
+              (i.variantId ?? null) === (variantId ?? null)
                 ? { ...i, quantity: Math.min(quantity, i.stockQuantity) }
                 : i
             ),
           });
         }
+
+        debouncedSync(get().items);
       },
 
       removeItem: (productId, variantId) => {
-        set({ items: get().items.filter((i) => !(i.productId === productId && (i.variantId ?? null) === (variantId ?? null))) });
+        set({
+          items: get().items.filter(
+            (i) =>
+              !(
+                i.productId === productId &&
+                (i.variantId ?? null) === (variantId ?? null)
+              )
+          ),
+        });
+
+        debouncedSync(get().items);
       },
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => {
+        set({ items: [] });
+        if (isAuthenticated()) {
+          clearCartApi().catch(() => {});
+        }
+      },
+
+      syncWithServer: async () => {
+        const { items } = get();
+        try {
+          const localItems = items.map((i) => ({
+            product_id: i.productId,
+            variant_id: i.variantId ?? null,
+            quantity: i.quantity,
+          }));
+          const serverItems = await syncCart(localItems);
+          set({ items: serverItems.map(mapServerToLocal) });
+        } catch {
+          console.error('Cart sync failed');
+        }
+      },
+
+      loadFromServer: async () => {
+        try {
+          const serverItems = await fetchCart();
+          set({ items: serverItems.map(mapServerToLocal) });
+        } catch {
+          console.error('Cart load failed');
+        }
+      },
 
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 
@@ -93,9 +201,10 @@ export const useCartStore = create<CartState>()(
     {
       name: 'cart-store',
       storage: createJSONStorage(() => localStorage),
-      version: 2,
+      version: 3,
       migrate: (persistedState, _version) => {
-        // v1 → v2: items may be missing variantId field — that's fine, they default to undefined
+        // v1 -> v2: items may be missing variantId field — that's fine, they default to undefined
+        // v2 -> v3: added syncWithServer/loadFromServer methods — no persisted shape change
         return persistedState as CartState;
       },
     }
