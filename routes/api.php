@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\AttributeController as AdminAttributeController;
 use App\Http\Controllers\Admin\VariantController as AdminVariantController;
 use App\Http\Controllers\Admin\HeroBannerController as AdminHeroBannerController;
 use App\Http\Controllers\Customer\AuthController;
+use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\HeroBannerController;
 use App\Http\Controllers\Customer\CategoryController;
 use App\Http\Controllers\Customer\DeliveryZoneController;
@@ -44,6 +45,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user',         [AuthController::class, 'updateProfile']);
     Route::post('/user/password', [AuthController::class, 'changePassword']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    // Cart routes (authenticated users)
+    Route::get('/cart',                    [CartController::class, 'index']);
+    Route::post('/cart/sync',             [CartController::class, 'sync']);
+    Route::post('/cart/items',            [CartController::class, 'store']);
+    Route::patch('/cart/items/{cartItem}', [CartController::class, 'update']);
+    Route::delete('/cart/items/{cartItem}', [CartController::class, 'destroy']);
+    Route::delete('/cart',                [CartController::class, 'clear']);
 
     // Customer order routes
     Route::get('/orders',                  [OrderController::class, 'index']);
