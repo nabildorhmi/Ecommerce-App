@@ -50,9 +50,9 @@ class ValidateStockAction
                 ? $product->variants->firstWhere('id', $variantId)
                 : $product->variants->firstWhere('is_default', true);
 
-            if (! $variant) {
+            if (! $variant || ! $variant->is_active) {
                 throw ValidationException::withMessages([
-                    'items' => ["No variant found for product '{$product->sku}'."],
+                    'items' => ["No active variant found for product '{$product->sku}'."],
                 ]);
             }
 
@@ -63,7 +63,11 @@ class ValidateStockAction
                 ]);
             }
 
-            $unitPrice    = $variant->price ?? $product->price;
+            $basePrice = $variant->price ?? $product->price;
+            $promoPrice = $variant->promo_price ?? $product->promo_price;
+            $unitPrice = ($promoPrice !== null && $promoPrice < $basePrice)
+                ? $promoPrice
+                : $basePrice;
             $itemSubtotal = $unitPrice * $quantity;
 
             $itemsData[] = [
