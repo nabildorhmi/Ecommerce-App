@@ -18,7 +18,7 @@ class CartController extends Controller
     {
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
 
-        $cart->load(['items.product', 'items.variant.attributeValues']);
+        $cart->load(['items.product', 'items.variant.product', 'items.variant.attributeValues']);
 
         // Filter out stale items (deleted/inactive products)
         $items = $cart->items->filter(function (CartItem $item) {
@@ -78,7 +78,7 @@ class CartController extends Controller
             }
         });
 
-        $cart->load(['items.product', 'items.variant.attributeValues']);
+        $cart->load(['items.product', 'items.variant.product', 'items.variant.attributeValues']);
 
         $items = $cart->items->filter(function (CartItem $item) {
             return $item->product && $item->product->is_active;
@@ -123,14 +123,14 @@ class CartController extends Controller
         if ($existing) {
             $newQty = min($existing->quantity + $quantity, $maxStock);
             $existing->update(['quantity' => max($newQty, 1)]);
-            $item = $existing->fresh(['product', 'variant.attributeValues']);
+            $item = $existing->fresh(['product', 'variant.product', 'variant.attributeValues']);
         } else {
             $item = $cart->items()->create([
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
                 'quantity'   => min($quantity, $maxStock),
             ]);
-            $item->load(['product', 'variant.attributeValues']);
+            $item->load(['product', 'variant.product', 'variant.attributeValues']);
         }
 
         return response()->json($this->formatItem($item), 201);
@@ -155,7 +155,7 @@ class CartController extends Controller
             'quantity' => min($request->input('quantity'), $maxStock),
         ]);
 
-        $cartItem->load(['product', 'variant.attributeValues']);
+        $cartItem->load(['product', 'variant.product', 'variant.attributeValues']);
 
         return response()->json($this->formatItem($cartItem));
     }
