@@ -110,7 +110,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Page CMS
         Route::get('/pages',           [AdminPageController::class, 'index']);
+        Route::post('/pages',          [AdminPageController::class, 'store']);
         Route::put('/pages/{page}',    [AdminPageController::class, 'update']);
+
+        Route::middleware('role:global_admin')->group(function () {
+            Route::get('/site-settings', [AdminPageController::class, 'showSiteSettings']);
+            Route::put('/site-settings', [AdminPageController::class, 'updateSiteSettings']);
+        });
 
         // Attributes (variation types — generic & scalable)
         Route::get('/attributes',                        [AdminAttributeController::class, 'index']);

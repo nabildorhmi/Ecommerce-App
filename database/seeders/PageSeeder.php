@@ -108,5 +108,33 @@ Les informations collectees lors de votre commande sont destinees a MiraiTech po
 MD,
             ]
         );
+
+                Page::updateOrCreate(
+                        ['slug' => 'site-settings'],
+                        [
+                                'title' => 'Parametres du site',
+                                'content' => <<<'JSON'
+{
+    "whatsapp_number": "212600000000",
+    "whatsapp_prefill_message": "Bonjour, je suis interesse(e) par vos trottinettes",
+    "whatsapp_url": "",
+    "instagram_url": "",
+    "facebook_url": "",
+    "email": "contact@miraitech.ma",
+    "phone": "+212 6XX XXX XXX",
+    "address": "123 Bd Mohammed V, Casablanca, Maroc",
+    "business_hours": "Lun-Sam: 9h - 18h",
+    "footer_description": "500+ clients satisfaits au Maroc. Trottinettes electriques premium avec garantie 2 ans et SAV local.",
+    "home_promo_headline": "",
+    "short_links": [
+        { "label": "A propos", "url": "/a-propos" },
+        { "label": "Contact", "url": "/contact" },
+        { "label": "CGV", "url": "/cgv" },
+        { "label": "Mentions legales", "url": "/mentions-legales" }
+    ]
+}
+JSON,
+                        ]
+                );
     }
 }
