@@ -7,10 +7,13 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\Variant;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -95,5 +98,28 @@ class ProductController extends Controller
         $media->delete();
 
         return response()->noContent();
+    }
+
+    public function clearDiscounts(): JsonResponse
+    {
+        [$productsUpdated, $variantsUpdated] = DB::transaction(function () {
+            $productsUpdated = Product::query()->update([
+                'promo_price' => null,
+                'discount_percentage' => null,
+            ]);
+
+            $variantsUpdated = Variant::query()->update([
+                'promo_price' => null,
+                'discount_percentage' => null,
+            ]);
+
+            return [$productsUpdated, $variantsUpdated];
+        });
+
+        return response()->json([
+            'message' => 'Toutes les remises ont ete desactivees.',
+            'products_updated' => $productsUpdated,
+            'variants_updated' => $variantsUpdated,
+        ]);
     }
 }
