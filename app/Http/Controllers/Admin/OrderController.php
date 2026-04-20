@@ -31,6 +31,18 @@ class OrderController extends Controller
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('delivery_zone_id'),
+                AllowedFilter::callback('city', fn ($q, $v) =>
+                    $q->where('city', 'like', '%' . $v . '%')
+                ),
+                AllowedFilter::callback('client', fn ($q, $v) =>
+                    $q->where(function ($subQ) use ($v) {
+                        $subQ->where('phone', 'like', '%' . $v . '%')
+                            ->orWhereHas('user', function ($userQ) use ($v) {
+                                $userQ->where('name', 'like', '%' . $v . '%')
+                                    ->orWhere('email', 'like', '%' . $v . '%');
+                            });
+                    })
+                ),
                 AllowedFilter::callback('date_from', fn ($q, $v) => $q->whereDate('created_at', '>=', $v)),
                 AllowedFilter::callback('date_to', fn ($q, $v) => $q->whereDate('created_at', '<=', $v)),
             ])
