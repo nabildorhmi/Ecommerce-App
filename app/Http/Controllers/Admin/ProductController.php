@@ -33,6 +33,10 @@ class ProductController extends Controller
                     $query->where(fn ($q) =>
                         $q->where('name', 'like', '%' . $value . '%')
                           ->orWhere('sku', 'like', '%' . $value . '%')
+                          ->orWhere('slug', 'like', '%' . $value . '%')
+                          ->orWhereHas('category', fn ($cq) =>
+                              $cq->where('name', 'like', '%' . $value . '%')
+                          )
                     )
                 ),
                 AllowedFilter::callback('min_price', fn ($query, $value) =>
