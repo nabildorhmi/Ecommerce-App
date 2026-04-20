@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Navigate } from 'react-router';
 import { useMutation } from '@tanstack/react-query';
 import Container from '@mui/material/Container';
@@ -27,11 +27,12 @@ export function LoginPage() {
   const [tab, setTab] = useState(0);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [registerError, setRegisterError] = useState<string | null>(null);
+  const isAuthenticating = useRef(false);
 
   const user = useAuthStore((s) => s.user);
 
-  // Already authenticated — redirect immediately
-  if (user) {
+  // Already authenticated — redirect (skip during active login/register to avoid unmount before sync)
+  if (user && !isAuthenticating.current) {
     return <Navigate to="/products" replace />;
   }
 
@@ -46,6 +47,7 @@ export function LoginPage() {
 
   const handleLogin = async (data: { email: string; password: string }) => {
     setLoginError(null);
+    isAuthenticating.current = true;
     try {
       const { token, user: loggedInUser } = await loginMutation.mutateAsync(data);
       useAuthStore.getState().setAuth(token, loggedInUser);
@@ -60,6 +62,8 @@ export function LoginPage() {
         (err as { response?: { data?: { message?: string } } })?.response?.data
           ?.message ?? "Identifiants incorrects";
       setLoginError(message);
+    } finally {
+      isAuthenticating.current = false;
     }
   };
 
@@ -71,6 +75,7 @@ export function LoginPage() {
     password_confirmation: string;
   }) => {
     setRegisterError(null);
+    isAuthenticating.current = true;
     try {
       const { token, user: newUser } = await registerMutation.mutateAsync(data);
       useAuthStore.getState().setAuth(token, newUser);
@@ -81,6 +86,8 @@ export function LoginPage() {
         (err as { response?: { data?: { message?: string } } })?.response?.data
           ?.message ?? "Erreur lors de l'inscription";
       setRegisterError(message);
+    } finally {
+      isAuthenticating.current = false;
     }
   };
 

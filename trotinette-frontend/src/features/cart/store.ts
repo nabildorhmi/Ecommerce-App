@@ -177,10 +177,11 @@ export const useCartStore = create<CartState>()(
             variant_id: i.variantId ?? null,
             quantity: i.quantity,
           }));
+          if (localItems.length === 0) return;
           const serverItems = await syncCart(localItems);
           set({ items: serverItems.map(mapServerToLocal) });
-        } catch {
-          console.error('Cart sync failed');
+        } catch (err) {
+          console.error('Cart sync failed:', err);
         }
       },
 
