@@ -29,7 +29,8 @@ class CartController extends Controller
     }
 
     /**
-     * POST /cart/sync — Merge guest localStorage cart with server cart.
+     * POST /cart/sync — Replace server cart with provided items.
+     * Used for syncing local cart state (on login) and for debounced sync when authenticated.
      */
     public function sync(Request $request): JsonResponse
     {
@@ -43,6 +44,9 @@ class CartController extends Controller
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
 
         DB::transaction(function () use ($cart, $request) {
+            // Replace mode: delete all existing items, then insert fresh from request
+            $cart->items()->delete();
+
             foreach ($request->input('items') as $incoming) {
                 $product = \App\Models\Product::find($incoming['product_id']);
                 if (!$product || !$product->is_active) continue;
@@ -60,21 +64,11 @@ class CartController extends Controller
                     $maxStock = $product->stock_quantity;
                 }
 
-                $existing = $cart->items()
-                    ->where('product_id', $incoming['product_id'])
-                    ->where('variant_id', $variantId)
-                    ->first();
-
-                if ($existing) {
-                    $newQty = min($existing->quantity + $incoming['quantity'], $maxStock);
-                    $existing->update(['quantity' => max($newQty, 1)]);
-                } else {
-                    $cart->items()->create([
-                        'product_id' => $incoming['product_id'],
-                        'variant_id' => $variantId,
-                        'quantity'   => min($incoming['quantity'], $maxStock),
-                    ]);
-                }
+                $cart->items()->create([
+                    'product_id' => $incoming['product_id'],
+                    'variant_id' => $variantId,
+                    'quantity'   => min($incoming['quantity'], $maxStock),
+                ]);
             }
         });
 
