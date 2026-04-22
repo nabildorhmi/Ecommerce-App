@@ -36,8 +36,22 @@ class HeroBannerController extends Controller
             'link'       => ['nullable', 'string', 'max:500'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active'       => ['nullable', 'boolean'],
-            'image'           => ['required', 'image', 'max:5120'], // 5 MB
+            'image_desktop'   => ['bail', 'required_without_all:image_mobile,image', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image_mobile'    => ['bail', 'required_without_all:image_desktop,image', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image'           => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'object_position' => ['nullable', 'string', 'max:50'],
+        ], [
+            'image_desktop.required_without_all' => 'Upload at least one image: desktop or mobile.',
+            'image_mobile.required_without_all' => 'Upload at least one image: desktop or mobile.',
+            'image_desktop.uploaded' => 'Desktop image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image_mobile.uploaded' => 'Mobile image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image.uploaded' => 'Image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image_desktop.max' => 'Desktop image is too large. Maximum allowed size is 10 MB.',
+            'image_mobile.max' => 'Mobile image is too large. Maximum allowed size is 10 MB.',
+            'image.max' => 'Image is too large. Maximum allowed size is 10 MB.',
+            'image_desktop.mimes' => 'Unsupported desktop image format. Allowed formats: JPG, PNG, WEBP.',
+            'image_mobile.mimes' => 'Unsupported mobile image format. Allowed formats: JPG, PNG, WEBP.',
+            'image.mimes' => 'Unsupported image format. Allowed formats: JPG, PNG, WEBP.',
         ]);
 
         $banner = HeroBanner::create([
@@ -49,8 +63,15 @@ class HeroBannerController extends Controller
             'object_position' => $data['object_position'] ?? 'center center',
         ]);
 
-        $banner->addMediaFromRequest('image')
-            ->toMediaCollection('banner');
+        if ($request->hasFile('image_desktop')) {
+            $banner->addMediaFromRequest('image_desktop')->toMediaCollection('banner_desktop');
+        } elseif ($request->hasFile('image')) {
+            $banner->addMediaFromRequest('image')->toMediaCollection('banner_desktop');
+        }
+
+        if ($request->hasFile('image_mobile')) {
+            $banner->addMediaFromRequest('image_mobile')->toMediaCollection('banner_mobile');
+        }
 
         $banner->load('media');
 
@@ -80,8 +101,20 @@ class HeroBannerController extends Controller
             'link'       => ['nullable', 'string', 'max:500'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_active'       => ['nullable', 'boolean'],
-            'image'           => ['nullable', 'image', 'max:5120'],
+            'image_desktop'   => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image_mobile'    => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
+            'image'           => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'object_position' => ['nullable', 'string', 'max:50'],
+        ], [
+            'image_desktop.uploaded' => 'Desktop image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image_mobile.uploaded' => 'Mobile image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image.uploaded' => 'Image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
+            'image_desktop.max' => 'Desktop image is too large. Maximum allowed size is 10 MB.',
+            'image_mobile.max' => 'Mobile image is too large. Maximum allowed size is 10 MB.',
+            'image.max' => 'Image is too large. Maximum allowed size is 10 MB.',
+            'image_desktop.mimes' => 'Unsupported desktop image format. Allowed formats: JPG, PNG, WEBP.',
+            'image_mobile.mimes' => 'Unsupported mobile image format. Allowed formats: JPG, PNG, WEBP.',
+            'image.mimes' => 'Unsupported image format. Allowed formats: JPG, PNG, WEBP.',
         ]);
 
         // Update each field only when it was actually submitted;
@@ -98,9 +131,17 @@ class HeroBannerController extends Controller
             'object_position' => $data['object_position'] ?? $heroBanner->object_position,
         ]);
 
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('image_desktop')) {
+            $heroBanner->addMediaFromRequest('image_desktop')
+                ->toMediaCollection('banner_desktop');
+        } elseif ($request->hasFile('image')) {
             $heroBanner->addMediaFromRequest('image')
-                ->toMediaCollection('banner'); // singleFile() auto-removes the old one
+                ->toMediaCollection('banner_desktop');
+        }
+
+        if ($request->hasFile('image_mobile')) {
+            $heroBanner->addMediaFromRequest('image_mobile')
+                ->toMediaCollection('banner_mobile');
         }
 
         $heroBanner->load('media');

@@ -31,8 +31,17 @@ class HeroBanner extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('banner_desktop')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+
+        $this->addMediaCollection('banner_mobile')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+
+        // Legacy collection kept for backwards compatibility with existing media records.
         $this->addMediaCollection('banner')
-            ->singleFile()                       // one image per banner entry
+            ->singleFile()
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
     }
 
@@ -40,10 +49,12 @@ class HeroBanner extends Model implements HasMedia
     {
         $this->addMediaConversion('thumbnail')
             ->fit(Fit::Contain, 400, 200)
+            ->performOnCollections('banner_desktop', 'banner_mobile', 'banner')
             ->nonQueued();
 
         $this->addMediaConversion('hero')
-            ->fit(Fit::Contain, 1920, 900)
+            ->fit(Fit::Contain, 1920, 1080)
+            ->performOnCollections('banner_desktop', 'banner_mobile', 'banner')
             ->nonQueued();
     }
 
