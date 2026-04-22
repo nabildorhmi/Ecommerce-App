@@ -105,6 +105,8 @@ class HeroBannerController extends Controller
             'image_mobile'    => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'image'           => ['bail', 'nullable', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:10240'],
             'object_position' => ['nullable', 'string', 'max:50'],
+            'remove_desktop'  => ['nullable', 'boolean'],
+            'remove_mobile'   => ['nullable', 'boolean'],
         ], [
             'image_desktop.uploaded' => 'Desktop image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
             'image_mobile.uploaded' => 'Mobile image upload failed before validation. Please use JPG/PNG/WEBP and keep it under 10 MB.',
@@ -131,12 +133,28 @@ class HeroBannerController extends Controller
             'object_position' => $data['object_position'] ?? $heroBanner->object_position,
         ]);
 
+        // Process removals BEFORE adding new uploads
+        if (!empty($data['remove_desktop'])) {
+            $heroBanner->clearMediaCollection('banner_desktop');
+            // Also clear legacy banner collection when desktop image is removed
+            $heroBanner->clearMediaCollection('banner');
+        }
+
+        if (!empty($data['remove_mobile'])) {
+            $heroBanner->clearMediaCollection('banner_mobile');
+        }
+
+        // Add new images
         if ($request->hasFile('image_desktop')) {
             $heroBanner->addMediaFromRequest('image_desktop')
                 ->toMediaCollection('banner_desktop');
+            // Clear legacy banner collection when new desktop image is uploaded (migrate old records)
+            $heroBanner->clearMediaCollection('banner');
         } elseif ($request->hasFile('image')) {
             $heroBanner->addMediaFromRequest('image')
                 ->toMediaCollection('banner_desktop');
+            // Clear legacy banner collection
+            $heroBanner->clearMediaCollection('banner');
         }
 
         if ($request->hasFile('image_mobile')) {

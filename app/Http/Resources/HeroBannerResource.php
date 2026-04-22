@@ -24,9 +24,11 @@ class HeroBannerResource extends JsonResource
 
     public function toArray(Request $request): array
     {
+        // Legacy banner collection only used for backwards compatibility with old records
+        // Maps to desktop for old banners, but never auto-populates mobile
         $legacyMedia = $this->getFirstMedia('banner');
         $desktopMedia = $this->getFirstMedia('banner_desktop') ?? $legacyMedia;
-        $mobileMedia = $this->getFirstMedia('banner_mobile') ?? $legacyMedia;
+        $mobileMedia = $this->getFirstMedia('banner_mobile');
 
         return [
             'id'         => $this->id,
@@ -40,6 +42,8 @@ class HeroBannerResource extends JsonResource
                 'desktop' => $this->mapImage($desktopMedia),
                 'mobile' => $this->mapImage($mobileMedia),
             ],
+            'has_desktop' => $desktopMedia !== null,
+            'has_mobile'  => $mobileMedia !== null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
