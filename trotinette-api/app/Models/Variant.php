@@ -14,17 +14,19 @@ class Variant extends Model
         'sku',
         'price',
         'promo_price',
+        'discount_percentage',
         'stock',
         'is_active',
         'is_default',
     ];
 
     protected $casts = [
-        'price'       => 'integer',
-        'promo_price' => 'integer',
-        'stock'       => 'integer',
-        'is_active'   => 'boolean',
-        'is_default'  => 'boolean',
+        'price'               => 'integer',
+        'promo_price'         => 'integer',
+        'discount_percentage' => 'integer',
+        'stock'               => 'integer',
+        'is_active'           => 'boolean',
+        'is_default'          => 'boolean',
     ];
 
     public function product(): BelongsTo
@@ -55,7 +57,8 @@ class Variant extends Model
      */
     public function getEffectivePriceAttribute(): int
     {
-        return $this->price ?? $this->product?->price ?? 0;
+        // Only access product if the relation is already loaded (prevent lazy loading)
+        return $this->price ?? ($this->relationLoaded('product') ? $this->product?->price : null) ?? 0;
     }
 
     /**
@@ -63,7 +66,8 @@ class Variant extends Model
      */
     public function getEffectivePromoPriceAttribute(): ?int
     {
-        return $this->promo_price ?? $this->product?->promo_price;
+        // Only access product if the relation is already loaded (prevent lazy loading)
+        return $this->promo_price ?? ($this->relationLoaded('product') ? $this->product?->promo_price : null);
     }
 
     /**

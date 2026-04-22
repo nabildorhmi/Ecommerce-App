@@ -76,7 +76,7 @@ export function ImageUploader({
           onClick={() => inputRef.current?.click()}
           disabled={remaining <= 0}
         >
-          Télécharger des images / Upload images
+          Télécharger des images
         </Button>
         <Chip
           label={`${totalCount} / ${MAX_IMAGES}`}
@@ -146,7 +146,7 @@ export function ImageUploader({
       {newFiles.length > 0 && (
         <Box>
           <Typography variant="caption" color="text.secondary" gutterBottom>
-            Nouvelles images / New images
+            Nouvelles images en attente
           </Typography>
           <Box display="flex" flexWrap="wrap" gap={1} mt={0.5}>
             {newFiles.map((nf, index) => (

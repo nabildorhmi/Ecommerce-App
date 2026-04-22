@@ -46,6 +46,29 @@ export function useProduct(slug: string) {
 }
 
 /**
+ * Fetch related products by category, excluding the current product.
+ */
+export function useRelatedProducts(categoryId: number | undefined, excludeProductId: number | undefined) {
+  return useQuery<PaginatedResponse<Product>>({
+    queryKey: ['products', 'related', categoryId, excludeProductId],
+    queryFn: async () => {
+      const response = await apiClient.get<PaginatedResponse<Product>>('/products', {
+        params: {
+          'filter[category_id]': categoryId,
+          per_page: 8,
+        },
+      });
+      return {
+        ...response.data,
+        data: response.data.data.filter(p => p.id !== excludeProductId),
+      };
+    },
+    enabled: Boolean(categoryId),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+/**
  * Fetch featured products for the homepage carousel.
  * Uses the `filter[is_featured]=1` query param added in the backend.
  */

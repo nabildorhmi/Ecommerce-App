@@ -74,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/products/{product}',                         [AdminProductController::class, 'update']);
         Route::patch('/products/{product}',                       [AdminProductController::class, 'update']);
         Route::delete('/products/{product}',                      [AdminProductController::class, 'destroy']);
+        Route::post('/products/discounts/clear',                  [AdminProductController::class, 'clearDiscounts']);
         Route::delete('/products/{product}/media/{mediaId}',      [AdminProductController::class, 'deleteMedia']);
 
         // Category CRUD
@@ -109,7 +110,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Page CMS
         Route::get('/pages',           [AdminPageController::class, 'index']);
+        Route::post('/pages',          [AdminPageController::class, 'store']);
         Route::put('/pages/{page}',    [AdminPageController::class, 'update']);
+
+        Route::middleware('role:global_admin')->group(function () {
+            Route::get('/site-settings', [AdminPageController::class, 'showSiteSettings']);
+            Route::put('/site-settings', [AdminPageController::class, 'updateSiteSettings']);
+        });
 
         // Attributes (variation types — generic & scalable)
         Route::get('/attributes',                        [AdminAttributeController::class, 'index']);

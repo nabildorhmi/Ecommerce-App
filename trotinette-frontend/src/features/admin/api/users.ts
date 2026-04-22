@@ -4,13 +4,17 @@ import type { AdminUser, PaginatedUsers } from '../types';
 
 // ---- Query hooks ----
 
-export function useAdminUsers(page?: number, perPage?: number) {
+export function useAdminUsers(params?: {
+  page?: number;
+  per_page?: number;
+  'filter[search]'?: string;
+  'filter[role]'?: string;
+  'filter[is_active]'?: string;
+}) {
   return useQuery<PaginatedUsers>({
-    queryKey: ['admin', 'users', page, perPage],
+    queryKey: ['admin', 'users', params],
     queryFn: async () => {
-      const res = await apiClient.get('/admin/users', {
-        params: (page || perPage) ? { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}) } : undefined,
-      });
+      const res = await apiClient.get('/admin/users', { params });
       return res.data;
     },
   });

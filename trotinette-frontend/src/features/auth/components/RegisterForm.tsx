@@ -165,9 +165,9 @@ export function RegisterForm({ onSubmit, error }: RegisterFormProps) {
           mt: 2,
           borderRadius: '12px',
           fontWeight: 700,
-          background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
+          bgcolor: '#00C2FF',
           transition: 'transform 0.2s',
-          '&:hover': { transform: 'translateY(-2px)' }
+          '&:hover': { bgcolor: '#33CFFF', transform: 'translateY(-2px)' }
         }}
       >
         {"S'inscrire"}

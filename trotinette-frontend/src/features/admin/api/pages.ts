@@ -32,3 +32,17 @@ export function useUpdatePage() {
     },
   });
 }
+
+export function useCreatePage() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ slug, title, content }: { slug: string; title: string; content: string }) => {
+      const res = await apiClient.post<{ data: PageData }>('/admin/pages', { slug, title, content });
+      return res.data.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'pages'] });
+      void queryClient.invalidateQueries({ queryKey: ['pages'] });
+    },
+  });
+}

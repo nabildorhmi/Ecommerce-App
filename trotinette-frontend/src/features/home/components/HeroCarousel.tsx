@@ -354,7 +354,7 @@ export function HeroCarousel({ fullBleed = false }: { fullBleed?: boolean }) {
         <Box
           sx={{
             position: 'absolute',
-            bottom: 50,
+            bottom: 70,
             left: '50%',
             transform: 'translateX(-50%)',
             display: 'flex',

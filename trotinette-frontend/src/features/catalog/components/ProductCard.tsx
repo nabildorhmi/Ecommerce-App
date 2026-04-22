@@ -1,8 +1,12 @@
-﻿import Box from '@mui/material/Box';
+import { memo } from 'react';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Link } from 'react-router';
+import { motion } from 'framer-motion';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
 import type { Product } from '../types';
 
@@ -13,306 +17,274 @@ interface ProductCardProps {
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400/111116/00C2FF?text=MiraiTech';
 
 /**
- * MiraiTech ProductCard — premium card with shimmer, quick-view, and price badge.
+ * MiraiTech ProductCard — clean card matching lovable neo-zen style with
+ * hover overlay, image zoom, glow border, and badges.
  */
-export function ProductCard({ product }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product }: ProductCardProps) {
   const imageUrl = product.images.length > 0 ? product.images[0].card : PLACEHOLDER_IMAGE;
+  const stockQty = product.stock_quantity ?? 0;
+  const isLowStock = product.in_stock && stockQty > 0 && stockQty <= 5;
+
+  // Calculate discount percentage
+  const discountPercent = product.is_on_sale && product.default_variant?.promo_price != null
+    ? Math.round((1 - product.default_variant.promo_price / product.price) * 100)
+    : 0;
 
   return (
-    <Box
-      component={Link}
-      to={`/products/${product.slug}`}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        textDecoration: 'none',
-        backgroundColor: 'background.paper',
-        backgroundImage: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.15))',
-        border: '1px solid',
-        borderColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: '14px',
-        overflow: 'hidden',
-        transition: 'all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-        position: 'relative',
-        /* Shimmer sweep */
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          top: 0, left: 0,
-          width: '100%', height: '100%',
-          background: 'linear-gradient(105deg, transparent 40%, rgba(0,194,255,0.04) 45%, rgba(0,194,255,0.08) 50%, rgba(0,194,255,0.04) 55%, transparent 60%)',
-          transform: 'translateX(-100%)',
-          pointerEvents: 'none',
-          zIndex: 2,
-        },
-        /* Gradient border pseudo */
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          borderRadius: '14px',
-          padding: '1px',
-          background: 'linear-gradient(135deg, rgba(0,194,255,0.4) 0%, transparent 50%, rgba(0,194,255,0.1) 100%)',
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          opacity: 0,
-          transition: 'opacity 0.3s ease',
-          pointerEvents: 'none',
-        },
-        '&:hover': {
-          borderColor: 'transparent',
-          transform: 'translateY(-8px)',
-          boxShadow: '0 16px 40px rgba(0,194,255,0.12), 0 0 0 1px rgba(0,194,255,0.2)',
-          '&::before': { opacity: 1 },
-          '&::after': { animation: 'shimmer 0.8s ease-out forwards' },
-          '& .card-img': {
-            transform: 'scale(1.06)',
-          },
-          '& .quick-view-overlay': {
-            opacity: 1,
-          },
-        },
-      }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      style={{ height: '100%' }}
     >
-      {/* Image */}
       <Box
+        component={Link}
+        to={`/products/${product.slug}`}
         sx={{
-          position: 'relative',
-          bgcolor: 'action.hover',
-          aspectRatio: '1 / 1',
-          overflow: 'hidden',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: 'column',
+          height: '100%',
+          textDecoration: 'none',
+          borderRadius: '12px',
+          border: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          bgcolor: 'rgba(19, 22, 35, 0.6)',
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            borderColor: 'rgba(0, 194, 255, 0.3)',
+            boxShadow: '0 0 20px rgba(0,194,255,0.12), 0 0 48px rgba(0,194,255,0.04)',
+            '& .card-img': { transform: 'scale(1.1)' },
+            '& .hover-overlay': { opacity: 1 },
+          },
         }}
       >
-        {/* Left-side badges (Vedette, PROMO, NOUVEAU) */}
-        <Stack
-          spacing={0.5}
+        {/* Image Container */}
+        <Box
           sx={{
-            position: 'absolute',
-            top: 10,
-            left: 10,
-            zIndex: 1,
+            position: 'relative',
+            aspectRatio: '1 / 1',
+            overflow: 'hidden',
+            bgcolor: 'rgba(19, 22, 35, 0.3)',
           }}
         >
-          {product.is_featured && (
-            <Chip
-              label="Vedette"
-              size="small"
-              sx={{
-                backgroundColor: 'rgba(0,194,255,0.15)',
-                color: '#00C2FF',
-                border: '1px solid rgba(0,194,255,0.3)',
-                fontSize: '0.6rem',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                height: 22,
-                borderRadius: '6px',
-              }}
-            />
-          )}
-          {product.is_on_sale && (
-            <Chip
-              label="PROMO"
-              size="small"
-              sx={{
-                backgroundColor: 'rgba(255,107,53,0.15)',
-                color: '#FF6B35',
-                border: '1px solid rgba(255,107,53,0.3)',
-                fontSize: '0.6rem',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                height: 22,
-                borderRadius: '6px',
-              }}
-            />
-          )}
-          {product.is_new && (
-            <Chip
-              label="NOUVEAU"
-              size="small"
-              sx={{
-                backgroundColor: 'rgba(0,200,83,0.15)',
-                color: '#00C853',
-                border: '1px solid rgba(0,200,83,0.3)',
-                fontSize: '0.6rem',
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                height: 22,
-                borderRadius: '6px',
-              }}
-            />
-          )}
-        </Stack>
-        {!product.in_stock && (
-          <Chip
-            label="Rupture de stock"
-            size="small"
+          {/* Product Image */}
+          <Box
+            component="img"
+            className="card-img"
+            src={imageUrl}
+            alt={product.name}
+            loading="lazy"
             sx={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              zIndex: 1,
-              backgroundColor: 'rgba(230,57,70,0.15)',
-              color: '#E63946',
-              border: '1px solid rgba(230,57,70,0.3)',
-              fontSize: '0.6rem',
-              fontWeight: 700,
-              height: 22,
-              borderRadius: '6px',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              display: 'block',
+              transition: 'transform 0.5s ease',
             }}
           />
-        )}
-        {/* Vignette Overlay */}
-        <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at center, transparent 30%, rgba(11,11,14,0.5) 110%)', pointerEvents: 'none', zIndex: 0 }} />
-        {/* Quick-view overlay */}
-        <Box className="quick-view-overlay" sx={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(0,194,255,0.15), transparent 60%)',
-          display: 'flex', alignItems: 'flex-end', justifyContent: 'center', pb: 2,
-          opacity: 0, transition: 'opacity 0.3s ease', zIndex: 1
-        }}>
-          <Typography sx={{
-            fontSize: '0.7rem', fontWeight: 700, letterSpacing: '0.15em',
-            color: '#F5F7FA', textTransform: 'uppercase',
-            bgcolor: 'rgba(0,194,255,0.2)', backdropFilter: 'blur(8px)',
-            px: 2, py: 0.5, borderRadius: '6px',
-            border: '1px solid rgba(0,194,255,0.3)'
-          }}>
-            VOIR LE PRODUIT
-          </Typography>
-        </Box>
-        <Box
-          className="card-img"
-          sx={{
-            width: '100%',
-            height: '100%',
-            backgroundImage: `url("${imageUrl}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-          }}
-        />
-      </Box>
 
-      {/* Content */}
-      <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {product.category && (
-          <Typography
+          {/* Badges — top left */}
+          <Stack spacing={0.5} sx={{ position: 'absolute', top: 8, left: 8, zIndex: 2 }}>
+            {product.is_new && (
+              <Chip
+                label="NEW"
+                size="small"
+                sx={{
+                  bgcolor: '#00C2FF',
+                  color: '#0c0c14',
+                  fontSize: '0.58rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.1em',
+                  height: 22,
+                  borderRadius: '4px',
+                  fontFamily: '"Orbitron", sans-serif',
+                }}
+              />
+            )}
+            {product.is_on_sale && (
+              <Chip
+                label="PROMO"
+                size="small"
+                sx={{
+                  bgcolor: '#C7404D',
+                  color: '#fff',
+                  fontSize: '0.58rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.1em',
+                  height: 22,
+                  borderRadius: '4px',
+                  fontFamily: '"Orbitron", sans-serif',
+                }}
+              />
+            )}
+          </Stack>
+
+          {/* Discount % badge — top right */}
+          {discountPercent > 0 && (
+            <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 2 }}>
+              <Chip
+                label={`-${discountPercent}%`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(199,64,77,0.9)',
+                  color: '#fff',
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  height: 24,
+                  borderRadius: '4px',
+                  fontFamily: '"Orbitron", sans-serif',
+                }}
+              />
+            </Box>
+          )}
+
+          {/* Low stock badge — top right below discount */}
+          {isLowStock && (
+            <Box sx={{ position: 'absolute', top: discountPercent > 0 ? 38 : 8, right: 8, zIndex: 2 }}>
+              <Tooltip title={`Plus que ${stockQty} en stock !`} placement="left">
+                <Chip
+                  label={`${stockQty} restants`}
+                  size="small"
+                  sx={{
+                    bgcolor: 'rgba(212,164,58,0.85)',
+                    color: '#0c0c14',
+                    fontSize: '0.56rem',
+                    fontWeight: 700,
+                    height: 20,
+                    borderRadius: '4px',
+                    cursor: 'help',
+                  }}
+                />
+              </Tooltip>
+            </Box>
+          )}
+
+          {/* Out of stock overlay */}
+          {!product.in_stock && (
+            <Box sx={{
+              position: 'absolute', inset: 0, zIndex: 3,
+              bgcolor: 'rgba(12,12,20,0.6)', backdropFilter: 'blur(2px)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Typography sx={{
+                fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.15em',
+                color: '#C7404D', textTransform: 'uppercase',
+                fontFamily: '"Orbitron", sans-serif',
+              }}>
+                Épuisé
+              </Typography>
+            </Box>
+          )}
+
+          {/* Hover overlay with action button */}
+          <Box
+            className="hover-overlay"
             sx={{
-              fontSize: '0.65rem',
-              letterSpacing: '0.1em',
-              color: 'primary.main',
-              textTransform: 'uppercase',
-              fontWeight: 600,
-              mb: 0.75,
+              position: 'absolute',
+              inset: 0,
+              bgcolor: 'rgba(12,12,20,0.55)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1.5,
+              opacity: 0,
+              transition: 'opacity 0.3s ease',
+              zIndex: 4,
             }}
           >
-            {product.category.name}
-          </Typography>
-        )}
+            <Box
+              sx={{
+                width: 44,
+                height: 44,
+                borderRadius: '50%',
+                border: '1px solid rgba(255,255,255,0.15)',
+                bgcolor: 'rgba(19,19,27,0.8)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#E8ECF2',
+                transition: 'all 0.2s ease',
+                '&:hover': { bgcolor: '#00C2FF', color: '#0c0c14', borderColor: '#00C2FF' },
+              }}
+            >
+              <VisibilityOutlinedIcon sx={{ fontSize: '1.1rem' }} />
+            </Box>
+          </Box>
+        </Box>
 
-        <Typography
-          sx={{
+        {/* Content */}
+        <Box sx={{ p: 2, flex: 1, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+          {/* Category */}
+          {product.category && (
+            <Typography sx={{
+              fontSize: '0.6rem',
+              letterSpacing: '0.12em',
+              color: 'text.secondary',
+              textTransform: 'uppercase',
+              fontWeight: 600,
+            }}>
+              {product.category.name}
+            </Typography>
+          )}
+
+          {/* Name */}
+          <Typography sx={{
             fontWeight: 700,
             color: 'text.primary',
-            fontSize: '0.92rem',
-            mb: 1.5,
+            fontSize: '0.85rem',
+            lineHeight: 1.4,
             flex: 1,
             overflow: 'hidden',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
-            lineHeight: 1.45,
-          }}
-        >
-          {product.name}
-        </Typography>
+          }}>
+            {product.name}
+          </Typography>
 
-        {/* Attributes preview — show first 3 attributes as chips */}
-        {product.attributes && Object.keys(product.attributes).length > 0 && (
-          <Box sx={{ display: 'flex', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
-            {Object.entries(product.attributes).slice(0, 3).map(([, value]) => (
-              <Box key={String(value)} sx={{ fontSize: '0.65rem', color: 'text.secondary', bgcolor: 'action.hover', px: 1, py: 0.25, borderRadius: '4px', border: '1px solid', borderColor: 'divider' }}>
-                {String(value)}
-              </Box>
-            ))}
-          </Box>
-        )}
-
-        {/* Price + stock */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-          {/* Price badge */}
-          {product.is_on_sale && product.default_variant?.promo_price != null ? (
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
-              <Typography
-                sx={{
-                  fontSize: '0.68rem',
-                  color: 'text.disabled',
-                  textDecoration: 'line-through',
-                  fontWeight: 500,
-                }}
-              >
-                {formatCurrency(product.price)}
-              </Typography>
-              <Box sx={{
-                display: 'inline-flex', alignItems: 'center',
-                bgcolor: 'rgba(255,107,53,0.08)',
-                border: '1px solid rgba(255,107,53,0.2)',
-                borderRadius: '8px', px: 1.25, py: 0.4,
-              }}>
-                <Typography
-                  sx={{
-                    fontWeight: 800,
-                    fontSize: '1rem',
-                    color: '#FF6B35',
-                    letterSpacing: '-0.02em',
-                  }}
-                >
-                  {formatCurrency(product.default_variant.promo_price)}
-                </Typography>
-              </Box>
-            </Box>
-          ) : (
-            <Box sx={{
-              display: 'inline-flex', alignItems: 'center',
-              bgcolor: 'rgba(0,194,255,0.08)',
-              border: '1px solid rgba(0,194,255,0.2)',
-              borderRadius: '8px', px: 1.25, py: 0.4,
-            }}>
-              <Typography
-                sx={{
-                  fontWeight: 800,
-                  fontSize: '1rem',
-                  color: '#00C2FF',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                {formatCurrency(product.price)}
-              </Typography>
-            </Box>
-          )}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-            <Box
+          {/* Price */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto', pt: 0.5 }}>
+            <Typography
               sx={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                backgroundColor: product.in_stock ? '#00C853' : '#E63946',
-                boxShadow: product.in_stock ? '0 0 8px #00C853' : 'none',
-                animation: product.in_stock ? 'pulse-dot 2s ease infinite' : 'none',
+                fontFamily: '"Orbitron", sans-serif',
+                fontWeight: 800,
+                fontSize: '0.92rem',
+                color: product.is_on_sale ? '#D97A50' : '#00C2FF',
               }}
-            />
-            <Typography sx={{ fontSize: '0.68rem', color: 'text.secondary', fontWeight: 500 }}>
-              {product.in_stock ? 'En stock' : 'Épuisé'}
+            >
+              {formatCurrency(
+                product.is_on_sale && product.default_variant?.promo_price != null
+                  ? product.default_variant.promo_price
+                  : product.price
+              )}
             </Typography>
+            {product.is_on_sale && product.default_variant?.promo_price != null && (
+              <Typography sx={{
+                fontSize: '0.72rem',
+                color: 'text.disabled',
+                textDecoration: 'line-through',
+                fontWeight: 500,
+              }}>
+                {formatCurrency(product.price)}
+              </Typography>
+            )}
           </Box>
+
+          <Typography sx={{
+            mt: 0.6,
+            fontSize: '0.68rem',
+            color: 'rgba(0,194,255,0.8)',
+            fontWeight: 700,
+            letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+          }}>
+            Voir details • Acheter
+          </Typography>
         </Box>
       </Box>
-    </Box>
+    </motion.div>
   );
-}
+});

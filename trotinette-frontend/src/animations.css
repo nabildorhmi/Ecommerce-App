@@ -2,70 +2,173 @@
 
 /* Shimmer sweep across cards */
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Slow float for decorative elements */
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  33% { transform: translateY(-12px) rotate(1deg); }
-  66% { transform: translateY(6px) rotate(-1deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  33% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+
+  66% {
+    transform: translateY(6px) rotate(-1deg);
+  }
 }
 
 /* Breathing glow for CTA buttons */
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(0,194,255,0.3), 0 0 60px rgba(0,194,255,0.1); }
-  50% { box-shadow: 0 0 30px rgba(0,194,255,0.5), 0 0 80px rgba(0,194,255,0.2); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(0, 194, 255, 0.3), 0 0 60px rgba(0, 194, 255, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(0, 194, 255, 0.5), 0 0 80px rgba(0, 194, 255, 0.2);
+  }
 }
 
 /* Background gradient shift */
 @keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Slow rotation for decorative rings */
 @keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Counter-rotation */
 @keyframes rotate-slow-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  from {
+    transform: rotate(360deg);
+  }
+
+  to {
+    transform: rotate(0deg);
+  }
 }
 
 /* Subtle fade-in upward for sections */
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in from left */
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Fade in from right */
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Border glow animation */
 @keyframes border-glow {
-  0%, 100% { border-color: rgba(0,194,255,0.15); }
-  50% { border-color: rgba(0,194,255,0.4); }
+
+  0%,
+  100% {
+    border-color: rgba(0, 194, 255, 0.15);
+  }
+
+  50% {
+    border-color: rgba(0, 194, 255, 0.4);
+  }
 }
 
 /* Pulsing dot */
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.4); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.4);
+  }
 }
 
 /* Glow pulse for PROMOS button (orange) */
 @keyframes promo-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(255,107,53,0.3), 0 0 18px rgba(255,107,53,0.1); }
-  50% { box-shadow: 0 0 10px rgba(255,107,53,0.5), 0 0 28px rgba(255,107,53,0.2); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(255, 107, 53, 0.3), 0 0 18px rgba(255, 107, 53, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 10px rgba(255, 107, 53, 0.5), 0 0 28px rgba(255, 107, 53, 0.2);
+  }
 }
 
 /* Glow pulse for NOUVEAUTÉS button (green) */
 @keyframes nouveaute-glow {
-  0%, 100% { box-shadow: 0 0 6px rgba(0,200,83,0.3), 0 0 18px rgba(0,200,83,0.1); }
-  50% { box-shadow: 0 0 10px rgba(0,200,83,0.5), 0 0 28px rgba(0,200,83,0.2); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(0, 200, 83, 0.3), 0 0 18px rgba(0, 200, 83, 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 10px rgba(0, 200, 83, 0.5), 0 0 28px rgba(0, 200, 83, 0.2);
+  }
 }
 
 /* Section fade-in animation (from index.css) */
@@ -74,6 +177,7 @@
     opacity: 0;
     transform: translateY(24px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -82,6 +186,115 @@
 
 /* Scanline subtle texture for hero (from index.css) */
 @keyframes scanlines {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 100%; }
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 0 100%;
+  }
+}
+
+/* Gold shimmer for star ratings and trust badges */
+@keyframes gold-shimmer {
+
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgba(240, 180, 41, 0.4);
+  }
+
+  50% {
+    text-shadow: 0 0 14px rgba(240, 180, 41, 0.8), 0 0 28px rgba(240, 180, 41, 0.3);
+  }
+}
+
+/* Trust badge pulsing attention getter */
+@keyframes trust-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* Free shipping progress bar fill */
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: var(--progress-target, 60%);
+  }
+}
+
+/* Urgency shake for scarcity elements */
+@keyframes urgency-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-2px);
+  }
+
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+/* Typewriter cursor blink */
+@keyframes cursor-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Card entrance stagger */
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Text shimmer for headings */
+@keyframes text-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+/* Premium glow ring */
+@keyframes glow-ring {
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 194, 255, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 194, 255, 0);
+  }
 }

@@ -35,6 +35,7 @@ export function AdminOrdersPage() {
 
   // Read filters from URL
   const status = searchParams.get('status') ?? '';
+  const client = searchParams.get('client') ?? '';
   const city = searchParams.get('city') ?? '';
   const dateFrom = searchParams.get('date_from') ?? '';
   const dateTo = searchParams.get('date_to') ?? '';
@@ -49,6 +50,7 @@ export function AdminOrdersPage() {
     sort,
   };
   if (status) filters['filter[status]'] = status;
+  if (client) filters['filter[client]'] = client;
   if (city) filters['filter[city]'] = city;
   if (dateFrom) filters['filter[date_from]'] = dateFrom;
   if (dateTo) filters['filter[date_to]'] = dateTo;
@@ -130,6 +132,16 @@ export function AdminOrdersPage() {
           value={city}
           onChange={(e) => setParam('city', e.target.value)}
           sx={{ minWidth: 180 }}
+        />
+
+        {/* Client filter */}
+        <TextField
+          size="small"
+          label={"Client"}
+          placeholder="Nom, e-mail, telephone"
+          value={client}
+          onChange={(e) => setParam('client', e.target.value)}
+          sx={{ minWidth: 220 }}
         />
 
         {/* Date from */}

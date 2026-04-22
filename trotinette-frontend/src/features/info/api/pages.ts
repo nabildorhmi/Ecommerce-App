@@ -14,9 +14,10 @@ async function fetchPage(slug: string): Promise<PageData> {
   return res.data.data;
 }
 
-export function usePageBySlug(slug: string) {
+export function usePageBySlug(slug?: string) {
   return useQuery({
     queryKey: ['pages', slug],
-    queryFn: () => fetchPage(slug),
+    queryFn: () => fetchPage(slug ?? ''),
+    enabled: Boolean(slug),
   });
 }

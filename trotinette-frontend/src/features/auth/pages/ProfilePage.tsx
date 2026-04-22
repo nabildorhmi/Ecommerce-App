@@ -150,7 +150,7 @@ export function ProfilePage() {
             left: 0,
             right: 0,
             height: 2,
-            background: 'linear-gradient(90deg, #00C2FF, #0099CC, transparent)',
+            background: 'linear-gradient(90deg, #00C2FF, transparent)',
           },
         }}
       >
@@ -254,8 +254,8 @@ export function ProfilePage() {
               py: 1.5,
               borderRadius: '12px',
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #00C2FF, #0099CC)',
-              '&:hover': { transform: 'translateY(-2px)' },
+              bgcolor: '#00C2FF',
+              '&:hover': { bgcolor: '#33CFFF', transform: 'translateY(-2px)' },
               transition: 'transform 0.2s',
             }}
           >
@@ -281,7 +281,7 @@ export function ProfilePage() {
             left: 0,
             right: 0,
             height: 2,
-            background: 'linear-gradient(90deg, #E63946, #0099CC, transparent)',
+            background: 'linear-gradient(90deg, #C7404D, transparent)',
           },
         }}
       >
@@ -343,7 +343,7 @@ export function ProfilePage() {
               py: 1.5,
               borderRadius: '12px',
               fontWeight: 700,
-              background: 'linear-gradient(45deg, #E63946, #C62828)',
+              bgcolor: '#C7404D',
               '&:hover': { transform: 'translateY(-2px)' },
               transition: 'transform 0.2s',
             }}

@@ -26,17 +26,29 @@ class OrderController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $orders = QueryBuilder::for(
-            Order::query()->with(['user', 'items', 'deliveryZone'])
+            Order::query()->with(['user', 'items.product', 'items.variant.attributeValues.attribute', 'deliveryZone'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('status'),
                 AllowedFilter::exact('delivery_zone_id'),
+                AllowedFilter::callback('city', fn ($q, $v) =>
+                    $q->where('city', 'like', '%' . $v . '%')
+                ),
+                AllowedFilter::callback('client', fn ($q, $v) =>
+                    $q->where(function ($subQ) use ($v) {
+                        $subQ->where('phone', 'like', '%' . $v . '%')
+                            ->orWhereHas('user', function ($userQ) use ($v) {
+                                $userQ->where('name', 'like', '%' . $v . '%')
+                                    ->orWhere('email', 'like', '%' . $v . '%');
+                            });
+                    })
+                ),
                 AllowedFilter::callback('date_from', fn ($q, $v) => $q->whereDate('created_at', '>=', $v)),
                 AllowedFilter::callback('date_to', fn ($q, $v) => $q->whereDate('created_at', '<=', $v)),
             ])
             ->defaultSort('-created_at')
             ->allowedSorts(['created_at', 'total', 'status'])
-            ->paginate(20)
+            ->paginate(min($request->integer('per_page', 20), 100))
             ->appends($request->query());
 
         return OrderResource::collection($orders);
@@ -44,7 +56,7 @@ class OrderController extends Controller
 
     public function show(Order $order): OrderResource
     {
-        $order->load(['items.product', 'items.variant.attributeValues', 'deliveryZone', 'statusLogs', 'user']);
+        $order->load(['items.product', 'items.variant.attributeValues.attribute', 'deliveryZone', 'statusLogs', 'user']);
 
         return new OrderResource($order);
     }

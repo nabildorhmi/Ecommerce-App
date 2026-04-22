@@ -16,24 +16,42 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useAdminUser, useDeactivateUser } from '../api/users';
+import { useAdminUser, useDeactivateUser, useActivateUser } from '../api/users';
 
 export function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const userId = Number(id);
   const { data, isLoading, error } = useAdminUser(userId);
   const deactivateMutation = useDeactivateUser();
+  const activateMutation = useActivateUser();
 
   const user = data?.data;
 
   const handleDeactivate = async () => {
     if (!user) return;
-    await deactivateMutation.mutateAsync(user.id);
-    setConfirmOpen(false);
+    try {
+      await deactivateMutation.mutateAsync(user.id);
+      setConfirmOpen(false);
+      setFeedback({ type: 'success', message: 'Utilisateur desactive.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de la desactivation.' });
+    }
+  };
+
+  const handleActivate = async () => {
+    if (!user) return;
+    try {
+      await activateMutation.mutateAsync(user.id);
+      setFeedback({ type: 'success', message: 'Utilisateur active.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de l activation.' });
+    }
   };
 
   if (isLoading) {
@@ -47,7 +65,7 @@ export function AdminUserDetailPage() {
   if (error || !user) {
     return (
       <Alert severity="error">
-        Utilisateur introuvable / User not found
+        Utilisateur introuvable
       </Alert>
     );
   }
@@ -59,11 +77,11 @@ export function AdminUserDetailPage() {
         onClick={() => void navigate('/admin/users')}
         sx={{ mb: 3 }}
       >
-        {"Retour aux utilisateurs"}
+        Retour aux utilisateurs
       </Button>
 
       <Typography variant="h5" fontWeight="bold" mb={3}>
-        {"Détail utilisateur"}
+        Detail utilisateur
       </Typography>
 
       <Card variant="outlined" sx={{ mb: 3 }}>
@@ -75,43 +93,49 @@ export function AdminUserDetailPage() {
           >
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Nom"}
+                Nom
               </Typography>
               <Typography>{user.name}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"E-mail"}
+                E-mail
               </Typography>
               <Typography>{user.email}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Téléphone"}
+                Telephone
               </Typography>
               <Typography>{user.phone ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Rôle"}
+                Role
               </Typography>
-              <Typography>{user.role}</Typography>
+              <Typography>
+                {user.role === 'global_admin'
+                  ? 'Super admin'
+                  : user.role === 'admin'
+                    ? 'Admin'
+                    : 'Client'}
+              </Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Ville"}
+                Ville
               </Typography>
               <Typography>{user.address_city ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Adresse"}
+                Adresse
               </Typography>
               <Typography>{user.address_street ?? '—'}</Typography>
             </Box>
             <Box>
               <Typography variant="caption" color="text.secondary">
-                {"Statut"}
+                Statut
               </Typography>
               <Box>
                 <Chip
@@ -125,6 +149,12 @@ export function AdminUserDetailPage() {
                 />
               </Box>
             </Box>
+            <Box>
+              <Typography variant="caption" color="text.secondary">
+                Inscrit le
+              </Typography>
+              <Typography>{new Date(user.created_at).toLocaleDateString('fr-FR')}</Typography>
+            </Box>
           </Box>
 
           {user.is_active && user.role !== 'admin' && (
@@ -133,8 +163,23 @@ export function AdminUserDetailPage() {
                 color="error"
                 variant="outlined"
                 onClick={() => setConfirmOpen(true)}
+                disabled={deactivateMutation.isPending || activateMutation.isPending}
               >
-                {"Désactiver"}
+                Desactiver
+              </Button>
+            </Box>
+          )}
+
+          {!user.is_active && (
+            <Box mt={3}>
+              <Button
+                color="success"
+                variant="outlined"
+                onClick={() => void handleActivate()}
+                disabled={deactivateMutation.isPending || activateMutation.isPending}
+                startIcon={activateMutation.isPending ? <CircularProgress size={16} /> : undefined}
+              >
+                Activer
               </Button>
             </Box>
           )}
@@ -143,43 +188,64 @@ export function AdminUserDetailPage() {
 
       <Paper variant="outlined" sx={{ p: 3 }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
-          {"Historique des commandes"}
+          Historique des commandes
         </Typography>
         <Divider sx={{ mb: 2 }} />
-        <Typography color="text.secondary">
-          {"Aucune commande pour le moment"}
-        </Typography>
+        {Array.isArray(user.order_history) && user.order_history.length > 0 ? (
+          <Typography color="text.secondary">
+            {user.order_history.length} commande(s)
+          </Typography>
+        ) : (
+          <Typography color="text.secondary">
+            Aucune commande pour le moment
+          </Typography>
+        )}
       </Paper>
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>{"Désactiver"}</DialogTitle>
+        <DialogTitle>Desactiver</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {"Êtes-vous sûr de vouloir désactiver cet utilisateur ?"} <strong>{user.name}</strong>?
+            Etes-vous sur de vouloir desactiver cet utilisateur ? <strong>{user.name}</strong>?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => setConfirmOpen(false)}
-            disabled={deactivateMutation.isPending}
+            disabled={deactivateMutation.isPending || activateMutation.isPending}
           >
-            Annuler / Cancel
+            Annuler
           </Button>
           <Button
             color="error"
             variant="contained"
             onClick={() => void handleDeactivate()}
-            disabled={deactivateMutation.isPending}
+            disabled={deactivateMutation.isPending || activateMutation.isPending}
             startIcon={
               deactivateMutation.isPending ? (
                 <CircularProgress size={16} />
               ) : undefined
             }
           >
-            {"Désactiver"}
+            Desactiver
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={Boolean(feedback)}
+        autoHideDuration={3000}
+        onClose={() => setFeedback(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={feedback?.type ?? 'success'}
+          onClose={() => setFeedback(null)}
+          sx={{ width: '100%' }}
+        >
+          {feedback?.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

@@ -7,10 +7,13 @@ use App\Http\Requests\Admin\StoreProductRequest;
 use App\Http\Requests\Admin\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\Variant;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -23,12 +26,22 @@ class ProductController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $products = QueryBuilder::for(
-            Product::query()->with(['media', 'category', 'variants'])
+            Product::query()->with(['media', 'category', 'variants.attributeValues.attribute'])
         )
             ->allowedFilters([
                 AllowedFilter::exact('category_id'),
                 AllowedFilter::exact('is_active'),
                 AllowedFilter::exact('is_featured'),
+                AllowedFilter::callback('search', fn ($query, $value) =>
+                    $query->where(fn ($q) =>
+                        $q->where('name', 'like', '%' . $value . '%')
+                          ->orWhere('sku', 'like', '%' . $value . '%')
+                          ->orWhere('slug', 'like', '%' . $value . '%')
+                          ->orWhereHas('category', fn ($cq) =>
+                              $cq->where('name', 'like', '%' . $value . '%')
+                          )
+                    )
+                ),
                 AllowedFilter::callback('min_price', fn ($query, $value) =>
                     $query->where('price', '>=', (int) $value)
                 ),
@@ -43,7 +56,7 @@ class ProductController extends Controller
             ])
             ->allowedSorts(['price', 'created_at', 'sku'])
             ->defaultSort('-created_at')
-            ->paginate(perPage: 20)
+            ->paginate(perPage: min($request->integer('per_page', 20), 100))
             ->appends($request->query());
 
         return ProductResource::collection($products);
@@ -85,5 +98,28 @@ class ProductController extends Controller
         $media->delete();
 
         return response()->noContent();
+    }
+
+    public function clearDiscounts(): JsonResponse
+    {
+        [$productsUpdated, $variantsUpdated] = DB::transaction(function () {
+            $productsUpdated = Product::query()->update([
+                'promo_price' => null,
+                'discount_percentage' => null,
+            ]);
+
+            $variantsUpdated = Variant::query()->update([
+                'promo_price' => null,
+                'discount_percentage' => null,
+            ]);
+
+            return [$productsUpdated, $variantsUpdated];
+        });
+
+        return response()->json([
+            'message' => 'Toutes les remises ont ete desactivees.',
+            'products_updated' => $productsUpdated,
+            'variants_updated' => $variantsUpdated,
+        ]);
     }
 }

@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useParams, Link } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -69,6 +69,7 @@ function ProductDetailSkeleton() {
  */
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { data: product, isLoading, isError } = useProduct(slug ?? '');
   const addItem = useCartStore((s) => s.addItem);
   const items = useCartStore((s) => s.items);
@@ -112,7 +113,7 @@ export function ProductDetailPage() {
       type,
       values: Array.from(values),
     }));
-  }, [product?.variants]);
+  }, [product]);
 
   // Find matching variant based on selected values
   const selectedVariant = useMemo<ProductVariantDisplay | null>(() => {
@@ -126,7 +127,7 @@ export function ProductDetailPage() {
         );
       }) ?? null
     );
-  }, [product?.variants, selectedVariantValues, variationTypes]);
+  }, [product, selectedVariantValues, variationTypes]);
 
   // Determine displayed price, promo, and stock from selected or default variant
   const displayPrice = selectedVariant?.price ?? product?.price ?? 0;
@@ -162,23 +163,37 @@ export function ProductDetailPage() {
   const isAtMaxStock = cartItem ? cartItem.quantity >= displayStock : false;
   const isAddDisabled = !displayInStock || isAtMaxStock || variantNotSelected;
 
+  const getVariantToAdd = (): ProductVariantDisplay | null => {
+    if (selectedVariant) {
+      return selectedVariant;
+    }
+
+    if (!hasVariants && product.default_variant) {
+      return {
+        id: product.default_variant.id,
+        sku: product.default_variant.sku,
+        price: product.default_variant.price,
+        promo_price: product.default_variant.promo_price,
+        is_on_sale: product.default_variant.is_on_sale,
+        stock: product.default_variant.stock,
+        attribute_values: [],
+      } as ProductVariantDisplay;
+    }
+
+    return null;
+  };
+
   const handleAddToCart = () => {
-    // If product has no attribute variants, pass the default variant
-    const variantToAdd = selectedVariant ?? (
-      !hasVariants && product.default_variant
-        ? {
-          id: product.default_variant.id,
-          sku: product.default_variant.sku,
-          price: product.default_variant.price,
-          promo_price: product.default_variant.promo_price,
-          is_on_sale: product.default_variant.is_on_sale,
-          stock: product.default_variant.stock,
-          attribute_values: [],
-        } as ProductVariantDisplay
-        : null
-    );
+    const variantToAdd = getVariantToAdd();
     addItem(product, product.name, variantToAdd);
     setSnackbarOpen(true);
+  };
+
+  const handleBuyNow = () => {
+    if (isAddDisabled) return;
+    const variantToAdd = getVariantToAdd();
+    addItem(product, product.name, variantToAdd);
+    void navigate('/checkout');
   };
 
   return (
@@ -526,6 +541,15 @@ export function ProductDetailPage() {
 
                 <Divider />
 
+                <Box sx={{ p: 1.25, borderRadius: '10px', border: '1px solid rgba(0,194,255,0.18)', backgroundColor: 'rgba(0,194,255,0.04)' }}>
+                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#00C2FF', mb: 0.25, letterSpacing: '0.06em' }}>
+                    COMMENT ACHETER
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', lineHeight: 1.5 }}>
+                    1. Choisissez vos options. 2. Ajoutez au panier ou achetez maintenant. 3. Confirmez avec paiement a la livraison.
+                  </Typography>
+                </Box>
+
                 {/* CTA Actions */}
                 <Stack spacing={1} sx={{ pt: 0.25 }}>
                   <Button
@@ -556,6 +580,26 @@ export function ProductDetailPage() {
                         ? "Stock maximum atteint"
                         : "Ajouter au panier"}
                   </Button>
+
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      fullWidth
+                      disabled={isAddDisabled}
+                      onClick={handleBuyNow}
+                      sx={{
+                        py: { xs: 1.1, md: 1.4 },
+                        fontSize: { xs: '0.76rem', md: '0.84rem' },
+                        fontWeight: 700,
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        borderRadius: { xs: '10px', md: '12px' },
+                        borderColor: 'rgba(0,194,255,0.45)',
+                        color: '#00C2FF',
+                      }}
+                    >
+                      Acheter maintenant
+                    </Button>
 
                   {/* Reassurance micro-copy */}
                   <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 1, md: 2.5 }, flexWrap: 'wrap', pt: 0.25 }}>
@@ -609,6 +653,22 @@ export function ProductDetailPage() {
           }}
         >
           Ajouter
+        </Button>
+        <Button
+          variant="outlined"
+          disabled={isAddDisabled}
+          onClick={handleBuyNow}
+          sx={{
+            py: 1.2,
+            minWidth: 120,
+            borderColor: 'rgba(0,194,255,0.45)',
+            color: '#00C2FF',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Acheter
         </Button>
       </Box>
 

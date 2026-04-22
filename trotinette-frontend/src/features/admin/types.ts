@@ -19,6 +19,7 @@ export interface AdminProduct {
   is_active: boolean;
   is_featured: boolean;
   promo_price: number | null;
+  discount_percentage: number | null;
   is_new: boolean;
   is_on_sale: boolean;
   category_id: number | null;       // may be absent in API response

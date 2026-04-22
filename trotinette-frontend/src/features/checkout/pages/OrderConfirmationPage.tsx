@@ -11,9 +11,12 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { PageDecor } from '@/shared/components/PageDecor';
+import { useSiteSettings } from '@/shared/hooks/useSiteSettings';
 import type { OrderConfirmation } from '../types';
 
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '212600000000';
+function normalizePhoneForWa(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
 
 interface LocationState {
   order: OrderConfirmation;
@@ -26,6 +29,7 @@ export function OrderConfirmationPage() {
 
   const state = location.state as LocationState | null;
   const order = state?.order ?? null;
+  const { data: siteSettings } = useSiteSettings();
 
   // If accessed directly (no state) redirect to /orders
   useEffect(() => {
@@ -41,7 +45,8 @@ export function OrderConfirmationPage() {
   const whatsappMessage = encodeURIComponent(
     `Bonjour, j'ai passé une commande (${order.order_number}) et j'aimerais plus d'informations.`
   );
-  const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`;
+  const whatsappNumber = normalizePhoneForWa(siteSettings?.whatsapp_number ?? '212600000000');
+  const whatsappHref = siteSettings?.whatsapp_url || `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
 
   return (
     <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>

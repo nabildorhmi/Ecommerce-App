@@ -1,5 +1,5 @@
 /* Japanese cyberpunk font */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Orbitron:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 /* MiraiTech Global Styles */
 *,
@@ -9,27 +9,42 @@
 }
 
 :root {
-  --mirai-black: #0B0B0E;
-  --mirai-surface: #111116;
-  --mirai-card: #16161C;
-  --mirai-border: #1E1E28;
+  --mirai-black: #0c0c14;
+  --mirai-surface: #13131b;
+  --mirai-card: #17171f;
+  --mirai-border: #1d1d27;
   --mirai-cyan: #00C2FF;
-  --mirai-cyan-glow: rgba(0, 194, 255, 0.25);
-  --mirai-white: #F5F7FA;
-  --mirai-gray: #9CA3AF;
-  --mirai-red: #E63946;
+  --mirai-cyan-glow: rgba(0, 194, 255, 0.12);
+  --mirai-white: #E8ECF2;
+  --mirai-gray: #8A919D;
+  --mirai-red: #C7404D;
+  --mirai-gold: #D4A43A;
+  --mirai-gold-glow: rgba(212, 164, 58, 0.12);
+  --mirai-emerald: #2EAD5F;
+  --mirai-emerald-glow: rgba(46, 173, 95, 0.12);
+  --mirai-orange: #D97A50;
 
   /* Glassmorphism / Neumorphism base values */
-  --glass-bg: rgba(17, 17, 22, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --glass-blur: blur(16px);
+  --glass-bg: rgba(19, 19, 27, 0.50);
+  --glass-border: rgba(255, 255, 255, 0.04);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+  --glass-blur: blur(20px);
 
-  font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  /* Easing — Apple-like: fast start, smooth deceleration */
+  --mirai-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Spacing scale */
+  --section-gap: clamp(48px, 6vw, 96px);
+
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -51,9 +66,14 @@ a {
   text-decoration: none;
 }
 
+::selection {
+  background: rgba(0, 194, 255, 0.25);
+  color: var(--mirai-white);
+}
+
 /* Neon glow utility */
 .mirai-glow {
-  text-shadow: 0 0 20px var(--mirai-cyan-glow), 0 0 40px var(--mirai-cyan-glow);
+  text-shadow: 0 0 16px var(--mirai-cyan-glow), 0 0 32px var(--mirai-cyan-glow);
 }
 
 /* Glassmorphic Panel Utility */
@@ -67,7 +87,7 @@ a {
 
 /* Gradient text */
 .mirai-gradient-text {
-  background: linear-gradient(135deg, #00C2FF, #0099CC, #E63946);
+  background: linear-gradient(135deg, #00C2FF, #C7404D);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -91,7 +111,49 @@ a {
   background: var(--mirai-cyan);
 }
 
-/* Utility classes that use animations defined in animations.css */
+/* ── Trust Badge Utility ──────────────────────────────────────────── */
+.mirai-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: rgba(19, 19, 27, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.mirai-trust-badge:hover {
+  border-color: rgba(0, 194, 255, 0.2);
+  background: rgba(0, 194, 255, 0.03);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 194, 255, 0.06);
+}
+
+/* ── Section Divider ──────────────────────────────────────────────── */
+.mirai-section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 194, 255, 0.12) 30%, rgba(0, 194, 255, 0.25) 50%, rgba(0, 194, 255, 0.12) 70%, transparent);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Premium Badge ────────────────────────────────────────────────── */
+.mirai-premium-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Utility classes that use animations defined in animations.css ── */
 .mirai-animate-in {
   animation: miraiSlideUp 0.6s ease forwards;
 }

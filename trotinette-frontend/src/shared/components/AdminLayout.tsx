@@ -7,6 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
+import Collapse from '@mui/material/Collapse';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -26,12 +27,15 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ViewCarouselIcon from '@mui/icons-material/ViewCarousel';
 import PeopleIcon from '@mui/icons-material/People';
+import SettingsIcon from '@mui/icons-material/Settings';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useAuthStore } from '@/features/auth/store';
 import { apiClient } from '@/shared/api/client';
 import miraiLogo from '@/assets/miraiTech-Logo.png';
@@ -50,6 +54,12 @@ interface NavItem {
   badge?: number;
 }
 
+interface NavGroup {
+  id: string;
+  label: string;
+  items: NavItem[];
+}
+
 /** Page title map derived from pathname */
 function getPageTitle(pathname: string): string {
   const map: Record<string, string> = {
@@ -62,6 +72,7 @@ function getPageTitle(pathname: string): string {
     '/admin/pages': 'Pages',
     '/admin/hero-banners': 'Hero Banners',
     '/admin/users': 'Utilisateurs',
+    '/admin/site-settings': 'Parametres du site',
   };
 
   // Exact match first
@@ -89,6 +100,13 @@ export function AdminLayout() {
 
   const [collapsed, setCollapsed] = useState(isTablet);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [groupExpanded, setGroupExpanded] = useState<Record<string, boolean>>({
+    pilotage: true,
+    catalogue: true,
+    contenu: true,
+    parametres: true,
+    administration: true,
+  });
 
   // Pending orders count
   const { data: pendingData } = useQuery({
@@ -103,23 +121,132 @@ export function AdminLayout() {
   });
   const pendingCount = (pendingData as number) ?? 0;
 
-  // Build nav items
-  const navItems: NavItem[] = [
-    { to: '/admin', icon: <DashboardIcon />, label: 'Tableau de bord', exact: true },
-    { to: '/admin/products', icon: <Inventory2Icon />, label: 'Produits' },
-    { to: '/admin/categories', icon: <CategoryIcon />, label: 'Categories' },
-    { to: '/admin/variation-types', icon: <TuneIcon />, label: 'Types de variations' },
-    { to: '/admin/orders', icon: <ReceiptLongIcon />, label: 'Commandes', badge: pendingCount },
-    { to: '/admin/pages', icon: <DescriptionIcon />, label: 'Pages' },
-    { to: '/admin/hero-banners', icon: <ViewCarouselIcon />, label: 'Hero Banners' },
+  const navGroups: NavGroup[] = [
+    {
+      id: 'pilotage',
+      label: 'Pilotage',
+      items: [
+        { to: '/admin', icon: <DashboardIcon />, label: 'Tableau de bord', exact: true },
+        { to: '/admin/orders', icon: <ReceiptLongIcon />, label: 'Commandes', badge: pendingCount },
+      ],
+    },
+    {
+      id: 'catalogue',
+      label: 'Catalogue',
+      items: [
+        { to: '/admin/products', icon: <Inventory2Icon />, label: 'Produits' },
+        { to: '/admin/categories', icon: <CategoryIcon />, label: 'Categories' },
+        { to: '/admin/variation-types', icon: <TuneIcon />, label: 'Types de variations' },
+        { to: '/admin/hero-banners', icon: <ViewCarouselIcon />, label: 'Bannieres hero' },
+      ],
+    },
+    {
+      id: 'contenu',
+      label: 'Contenu',
+      items: [
+        { to: '/admin/pages', icon: <DescriptionIcon />, label: 'Pages markdown' },
+      ],
+    },
+    ...(user?.role === 'global_admin'
+      ? [{
+        id: 'parametres',
+        label: 'Parametres',
+        items: [
+          { to: '/admin/site-settings#contact', icon: <SettingsIcon />, label: 'Contact et disponibilite' },
+          { to: '/admin/site-settings#social', icon: <SettingsIcon />, label: 'Reseaux sociaux' },
+          { to: '/admin/site-settings#shipping', icon: <TuneIcon />, label: 'Livraison et tarification' },
+          { to: '/admin/site-settings#short-links', icon: <DescriptionIcon />, label: 'Short links dynamiques' },
+        ],
+      }]
+      : []),
+    ...(user?.role === 'global_admin'
+      ? [{
+        id: 'administration',
+        label: 'Administration',
+        items: [{ to: '/admin/users', icon: <PeopleIcon />, label: 'Utilisateurs' }],
+      }]
+      : []),
   ];
-  if (user?.role === 'global_admin') {
-    navItems.push({ to: '/admin/users', icon: <PeopleIcon />, label: 'Utilisateurs' });
-  }
+
+  const allNavItems = navGroups.flatMap((group) => group.items);
 
   const isItemActive = (item: NavItem) => {
-    if (item.exact) return location.pathname === item.to;
-    return location.pathname.startsWith(item.to);
+    const [itemPath, itemHashRaw] = item.to.split('#');
+    const itemHash = itemHashRaw ? `#${itemHashRaw}` : '';
+
+    if (itemHash) {
+      return location.pathname === itemPath && location.hash === itemHash;
+    }
+
+    if (item.exact) return location.pathname === itemPath;
+    return location.pathname.startsWith(itemPath);
+  };
+
+  const toggleGroup = (groupId: string) => {
+    setGroupExpanded((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  const renderNavButton = (item: NavItem) => {
+    const active = isItemActive(item);
+    const iconEl = item.badge && item.badge > 0
+      ? <Badge badgeContent={item.badge} color="error" max={99}>{item.icon}</Badge>
+      : item.icon;
+
+    const button = (
+      <ListItemButton
+        key={item.to}
+        component={Link}
+        to={item.to}
+        onClick={() => isMobile && setMobileOpen(false)}
+        sx={{
+          mx: 1,
+          mb: 0.25,
+          borderRadius: '8px',
+          borderLeft: '3px solid',
+          borderLeftColor: active ? '#00C2FF' : 'transparent',
+          backgroundColor: active ? 'rgba(0,194,255,0.08)' : 'transparent',
+          boxShadow: active ? 'inset 4px 0 12px rgba(0,194,255,0.06)' : 'none',
+          color: active ? '#00C2FF' : '#8A919D',
+          transition: 'all 0.2s ease',
+          justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
+          px: collapsed && !isMobile ? 1.5 : 2,
+          py: 1,
+          minHeight: 44,
+          '&:hover': {
+            color: active ? '#00C2FF' : '#E8ECF2',
+            backgroundColor: active ? 'rgba(0,194,255,0.08)' : 'rgba(255,255,255,0.03)',
+          },
+        }}
+      >
+        <ListItemIcon
+          sx={{
+            color: 'inherit',
+            minWidth: collapsed && !isMobile ? 0 : 36,
+            justifyContent: 'center',
+          }}
+        >
+          {iconEl}
+        </ListItemIcon>
+        {(!collapsed || isMobile) && (
+          <ListItemText
+            primary={item.label}
+            primaryTypographyProps={{
+              fontSize: '0.82rem',
+              fontWeight: active ? 600 : 500,
+              whiteSpace: 'nowrap',
+            }}
+          />
+        )}
+      </ListItemButton>
+    );
+
+    return collapsed && !isMobile ? (
+      <Tooltip key={item.to} title={item.label} placement="right" arrow>
+        {button}
+      </Tooltip>
+    ) : (
+      <Box key={item.to}>{button}</Box>
+    );
   };
 
   const sidebarWidth = isMobile ? SIDEBAR_EXPANDED : (collapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED);
@@ -144,88 +271,47 @@ export function AdminLayout() {
           alt="MiraiTech"
           sx={{ height: 32, width: 'auto', flexShrink: 0 }}
         />
-        {(!collapsed || isMobile) && (
-          <Typography
-            sx={{
-              fontFamily: '"Orbitron", sans-serif',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              letterSpacing: '0.15em',
-              color: '#00C2FF',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            MIRAI ADMIN
-          </Typography>
-        )}
+  
       </Box>
 
       <Divider sx={{ borderColor: '#1d1d27' }} />
 
       {/* Nav items */}
       <List sx={{ flex: 1, py: 1, overflow: 'auto' }}>
-        {navItems.map((item) => {
-          const active = isItemActive(item);
-          const iconEl = item.badge && item.badge > 0
-            ? <Badge badgeContent={item.badge} color="error" max={99}>{item.icon}</Badge>
-            : item.icon;
-
-          const button = (
-            <ListItemButton
-              key={item.to}
-              component={Link}
-              to={item.to}
-              onClick={() => isMobile && setMobileOpen(false)}
-              sx={{
-                mx: 1,
-                mb: 0.25,
-                borderRadius: '8px',
-                borderLeft: '3px solid',
-                borderLeftColor: active ? '#00C2FF' : 'transparent',
-                backgroundColor: active ? 'rgba(0,194,255,0.08)' : 'transparent',
-                boxShadow: active ? 'inset 4px 0 12px rgba(0,194,255,0.06)' : 'none',
-                color: active ? '#00C2FF' : '#8A919D',
-                transition: `all 0.2s ease`,
-                justifyContent: collapsed && !isMobile ? 'center' : 'flex-start',
-                px: collapsed && !isMobile ? 1.5 : 2,
-                py: 1,
-                minHeight: 44,
-                '&:hover': {
-                  color: active ? '#00C2FF' : '#E8ECF2',
-                  backgroundColor: active ? 'rgba(0,194,255,0.08)' : 'rgba(255,255,255,0.03)',
-                },
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  color: 'inherit',
-                  minWidth: collapsed && !isMobile ? 0 : 36,
-                  justifyContent: 'center',
-                }}
-              >
-                {iconEl}
-              </ListItemIcon>
-              {(!collapsed || isMobile) && (
-                <ListItemText
-                  primary={item.label}
-                  primaryTypographyProps={{
-                    fontSize: '0.82rem',
-                    fontWeight: active ? 600 : 500,
-                    whiteSpace: 'nowrap',
+        {collapsed && !isMobile
+          ? allNavItems.map((item) => renderNavButton(item))
+          : navGroups.map((group) => {
+            const isOpen = groupExpanded[group.id] ?? true;
+            return (
+              <Box key={group.id} sx={{ mb: 0.5 }}>
+                <ListItemButton
+                  onClick={() => toggleGroup(group.id)}
+                  sx={{
+                    mx: 1,
+                    mb: 0.4,
+                    minHeight: 34,
+                    borderRadius: '8px',
+                    color: '#9BA3AF',
+                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)', color: '#E8ECF2' },
                   }}
-                />
-              )}
-            </ListItemButton>
-          );
-
-          return collapsed && !isMobile ? (
-            <Tooltip key={item.to} title={item.label} placement="right" arrow>
-              {button}
-            </Tooltip>
-          ) : (
-            <Box key={item.to}>{button}</Box>
-          );
-        })}
+                >
+                  <ListItemText
+                    primary={group.label}
+                    primaryTypographyProps={{
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    }}
+                  />
+                  {isOpen ? <ExpandLessIcon sx={{ fontSize: '1rem' }} /> : <ExpandMoreIcon sx={{ fontSize: '1rem' }} />}
+                </ListItemButton>
+                <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                  <Box>{group.items.map((item) => renderNavButton(item))}</Box>
+                </Collapse>
+              </Box>
+            );
+          })}
       </List>
 
       <Divider sx={{ borderColor: '#1d1d27' }} />

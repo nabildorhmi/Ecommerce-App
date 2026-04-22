@@ -24,6 +24,7 @@ import Chip from '@mui/material/Chip';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { PageDecor } from '@/shared/components/PageDecor';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
@@ -40,6 +41,8 @@ import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { RegisterForm } from '../../auth/components/RegisterForm';
 import { registerApi, updateProfileApi, type RegisterData } from '../../auth/api/auth';
 import { MOROCCAN_CITIES } from '@/shared/constants/moroccanCities';
+import { useSiteSettings } from '@/shared/hooks/useSiteSettings';
+import { defaultSiteSettings, getDeliveryFeeForSubtotal } from '@/shared/types/siteSettings';
 
 const orderSchema = z.object({
   note: z.string().max(500, { message: 'Note must be 500 characters or less' }).optional(),
@@ -76,6 +79,7 @@ export function CheckoutPage() {
   const items = useCartStore((s) => s.items);
   const subtotalCentimes = useCartStore((s) => s.subtotalCentimes());
   const user = useAuthStore((s) => s.user);
+  const { data: siteSettings } = useSiteSettings();
 
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [editingDelivery, setEditingDelivery] = useState(false);
@@ -184,6 +188,17 @@ export function CheckoutPage() {
 
   if (items.length === 0) return null;
 
+  const pricingSettings = siteSettings ?? defaultSiteSettings;
+  const deliveryFeeCentimes = getDeliveryFeeForSubtotal(pricingSettings, subtotalCentimes);
+  const checkoutTotalCentimes = subtotalCentimes + deliveryFeeCentimes;
+
+  const hasDeliveryInfo = Boolean(user?.phone && user?.address_city);
+  const canSubmitOrder = Boolean(user) && hasDeliveryInfo && !editingDelivery;
+  const stepStates = {
+    infoDone: Boolean(user),
+    deliveryDone: Boolean(user) && hasDeliveryInfo && !editingDelivery,
+  };
+
   return (
     <Box sx={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
       <PageDecor variant="checkout" />
@@ -201,21 +216,21 @@ export function CheckoutPage() {
         {/* Progress stepper */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0, mb: 4, maxWidth: 480 }}>
           {[
-            { step: 1, label: 'Informations' },
-            { step: 2, label: 'Livraison' },
-            { step: 3, label: 'Confirmation' },
-          ].map(({ step, label }, i) => (
+            { step: 1, label: 'Informations', done: stepStates.infoDone, active: !stepStates.infoDone },
+            { step: 2, label: 'Livraison', done: stepStates.deliveryDone, active: stepStates.infoDone && !stepStates.deliveryDone },
+            { step: 3, label: 'Confirmation', done: false, active: stepStates.deliveryDone },
+          ].map(({ step, label, done, active }, i) => (
             <>
               <Box key={step} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
                 <Box sx={{
                   width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  bgcolor: step === 1 ? '#00C2FF' : 'rgba(255,255,255,0.07)',
-                  border: step <= 2 ? '1px solid rgba(0,194,255,0.3)' : '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: step === 1 ? '0 0 12px rgba(0,194,255,0.3)' : 'none',
+                  bgcolor: active ? '#00C2FF' : done ? 'rgba(46,173,95,0.2)' : 'rgba(255,255,255,0.07)',
+                  border: active || done ? '1px solid rgba(0,194,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: active ? '0 0 12px rgba(0,194,255,0.3)' : 'none',
                 }}>
-                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: step === 1 ? '#0c0c14' : 'text.disabled' }}>{step}</Typography>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 800, color: active ? '#0c0c14' : done ? '#2EAD5F' : 'text.disabled' }}>{step}</Typography>
                 </Box>
-                <Typography sx={{ fontSize: '0.6rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? '#00C2FF' : 'text.disabled', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{label}</Typography>
+                <Typography sx={{ fontSize: '0.6rem', fontWeight: active ? 700 : 500, color: active ? '#00C2FF' : done ? '#2EAD5F' : 'text.disabled', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{label}</Typography>
               </Box>
               {i < 2 && <Box sx={{ flex: 1, height: 1, bgcolor: 'rgba(255,255,255,0.08)', mx: 1, mb: 2.5 }} />}
             </>
@@ -430,7 +445,7 @@ export function CheckoutPage() {
                 <Stack spacing={1} divider={<Divider />}>
                   {items.map((item) => (
                     <Stack
-                      key={item.productId}
+                      key={`${item.productId}-${item.variantId ?? 'default'}`}
                       direction="row"
                       justifyContent="space-between"
                       alignItems="center"
@@ -481,13 +496,15 @@ export function CheckoutPage() {
                   </Stack>
                   <Stack direction="row" justifyContent="space-between">
                     <Typography variant="body2">Frais de livraison</Typography>
-                    <Typography variant="body2" color="success.main">Gratuit</Typography>
+                    <Typography variant="body2" color={deliveryFeeCentimes === 0 ? 'success.main' : 'text.primary'}>
+                      {deliveryFeeCentimes === 0 ? 'Gratuit' : formatCurrency(deliveryFeeCentimes)}
+                    </Typography>
                   </Stack>
                   <Divider />
                   <Stack direction="row" justifyContent="space-between">
                     <Typography variant="body1" fontWeight={700}>Total</Typography>
                     <Typography variant="body1" fontWeight={700} color="primary">
-                      {formatCurrency(subtotalCentimes)}
+                      {formatCurrency(checkoutTotalCentimes)}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -495,7 +512,7 @@ export function CheckoutPage() {
 
               {/* Note */}
               <TextField
-                label="Note (optionnel)"
+                label="Instructions de livraison (optionnel)"
                 placeholder="Instructions de livraison, code d'accès..."
                 multiline
                 rows={3}
@@ -508,12 +525,30 @@ export function CheckoutPage() {
 
               {apiErrorMessage && <Alert severity="error">{apiErrorMessage}</Alert>}
 
+              {!user && (
+                <Alert severity="warning" sx={{ borderRadius: '12px' }}>
+                  Creez votre compte ci-dessus pour finaliser la commande.
+                </Alert>
+              )}
+
+              {user && !hasDeliveryInfo && (
+                <Alert severity="warning" sx={{ borderRadius: '12px' }}>
+                  Ajoutez votre telephone et votre ville de livraison avant de confirmer.
+                </Alert>
+              )}
+
+              {editingDelivery && (
+                <Alert severity="info" sx={{ borderRadius: '12px' }}>
+                  Enregistrez vos informations de livraison pour activer la confirmation.
+                </Alert>
+              )}
+
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
                 fullWidth
-                disabled={isPending || !user || editingDelivery}
+                disabled={isPending || !canSubmitOrder}
                 startIcon={isPending ? <CircularProgress size={16} color="inherit" /> : undefined}
                 sx={{
                   py: 2,
@@ -527,7 +562,22 @@ export function CheckoutPage() {
                   transition: 'all 0.3s ease',
                 }}
               >
-                {isPending ? 'Envoi en cours...' : `Confirmer — ${formatCurrency(subtotalCentimes)}`}
+                {isPending ? 'Envoi en cours...' : `Confirmer — ${formatCurrency(checkoutTotalCentimes)}`}
+              </Button>
+
+              <Button
+                variant="outlined"
+                fullWidth
+                startIcon={<ShoppingCartOutlinedIcon />}
+                onClick={() => void navigate('/products')}
+                sx={{
+                  borderRadius: '12px',
+                  borderColor: 'rgba(0,194,255,0.3)',
+                  color: '#00C2FF',
+                  fontWeight: 600,
+                }}
+              >
+                Continuer mes achats
               </Button>
 
               {/* Final reassurance */}

@@ -23,10 +23,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
 import Container from '@mui/material/Container';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   useAdminCategories,
   useDeleteCategory,
@@ -55,30 +58,28 @@ function DeleteDialog({
 
   return (
     <Dialog open={Boolean(category)} onClose={onClose}>
-      <DialogTitle>Supprimer la categorie / Delete category</DialogTitle>
+      <DialogTitle>Supprimer la categorie</DialogTitle>
       <DialogContent>
         {hasProducts && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            Cette categorie contient {category?.product_count} produit(s). La
-            suppression sera bloquee / This category has {category?.product_count}{' '}
-            product(s). Deletion will be blocked.
+            Cette categorie contient {category?.product_count} produit(s). La suppression sera bloquee.
           </Alert>
         )}
         <DialogContentText>
           Etes-vous sur de vouloir supprimer{' '}
           <strong>{category?.name ?? category?.slug}</strong>
-          {' '}? Are you sure you want to delete this category?
+          {' '}?
         </DialogContentText>
         {deleteError && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {(deleteError as { response?: { data?: { message?: string } } })
-              ?.response?.data?.message ?? 'Suppression impossible / Deletion failed'}
+              ?.response?.data?.message ?? 'Suppression impossible'}
           </Alert>
         )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isDeleting}>
-          Annuler / Cancel
+          Annuler
         </Button>
         <Button
           color="error"
@@ -87,7 +88,7 @@ function DeleteDialog({
           disabled={isDeleting}
           startIcon={isDeleting ? <CircularProgress size={16} /> : undefined}
         >
-          Supprimer / Delete
+          Supprimer
         </Button>
       </DialogActions>
     </Dialog>
@@ -102,13 +103,20 @@ export function AdminCategoriesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<AdminCategory | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminCategory | null>(null);
+  const [search, setSearch] = useState('');
 
   const categories: AdminCategory[] = (data?.data as AdminCategory[]) ?? [];
+  const filteredCategories = categories.filter((cat) => {
+    const q = search.trim().toLowerCase();
+    if (!q) return true;
+    return cat.name.toLowerCase().includes(q) || cat.slug.toLowerCase().includes(q);
+  });
 
   const [catPage, setCatPage] = useState(1);
   const [catPerPage, setCatPerPage] = useState(10);
-  const catTotalPages = Math.ceil(categories.length / catPerPage);
-  const paginatedCategories = categories.slice((catPage - 1) * catPerPage, catPage * catPerPage);
+  const catTotalPages = Math.max(1, Math.ceil(filteredCategories.length / catPerPage));
+  const safeCatPage = Math.min(catPage, catTotalPages);
+  const paginatedCategories = filteredCategories.slice((safeCatPage - 1) * catPerPage, safeCatPage * catPerPage);
 
   const handleToggleActive = async (cat: AdminCategory) => {
     await updateMutation.mutateAsync({
@@ -169,9 +177,52 @@ export function AdminCategoriesPage() {
           startIcon={<AddIcon />}
           onClick={openCreate}
         >
-          Ajouter une categorie / Add category
+          Ajouter une categorie
         </Button>
       </Box>
+
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
+          Gestion des categories
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Organisez votre catalogue par famille de produits. Activez ou desactivez rapidement une categorie depuis le tableau.
+        </Typography>
+      </Paper>
+
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
+          <TextField
+            size="small"
+            placeholder="Rechercher (nom, slug)"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCatPage(1);
+            }}
+            sx={{ minWidth: 240 }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          {search && (
+            <Button size="small" variant="outlined" onClick={() => { setSearch(''); setCatPage(1); }}>
+              Effacer
+            </Button>
+          )}
+
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+            {filteredCategories.length} categorie(s)
+          </Typography>
+        </Box>
+      </Paper>
 
       <TableContainer component={Paper}>
         <Table size="small">
@@ -179,15 +230,15 @@ export function AdminCategoriesPage() {
             <TableRow>
               <TableCell>Nom</TableCell>
               <TableCell>Slug</TableCell>
-              <TableCell>Actif / Active</TableCell>
+              <TableCell>Statut</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {categories.length === 0 ? (
+            {filteredCategories.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center">
-                  Aucune categorie / No categories found
+                  Aucune categorie
                 </TableCell>
               </TableRow>
             ) : (
@@ -198,7 +249,7 @@ export function AdminCategoriesPage() {
                   <TableCell>
                     <Chip
                       label={
-                        cat.is_active ? 'Actif / Active' : 'Inactif / Inactive'
+                        cat.is_active ? 'Actif' : 'Inactif'
                       }
                       color={cat.is_active ? 'success' : 'default'}
                       size="small"
@@ -210,7 +261,7 @@ export function AdminCategoriesPage() {
                     <IconButton
                       size="small"
                       onClick={() => openEdit(cat)}
-                      title="Modifier / Edit"
+                      title="Modifier"
                     >
                       <EditIcon fontSize="small" />
                     </IconButton>
@@ -218,7 +269,7 @@ export function AdminCategoriesPage() {
                       size="small"
                       color="error"
                       onClick={() => setDeleteTarget(cat)}
-                      title="Supprimer / Delete"
+                      title="Supprimer"
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
@@ -247,13 +298,13 @@ export function AdminCategoriesPage() {
             </Select>
           </FormControl>
           <Typography variant="body2" color="text.secondary">
-            {categories.length} au total
+            {filteredCategories.length} au total
           </Typography>
         </Box>
         {catTotalPages > 1 && (
           <Pagination
             count={catTotalPages}
-            page={catPage}
+            page={safeCatPage}
             onChange={(_e, p) => setCatPage(p)}
             color="primary"
             size="small"
@@ -270,8 +321,8 @@ export function AdminCategoriesPage() {
       >
         <DialogTitle>
           {editTarget
-            ? 'Modifier la categorie / Edit category'
-            : 'Nouvelle categorie / New category'}
+            ? 'Modifier la categorie'
+            : 'Nouvelle categorie'}
         </DialogTitle>
         <DialogContent>
           <Box pt={1}>

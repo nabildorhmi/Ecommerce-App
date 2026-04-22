@@ -12,9 +12,37 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function index(): ResourceCollection
+    public function index(Request $request): ResourceCollection
     {
-        $users = User::with('roles')->paginate(25);
+        $users = User::query()
+            ->with('roles')
+            ->when(
+                $request->filled('filter.search') || $request->filled('filter[search]'),
+                function ($query) use ($request) {
+                    $search = (string) ($request->input('filter.search') ?? $request->input('filter[search]'));
+                    $query->where(function ($q) use ($search) {
+                        $q->where('name', 'like', '%' . $search . '%')
+                            ->orWhere('email', 'like', '%' . $search . '%')
+                            ->orWhere('phone', 'like', '%' . $search . '%');
+                    });
+                }
+            )
+            ->when(
+                $request->filled('filter.role') || $request->filled('filter[role]'),
+                function ($query) use ($request) {
+                    $role = (string) ($request->input('filter.role') ?? $request->input('filter[role]'));
+                    $query->whereHas('roles', fn ($rq) => $rq->where('name', $role));
+                }
+            )
+            ->when(
+                $request->filled('filter.is_active') || $request->filled('filter[is_active]'),
+                function ($query) use ($request) {
+                    $isActive = (int) ($request->input('filter.is_active') ?? $request->input('filter[is_active]'));
+                    $query->where('is_active', $isActive === 1);
+                }
+            )
+            ->latest('id')
+            ->paginate(min($request->integer('per_page', 25), 100));
 
         return UserResource::collection($users);
     }

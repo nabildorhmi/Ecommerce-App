@@ -19,6 +19,7 @@ import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import Pagination from '@mui/material/Pagination';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -36,7 +37,7 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import NewReleasesOutlinedIcon from '@mui/icons-material/NewReleasesOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { useAdminProducts, useDeleteProduct, useUpdateProduct } from '../api/products';
+import { useAdminProducts, useDeleteProduct, useUpdateProduct, useClearAllProductDiscounts } from '../api/products';
 import { useCategories } from '../../catalog/api/categories';
 import type { AdminProduct } from '../types';
 function formatPrice(centimes: number): string {
@@ -104,8 +105,11 @@ export function AdminProductsPage() {
   const categories = categoriesData?.data ?? [];
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
+  const clearDiscountsMutation = useClearAllProductDiscounts();
 
   const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null);
+  const [clearDiscountsDialogOpen, setClearDiscountsDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const products: AdminProduct[] = (data?.data as AdminProduct[]) ?? [];
   const totalPages = data?.meta?.last_page ?? 1;
@@ -134,6 +138,22 @@ export function AdminProductsPage() {
   const handleDelete = async (id: number) => {
     await deleteMutation.mutateAsync(id);
     setDeleteTarget(null);
+  };
+
+  const handleClearAllDiscounts = async () => {
+    try {
+      const result = await clearDiscountsMutation.mutateAsync() as {
+        products_updated?: number;
+        variants_updated?: number;
+      };
+      setClearDiscountsDialogOpen(false);
+      setFeedback({
+        type: 'success',
+        message: `Remises desactivees (${result.products_updated ?? 0} produits, ${result.variants_updated ?? 0} variantes).`,
+      });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de la desactivation globale des remises.' });
+    }
   };
 
   return (
@@ -169,59 +189,82 @@ export function AdminProductsPage() {
         </Button>
       </Box>
 
-      {/* ── Filters bar ── */}
-      <Box display="flex" gap={1.5} mb={2} flexWrap="wrap" alignItems="center">
-        <TextField
-          size="small"
-          placeholder="Rechercher (nom, SKU…)"
-          value={search}
-          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          sx={{ minWidth: 220 }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-        <FormControl size="small" sx={{ minWidth: 180 }}>
-          <InputLabel sx={{ fontSize: '0.82rem' }}>Catégorie</InputLabel>
-          <Select
-            label="Catégorie"
-            value={categoryId}
-            onChange={(e) => { setCategoryId(e.target.value as number | ''); setPage(1); }}
-            startAdornment={<FilterListIcon fontSize="small" sx={{ mr: 0.5, color: 'text.disabled' }} />}
-          >
-            <MenuItem value="">Toutes</MenuItem>
-            {categories.map((cat) => (
-              <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl size="small" sx={{ minWidth: 130 }}>
-          <InputLabel sx={{ fontSize: '0.82rem' }}>Statut</InputLabel>
-          <Select
-            label="Statut"
-            value={activeFilter}
-            onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
-          >
-            <MenuItem value="">Tous</MenuItem>
-            <MenuItem value="1">Actifs</MenuItem>
-            <MenuItem value="0">Inactifs</MenuItem>
-          </Select>
-        </FormControl>
-        {(search || categoryId !== '' || activeFilter !== '') && (
-          <Button size="small" variant="outlined" color="inherit" onClick={() => { setSearch(''); setCategoryId(''); setActiveFilter(''); setPage(1); }}>
-            Effacer
-          </Button>
-        )}
-        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
-          {data?.meta?.total ?? 0} produit(s)
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
+          Organisation produits
         </Typography>
-      </Box>
+        <Typography variant="body2" color="text.secondary">
+          Utilisez les filtres pour trouver rapidement un produit, puis activez ou mettez a jour ses badges depuis le tableau.
+        </Typography>
+      </Paper>
+
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+          Filtres et actions rapides
+        </Typography>
+        <Box display="flex" gap={1.5} flexWrap="wrap" alignItems="center">
+          <TextField
+            size="small"
+            placeholder="Rechercher (nom, SKU...)"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            sx={{ minWidth: 220 }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <FormControl size="small" sx={{ minWidth: 180 }}>
+            <InputLabel sx={{ fontSize: '0.82rem' }}>Categorie</InputLabel>
+            <Select
+              label="Categorie"
+              value={categoryId}
+              onChange={(e) => { setCategoryId(e.target.value as number | ''); setPage(1); }}
+              startAdornment={<FilterListIcon fontSize="small" sx={{ mr: 0.5, color: 'text.disabled' }} />}
+            >
+              <MenuItem value="">Toutes</MenuItem>
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <InputLabel sx={{ fontSize: '0.82rem' }}>Statut</InputLabel>
+            <Select
+              label="Statut"
+              value={activeFilter}
+              onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+            >
+              <MenuItem value="">Tous</MenuItem>
+              <MenuItem value="1">Actifs</MenuItem>
+              <MenuItem value="0">Inactifs</MenuItem>
+            </Select>
+          </FormControl>
+          {(search || categoryId !== '' || activeFilter !== '') && (
+            <Button size="small" variant="outlined" color="inherit" onClick={() => { setSearch(''); setCategoryId(''); setActiveFilter(''); setPage(1); }}>
+              Effacer
+            </Button>
+          )}
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={() => setClearDiscountsDialogOpen(true)}
+            disabled={clearDiscountsMutation.isPending}
+            startIcon={clearDiscountsMutation.isPending ? <CircularProgress size={14} /> : undefined}
+          >
+            Desactiver toutes remises
+          </Button>
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+            {data?.meta?.total ?? 0} produit(s)
+          </Typography>
+        </Box>
+      </Paper>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -393,6 +436,35 @@ export function AdminProductsPage() {
         isDeleting={deleteMutation.isPending}
       />
 
+      <Dialog
+        open={clearDiscountsDialogOpen}
+        onClose={() => setClearDiscountsDialogOpen(false)}
+      >
+        <DialogTitle>Desactiver toutes les remises</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Cette action va supprimer les remises de tous les produits et de toutes les variantes. Vous pourrez ensuite reactiver des remises produit par produit.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setClearDiscountsDialogOpen(false)}
+            disabled={clearDiscountsMutation.isPending}
+          >
+            Annuler
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => void handleClearAllDiscounts()}
+            disabled={clearDiscountsMutation.isPending}
+            startIcon={clearDiscountsMutation.isPending ? <CircularProgress size={16} /> : undefined}
+          >
+            Desactiver toutes remises
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Box display="flex" justifyContent="space-between" alignItems="center" mt={3} flexWrap="wrap" gap={2}>
         <Box display="flex" alignItems="center" gap={1}>
           <FormControl size="small" sx={{ minWidth: 130 }}>
@@ -418,6 +490,21 @@ export function AdminProductsPage() {
           />
         )}
       </Box>
+
+      <Snackbar
+        open={Boolean(feedback)}
+        autoHideDuration={3000}
+        onClose={() => setFeedback(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          severity={feedback?.type ?? 'success'}
+          onClose={() => setFeedback(null)}
+          sx={{ width: '100%' }}
+        >
+          {feedback?.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

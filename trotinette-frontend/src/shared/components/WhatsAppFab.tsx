@@ -1,16 +1,20 @@
 import Fab from '@mui/material/Fab';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import { useSiteSettings } from '@/shared/hooks/useSiteSettings';
 
-// Phone number comes from env — client-visible (public phone number, acceptable)
-const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '212600000000';
+function normalizePhoneForWa(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
 
 /**
  * WhatsAppFab — Global floating action button for WhatsApp contact.
  * Fixed at bottom-right corner on all pages.
  */
 export function WhatsAppFab() {
-  const message = encodeURIComponent("Bonjour, je suis interesse(e) par vos trottinettes");
-  const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+  const { data: siteSettings } = useSiteSettings();
+  const message = encodeURIComponent(siteSettings?.whatsapp_prefill_message ?? 'Bonjour, je suis interesse(e) par vos trottinettes');
+  const number = normalizePhoneForWa(siteSettings?.whatsapp_number ?? '212600000000');
+  const href = siteSettings?.whatsapp_url || `https://wa.me/${number}?text=${message}`;
 
   return (
     <Fab

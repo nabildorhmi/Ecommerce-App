@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -6,12 +6,10 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import IconButton from '@mui/material/IconButton';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { motion } from 'framer-motion';
-import CountUp from 'react-countup';
 
 import { useFeaturedProducts, useProducts } from '../../catalog/api/products';
 import { ProductCard } from '../../catalog/components/ProductCard';
@@ -20,6 +18,7 @@ import { TrustBadgesSection } from '../components/TrustBadgesSection';
 import { TestimonialsSection } from '../components/TestimonialsSection';
 import { WhyChooseUsSection } from '../components/WhyChooseUsSection';
 import { AnimatedSection } from '@/shared/components/AnimatedSection';
+import { useSiteSettings } from '@/shared/hooks/useSiteSettings';
 import type { Product } from '../../catalog/types';
 
 /* ════════════════════════════════════════════════════════════════════
@@ -202,63 +201,33 @@ function NouveauteSection() {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   PROMO BANNER SECTION — with countdown timer
+   PROMO BANNER SECTION — dynamic from real sales
    ════════════════════════════════════════════════════════════════════ */
-function useCountdown() {
-  // Countdown to end of current month as the promo deadline
-  const getTarget = () => {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).getTime();
-  };
-
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const diff = getTarget() - Date.now();
-    return diff > 0 ? diff : 0;
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const diff = getTarget() - Date.now();
-      setTimeLeft(diff > 0 ? diff : 0);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((timeLeft / (1000 * 60)) % 60);
-  const seconds = Math.floor((timeLeft / 1000) % 60);
-
-  return { days, hours, minutes, seconds };
-}
-
-function CountdownBox({ value, label }: { value: number; label: string }) {
-  return (
-    <Box sx={{ textAlign: 'center', minWidth: 52 }}>
-      <Box sx={{
-        bgcolor: 'rgba(199,64,77,0.12)',
-        border: '1px solid rgba(199,64,77,0.25)',
-        borderRadius: '10px',
-        px: 1.5, py: 0.75,
-        mb: 0.5,
-      }}>
-        <Typography sx={{
-          fontFamily: '"Orbitron", sans-serif',
-          fontWeight: 800, fontSize: '1.2rem', color: '#E8ECF2',
-          lineHeight: 1,
-        }}>
-          {String(value).padStart(2, '0')}
-        </Typography>
-      </Box>
-      <Typography sx={{ fontSize: '0.6rem', color: '#8A919D', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-        {label}
-      </Typography>
-    </Box>
-  );
-}
+const MANUAL_PROMO_HEADLINE: string | null = null;
 
 function PromoSection() {
-  const countdown = useCountdown();
+  const { data, isLoading } = useProducts({ 'filter[is_on_sale]': '1', per_page: 24 });
+  const { data: siteSettings } = useSiteSettings();
+  const saleProducts = data?.data ?? [];
+  const manualHeadlineFromEnv = (import.meta.env.VITE_HOME_PROMO_HEADLINE as string | undefined)?.trim();
+  const manualHeadlineFromCms = siteSettings?.home_promo_headline?.trim();
+
+  if (!isLoading && saleProducts.length === 0) {
+    return null;
+  }
+
+  const biggestDiscount = saleProducts.reduce((max, product) => {
+    const fromField = product.discount_percentage ?? 0;
+    const fromPrice =
+      product.promo_price != null && product.price > 0
+        ? Math.round((1 - product.promo_price / product.price) * 100)
+        : 0;
+    return Math.max(max, fromField, fromPrice);
+  }, 0);
+
+  const headline =
+    (manualHeadlineFromCms || manualHeadlineFromEnv || MANUAL_PROMO_HEADLINE)
+    ?? (biggestDiscount > 0 ? `JUSQU'A -${biggestDiscount}%` : 'OFFRES SPECIALES');
 
   return (
     <AnimatedSection>
@@ -284,12 +253,9 @@ function PromoSection() {
             <Box sx={{ position: 'absolute', right: -100, top: -100, width: 300, height: 300, background: 'radial-gradient(circle, rgba(199,64,77,0.15) 0%, transparent 70%)', borderRadius: '50%', pointerEvents: 'none' }} />
 
             <Box sx={{ flex: 1, zIndex: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                <AccessTimeIcon sx={{ fontSize: '1rem', color: '#C7404D' }} />
-                <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em', color: '#C7404D', textTransform: 'uppercase' }}>
-                  OFFRE LIMITÉE
-                </Typography>
-              </Box>
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em', color: '#C7404D', textTransform: 'uppercase', mb: 1.5 }}>
+                OFFRES EN COURS
+              </Typography>
               <Typography
                 sx={{
                   fontWeight: 900,
@@ -301,24 +267,13 @@ function PromoSection() {
                   textTransform: 'uppercase',
                 }}
               >
-                JUSQU'À <Box component="span" sx={{ color: '#00C2FF' }}>
-                  -<CountUp end={30} duration={2} />%
+                <Box component="span" sx={{ color: '#00C2FF' }}>
+                  {headline}
                 </Box>
               </Typography>
               <Typography sx={{ fontSize: '0.95rem', color: '#8A919D', maxWidth: 450, lineHeight: 1.6, mb: 3 }}>
-                Ne manquez pas ces prix exceptionnels sur nos trottinettes les plus populaires. Une fois le stock écoulé, les prix remontent.
+                Profitez des meilleures reductions disponibles actuellement sur notre catalogue.
               </Typography>
-
-              {/* Countdown timer */}
-              <Box sx={{ display: 'flex', gap: 1, mb: { xs: 2, md: 0 } }}>
-                <CountdownBox value={countdown.days} label="Jours" />
-                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
-                <CountdownBox value={countdown.hours} label="Heures" />
-                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
-                <CountdownBox value={countdown.minutes} label="Min" />
-                <Typography sx={{ color: '#C7404D', fontWeight: 700, fontSize: '1.2rem', alignSelf: 'flex-start', mt: 1 }}>:</Typography>
-                <CountdownBox value={countdown.seconds} label="Sec" />
-              </Box>
             </Box>
 
             <Box sx={{ flexShrink: 0, zIndex: 1 }}>

@@ -12,6 +12,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Paper from '@mui/material/Paper';
+import { useParams } from 'react-router';
 import EditIcon from '@mui/icons-material/Edit';
 import MDEditor from '@uiw/react-md-editor';
 import { PageDecor } from '@/shared/components/PageDecor';
@@ -20,7 +21,7 @@ import { useUpdatePage } from '../../admin/api/pages';
 import { useAuthStore } from '../../auth/store';
 
 interface DynamicPageProps {
-  slug: string;
+  slug?: string;
 }
 
 const markdownStyles = {
@@ -33,7 +34,9 @@ const markdownStyles = {
 
 
 export function DynamicPage({ slug }: DynamicPageProps) {
-  const { data: page, isLoading, error } = usePageBySlug(slug);
+  const params = useParams<{ slug: string }>();
+  const pageSlug = slug ?? params.slug;
+  const { data: page, isLoading, error } = usePageBySlug(pageSlug);
   const updateMutation = useUpdatePage();
   const user = useAuthStore((s) => s.user);
   const isAdmin = user?.role === 'admin' || user?.role === 'global_admin';
@@ -42,6 +45,14 @@ export function DynamicPage({ slug }: DynamicPageProps) {
   const [editContent, setEditContent] = useState('');
   const [editTab, setEditTab] = useState(0);
   const [successOpen, setSuccessOpen] = useState(false);
+
+  if (!pageSlug) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 6 }}>
+        <Alert severity="error">Page non disponible</Alert>
+      </Container>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -71,7 +82,7 @@ export function DynamicPage({ slug }: DynamicPageProps) {
 
   const handleSave = async () => {
     await updateMutation.mutateAsync({
-      slug,
+      slug: pageSlug,
       title: page.title,
       content: editContent,
     });

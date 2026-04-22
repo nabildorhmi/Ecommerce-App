@@ -307,7 +307,7 @@ export function HeroSection() {
             <Box
                 sx={{
                     position: 'absolute',
-                    bottom: { xs: 80, md: 60 },
+                    bottom: { xs: 100, md: 80 },
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 3,

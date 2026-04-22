@@ -6,6 +6,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Button,
   Select,
   MenuItem,
   FormControl,
@@ -74,8 +75,9 @@ export function AdminDashboardPage() {
   const handleFilterChange = (key: keyof DashboardFilters, value: string | number | undefined) => {
     setFilters((prev) => {
       if (value === undefined || value === '') {
-        const { [key]: _, ...rest } = prev;
-        return rest;
+        const next = { ...prev };
+        delete next[key];
+        return next;
       }
       return { ...prev, [key]: value };
     });
@@ -116,8 +118,20 @@ export function AdminDashboardPage() {
         </Typography>
       </Box>
 
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
+          Vue de pilotage
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Analysez les performances commerciales par periode, statut de commande et tendances de vente.
+        </Typography>
+      </Paper>
+
       {/* Filters */}
       <Paper className="mirai-glass" sx={{ p: 2, mb: 3, borderRadius: '12px' }}>
+        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
+          Filtres d analyse
+        </Typography>
         <Stack direction="row" spacing={2} flexWrap="wrap" gap={2}>
           <TextField
             label="Date début"
@@ -134,7 +148,7 @@ export function AdminDashboardPage() {
             size="small"
             sx={{ minWidth: 150 }}
             InputLabelProps={{ shrink: true }}
-            value={filters.date_from || ''}
+            value={filters.date_to || ''}
             onChange={(e) => handleFilterChange('date_to', e.target.value)}
           />
           <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -182,6 +196,15 @@ export function AdminDashboardPage() {
               ))}
             </Select>
           </FormControl>
+          {Object.keys(filters).length > 0 && (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setFilters({})}
+            >
+              Effacer filtres
+            </Button>
+          )}
         </Stack>
       </Paper>
 
@@ -190,8 +213,8 @@ export function AdminDashboardPage() {
         {[
           { title: 'Commandes totales', value: data.kpis.total_orders, color: '#00C2FF' },
           { title: "Chiffre d'affaires", value: data.kpis.total_revenue, isCurrency: true, color: '#0099CC' },
-          { title: 'Panier moyen', value: data.kpis.average_order_value, isCurrency: true, color: '#E63946' },
-          { title: 'Nouveaux clients', value: data.kpis.new_customers, color: '#9CA3AF' },
+          { title: 'Panier moyen', value: data.kpis.average_order_value, isCurrency: true, color: '#C7404D' },
+          { title: 'Nouveaux clients', value: data.kpis.new_customers, color: '#8A919D' },
         ].map((kpi, i) => (
           <motion.div
             key={kpi.title}
@@ -200,7 +223,7 @@ export function AdminDashboardPage() {
             transition={{ delay: i * 0.1, duration: 0.5 }}
             whileHover={{ y: -5 }}
           >
-            <Card className="mirai-glass" sx={{ borderRadius: '16px', borderBottom: `2px solid ${kpi.color}`, transition: 'all 0.3s' }}>
+            <Card className="mirai-glass" sx={{ borderRadius: '16px', borderLeft: `3px solid ${kpi.color}`, transition: 'all 0.3s' }}>
               <CardContent>
                 <Typography sx={{ color: 'var(--mirai-gray)', fontSize: '0.85rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }} gutterBottom>
                   {kpi.title}
@@ -288,7 +311,7 @@ export function AdminDashboardPage() {
               <XAxis type="number" />
               <YAxis type="category" dataKey="product_name" width={150} />
               <Tooltip />
-              <Bar dataKey="total_quantity" fill="#E63946" name="Quantité" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="total_quantity" fill="#C7404D" name="Quantité" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Paper>

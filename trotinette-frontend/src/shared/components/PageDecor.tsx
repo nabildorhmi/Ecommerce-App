@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 const CYAN   = '#00C2FF';
-const RED    = '#E63946';
+const RED    = '#C7404D';
 const PINK   = '#FF2D78';
 const PURPLE = '#8B5CF6';
 

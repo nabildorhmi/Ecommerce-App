@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import ElectricScooterIcon from '@mui/icons-material/ElectricScooter';
 import { useCartStore } from '../store';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
 import type { CartItem as CartItemType } from '../types';
@@ -26,8 +27,8 @@ export function CartItem({ item }: CartItemProps) {
       sx={{
         display: 'flex',
         alignItems: 'center',
-        gap: 2,
-        py: 1.5,
+        gap: 1.75,
+        py: 1.75,
         borderBottom: '1px solid',
         borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.04)' : 'divider',
       }}
@@ -39,80 +40,82 @@ export function CartItem({ item }: CartItemProps) {
           src={item.thumbnailUrl}
           alt={item.name}
           sx={{
-            width: 64,
-            height: 64,
-            objectFit: 'cover',
-            borderRadius: 1,
-            flexShrink: 0,
+            width: 68, height: 68, objectFit: 'cover',
+            borderRadius: '10px', flexShrink: 0,
+            border: '1px solid rgba(255,255,255,0.07)',
           }}
         />
       ) : (
         <Box
           sx={{
-            width: 64,
-            height: 64,
-            bgcolor: 'grey.200',
-            borderRadius: 1,
-            flexShrink: 0,
+            width: 68, height: 68,
+            borderRadius: '10px', flexShrink: 0,
+            background: 'rgba(0,194,255,0.06)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
-        />
+        >
+          <ElectricScooterIcon sx={{ fontSize: '1.4rem', color: 'rgba(0,194,255,0.4)' }} />
+        </Box>
       )}
 
-      {/* Name + price */}
-      <Stack flex={1} spacing={0.5} minWidth={0}>
-        <Typography variant="body2" fontWeight={600} noWrap title={item.name}>
+      {/* Name + variant + unit price */}
+      <Stack flex={1} spacing={0.4} minWidth={0}>
+        <Typography variant="body2" fontWeight={700} noWrap title={item.name} sx={{ color: 'text.primary' }}>
           {item.name}
         </Typography>
         {item.variantLabel && (
-          <Typography variant="caption" color="primary.main" noWrap>
+          <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600 }} noWrap>
             {item.variantLabel}
           </Typography>
         )}
-        <Typography variant="caption" color="text.secondary">
-          {formatCurrency(item.price)}
+        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+          {formatCurrency(item.price)} / unité
         </Typography>
       </Stack>
 
       {/* Quantity controls */}
-      <Stack direction="row" alignItems="center" spacing={0.5}>
+      <Box sx={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', overflow: 'hidden', flexShrink: 0 }}>
         <IconButton
           size="small"
           onClick={handleDecrement}
           disabled={item.quantity <= 1}
-          aria-label={"Quantité" + ' -'}
+          aria-label="Quantité -"
+          sx={{ borderRadius: 0, width: 28, height: 28, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(0,194,255,0.08)' } }}
         >
-          <RemoveIcon fontSize="small" />
+          <RemoveIcon sx={{ fontSize: '0.85rem' }} />
         </IconButton>
-        <Typography variant="body2" sx={{ minWidth: 20, textAlign: 'center' }}>
+        <Typography variant="body2" sx={{ minWidth: 28, textAlign: 'center', fontWeight: 700, color: 'text.primary', fontSize: '0.85rem' }}>
           {item.quantity}
         </Typography>
         <IconButton
           size="small"
           onClick={handleIncrement}
           disabled={item.quantity >= item.stockQuantity}
-          aria-label={"Quantité" + ' +'}
+          aria-label="Quantité +"
+          sx={{ borderRadius: 0, width: 28, height: 28, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'rgba(0,194,255,0.08)' } }}
         >
-          <AddIcon fontSize="small" />
+          <AddIcon sx={{ fontSize: '0.85rem' }} />
         </IconButton>
-      </Stack>
+      </Box>
 
-      {/* Subtotal */}
+      {/* Item total */}
       <Typography
         variant="body2"
-        fontWeight={600}
-        sx={{ minWidth: 80, textAlign: 'right' }}
+        fontWeight={700}
+        sx={{ minWidth: 72, textAlign: 'right', color: '#00C2FF', flexShrink: 0 }}
       >
         {formatCurrency(item.price * item.quantity)}
       </Typography>
 
-      {/* Remove button */}
+      {/* Remove */}
       <IconButton
         size="small"
         onClick={handleRemove}
-        aria-label={"Supprimer"}
-        color="error"
+        aria-label="Supprimer"
+        sx={{ color: 'text.disabled', '&:hover': { color: '#C7404D', bgcolor: 'rgba(199,64,77,0.08)' }, flexShrink: 0 }}
       >
-        <DeleteOutlineIcon fontSize="small" />
+        <DeleteOutlineIcon sx={{ fontSize: '1rem' }} />
       </IconButton>
     </Box>
   );

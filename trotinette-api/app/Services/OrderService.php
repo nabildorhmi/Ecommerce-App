@@ -73,11 +73,11 @@ class OrderService
                 'note'        => null,
             ]);
 
-            return $order->load(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
+            return $order->load(['items.product', 'items.variant.attributeValues.attribute', 'statusLogs', 'user']);
         });
 
         // k. Dispatch event AFTER successful DB transaction - listeners will send emails asynchronously
-        OrderPlaced::dispatch($order);
+        OrderPlaced::dispatch($order->id);
 
         return $order;
     }
@@ -108,10 +108,10 @@ class OrderService
             ]);
         });
 
-        $order = $order->fresh(['items.product', 'items.variant.attributeValues', 'statusLogs', 'user']);
+        $order = $order->fresh(['items.product', 'items.variant.attributeValues.attribute', 'statusLogs', 'user']);
 
         // Dispatch event AFTER successful DB transaction - listener will send status-specific email asynchronously
-        OrderStatusChanged::dispatch($order, $newStatus, $note);
+        OrderStatusChanged::dispatch($order->id, $newStatus, $note);
 
         return $order;
     }
@@ -123,6 +123,6 @@ class OrderService
     {
         $order->update(['note' => $note]);
 
-        return $order->fresh(['items.product', 'items.variant.attributeValues', 'statusLogs']);
+        return $order->fresh(['items.product', 'items.variant.attributeValues.attribute', 'statusLogs']);
     }
 }

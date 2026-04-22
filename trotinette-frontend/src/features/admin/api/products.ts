@@ -37,7 +37,8 @@ function buildProductFormData(data: {
   slug?: string;
   description?: string;
   price?: number; // centimes (already converted)
-  promo_price?: number | null; // centimes (already converted)
+  stock_quantity?: number;
+  discount_percentage?: number | null; // 0-100 integer
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
@@ -53,8 +54,9 @@ function buildProductFormData(data: {
   if (data.slug !== undefined) fd.append('slug', data.slug);
   if (data.description !== undefined) fd.append('description', data.description);
   if (data.price !== undefined) fd.append('price', String(data.price));
-  if (data.promo_price !== undefined) {
-    fd.append('promo_price', data.promo_price !== null ? String(data.promo_price) : '');
+  if (data.stock_quantity !== undefined) fd.append('stock_quantity', String(data.stock_quantity));
+  if (data.discount_percentage !== undefined) {
+    fd.append('discount_percentage', data.discount_percentage !== null ? String(data.discount_percentage) : '');
   }
   if (data.category_id !== undefined && data.category_id !== null)
     fd.append('category_id', String(data.category_id));
@@ -95,7 +97,8 @@ interface CreateProductInput {
   slug: string;
   description: string;
   price: number; // in MAD — we convert to centimes here
-  promo_price?: number | null; // in MAD — base promo price
+  stock_quantity?: number;
+  discount_percentage?: number | null; // 0-100 integer
   category_id: number | null;
   is_active: boolean;
   is_featured: boolean;
@@ -112,7 +115,8 @@ export function useCreateProduct() {
       const fd = buildProductFormData({
         ...input,
         price: Math.round(input.price * 100), // MAD -> centimes
-        promo_price: input.promo_price != null ? Math.round(input.promo_price * 100) : null,
+        stock_quantity: input.stock_quantity ?? 0,
+        discount_percentage: input.discount_percentage ?? null,
         delete_images: [],
       });
       const res = await apiClient.post('/admin/products', fd, {
@@ -134,7 +138,7 @@ interface UpdateProductInput {
   slug?: string;
   description?: string;
   price?: number; // in MAD — converted to centimes
-  promo_price?: number | null; // in MAD — base promo price
+  discount_percentage?: number | null; // 0-100 integer
   category_id?: number | null;
   is_active?: boolean;
   is_featured?: boolean;
@@ -148,13 +152,11 @@ export function useUpdateProduct() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, price, promo_price, ...rest }: UpdateProductInput) => {
+    mutationFn: async ({ id, price, discount_percentage, ...rest }: UpdateProductInput) => {
       const fd = buildProductFormData({
         ...rest,
         price: price !== undefined ? Math.round(price * 100) : undefined,
-        promo_price: promo_price !== undefined
-          ? (promo_price != null ? Math.round(promo_price * 100) : null)
-          : undefined,
+        discount_percentage: discount_percentage !== undefined ? discount_percentage : undefined,
       });
       // Laravel doesn't support PUT/PATCH with multipart — use POST + _method
       fd.append('_method', 'PATCH');
@@ -208,6 +210,21 @@ export function useDeleteProductImage() {
       void queryClient.invalidateQueries({
         queryKey: ['admin', 'products', variables.productId],
       });
+    },
+  });
+}
+
+export function useClearAllProductDiscounts() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post('/admin/products/discounts/clear');
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      void queryClient.invalidateQueries({ queryKey: ['products'] });
     },
   });
 }

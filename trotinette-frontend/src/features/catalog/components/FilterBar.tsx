@@ -28,7 +28,11 @@ const LABEL_STYLE = {
 /**
  * MiraiTech FilterBar — vertical sidebar filter panel.
  */
-export function FilterBar() {
+interface FilterBarProps {
+  isMobileOpen?: () => void;
+}
+
+export function FilterBar({ isMobileOpen }: FilterBarProps = {}) {
   const { filters, setFilter, clearFilters } = useCatalogFilters();
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
@@ -71,25 +75,32 @@ export function FilterBar() {
   const handleClear = () => {
     setSearchInput('');
     clearFilters();
+    if (isMobileOpen) isMobileOpen();
   };
 
-  const hasActiveFilters =
-    !!filters['filter[search]'] ||
-    !!filters['filter[category_id]'] ||
-    !!filters['filter[min_price]'] ||
-    !!filters['filter[max_price]'] ||
-    !!filters['filter[in_stock]'] ||
-    !!filters['filter[is_new]'] ||
-    !!filters['filter[is_on_sale]'];
+  const activeFilterCount = [
+    filters['filter[search]'],
+    filters['filter[category_id]'],
+    filters['filter[min_price]'],
+    filters['filter[max_price]'],
+    filters['filter[in_stock]'],
+    filters['filter[is_new]'],
+    filters['filter[is_on_sale]'],
+  ].filter(Boolean).length;
+
+  const hasActiveFilters = activeFilterCount > 0;
 
   return (
     <Box
-      className="mirai-glass"
       sx={{
         borderRadius: '16px',
-        p: 2.5,
+        p: 3,
         position: { md: 'sticky' },
-        top: { md: 80 },
+        top: { md: 100 },
+        background: 'rgba(17, 17, 22, 0.6)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.05)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
         overflow: 'hidden',
         '&::before': {
           content: '""',
@@ -98,20 +109,27 @@ export function FilterBar() {
           left: 0,
           right: 0,
           height: 2,
-          background: 'linear-gradient(90deg, #00C2FF, transparent)',
+          background: '#00C2FF',
         },
       }}
     >
       {/* Header */}
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TuneIcon sx={{ fontSize: '1rem', color: '#00C2FF' }} />
-          <Typography sx={{ fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', color: 'text.primary', textTransform: 'uppercase' }}>
-            {"Filtres"}
+          <TuneIcon sx={{ fontSize: '1.2rem', color: '#00C2FF' }} />
+          <Typography sx={{ fontWeight: 800, fontSize: '0.85rem', letterSpacing: '0.15em', color: '#E8ECF2', textTransform: 'uppercase', fontFamily: '"Orbitron", sans-serif' }}>
+            Filtres
           </Typography>
-          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.55rem', color: 'rgba(0,194,255,0.2)' }}>
-            フィルター
-          </Typography>
+          {activeFilterCount > 0 && (
+            <Box sx={{
+              bgcolor: '#00C2FF', color: '#0c0c14',
+              borderRadius: '50%', width: 20, height: 20,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '0.65rem', fontWeight: 800,
+            }}>
+              {activeFilterCount}
+            </Box>
+          )}
         </Box>
         {hasActiveFilters && (
           <Button
@@ -119,10 +137,10 @@ export function FilterBar() {
             onClick={handleClear}
             sx={{
               fontSize: '0.65rem',
-              color: '#E63946',
+              color: '#C7404D',
               minWidth: 'auto',
               p: '2px 6px',
-              '&:hover': { backgroundColor: 'rgba(230,57,70,0.08)' },
+              '&:hover': { backgroundColor: 'rgba(199,64,77,0.08)' },
             }}
           >
             {"Effacer"}
@@ -149,7 +167,15 @@ export function FilterBar() {
                 ),
               },
             }}
-            sx={{ '& input': { fontSize: '0.82rem' } }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                bgcolor: 'rgba(255,255,255,0.02)',
+                '& fieldset': { borderColor: 'rgba(255,255,255,0.05)' },
+                '&:hover fieldset': { borderColor: 'rgba(0,194,255,0.2)' },
+                '&.Mui-focused fieldset': { borderColor: '#00C2FF' },
+              },
+              '& input': { fontSize: '0.82rem', color: '#E8ECF2' },
+            }}
           />
         </Box>
 
@@ -163,7 +189,15 @@ export function FilterBar() {
               value={filters['filter[category_id]'] ?? ''}
               onChange={(e) => setFilter('filter[category_id]', e.target.value)}
               displayEmpty
-              sx={{ fontSize: '0.82rem' }}
+              sx={{
+                fontSize: '0.82rem',
+                color: '#E8ECF2',
+                bgcolor: 'rgba(255,255,255,0.02)',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,194,255,0.2)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00C2FF' },
+                '& .MuiSvgIcon-root': { color: 'text.secondary' },
+              }}
             >
               <MenuItem value="" sx={{ fontSize: '0.82rem' }}>
                 <em style={{ fontStyle: 'normal' }} className="filter-placeholder">{"Toutes les catégories"}</em>
@@ -190,7 +224,15 @@ export function FilterBar() {
               value={minPriceDisplay}
               onChange={(e) => handleMinPrice(e.target.value)}
               slotProps={{ input: { inputProps: { min: 0 } } }}
-              sx={{ '& input': { fontSize: '0.82rem' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'rgba(255,255,255,0.02)',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.05)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0,194,255,0.2)' },
+                  '&.Mui-focused fieldset': { borderColor: '#00C2FF' },
+                },
+                '& input': { fontSize: '0.82rem', color: '#E8ECF2' },
+              }}
             />
             <TextField
               size="small"
@@ -199,7 +241,15 @@ export function FilterBar() {
               value={maxPriceDisplay}
               onChange={(e) => handleMaxPrice(e.target.value)}
               slotProps={{ input: { inputProps: { min: 0 } } }}
-              sx={{ '& input': { fontSize: '0.82rem' } }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: 'rgba(255,255,255,0.02)',
+                  '& fieldset': { borderColor: 'rgba(255,255,255,0.05)' },
+                  '&:hover fieldset': { borderColor: 'rgba(0,194,255,0.2)' },
+                  '&.Mui-focused fieldset': { borderColor: '#00C2FF' },
+                },
+                '& input': { fontSize: '0.82rem', color: '#E8ECF2' },
+              }}
             />
           </Stack>
         </Box>
@@ -213,10 +263,14 @@ export function FilterBar() {
               checked={filters['filter[in_stock]'] === '1'}
               onChange={(e) => setFilter('filter[in_stock]', e.target.checked ? '1' : '')}
               size="small"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#00C2FF' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#00C2FF' },
+              }}
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+            <Typography sx={{ fontSize: '0.78rem', color: '#E8ECF2', fontWeight: 600 }}>
               {"En stock uniquement"}
             </Typography>
           }
@@ -230,10 +284,14 @@ export function FilterBar() {
               checked={filters['filter[is_on_sale]'] === '1'}
               onChange={(e) => setFilter('filter[is_on_sale]', e.target.checked ? '1' : '')}
               size="small"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#C7404D' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#C7404D' },
+              }}
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+            <Typography sx={{ fontSize: '0.78rem', color: '#E8ECF2', fontWeight: 600 }}>
               {"Promotions"}
             </Typography>
           }
@@ -247,10 +305,14 @@ export function FilterBar() {
               checked={filters['filter[is_new]'] === '1'}
               onChange={(e) => setFilter('filter[is_new]', e.target.checked ? '1' : '')}
               size="small"
+              sx={{
+                '& .MuiSwitch-switchBase.Mui-checked': { color: '#2EAD5F' },
+                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#2EAD5F' },
+              }}
             />
           }
           label={
-            <Typography sx={{ fontSize: '0.78rem', color: 'text.secondary', fontWeight: 500 }}>
+            <Typography sx={{ fontSize: '0.78rem', color: '#E8ECF2', fontWeight: 600 }}>
               {"Nouveautés"}
             </Typography>
           }

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, useRouteError } from 'react-router';
 import { ProtectedRoute } from '@/shared/components/ProtectedRoute';
@@ -71,6 +72,7 @@ const AboutPage = lazy(() => import('@/features/info/pages/AboutPage').then(m =>
 const ContactPage = lazy(() => import('@/features/info/pages/ContactPage').then(m => ({ default: m.ContactPage })));
 const CgvPage = lazy(() => import('@/features/info/pages/CgvPage').then(m => ({ default: m.CgvPage })));
 const MentionsLegalesPage = lazy(() => import('@/features/info/pages/MentionsLegalesPage').then(m => ({ default: m.MentionsLegalesPage })));
+const DynamicPage = lazy(() => import('@/features/info/pages/DynamicPage').then(m => ({ default: m.DynamicPage })));
 
 // Admin layout + pages
 const AdminLayout = lazy(() => import('@/shared/components/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -85,6 +87,7 @@ const AdminOrderDetailPage = lazy(() => import('@/features/orders/pages/AdminOrd
 const AdminPagesPage = lazy(() => import('@/features/admin/pages/AdminPagesPage').then(m => ({ default: m.AdminPagesPage })));
 const AdminVariationTypesPage = lazy(() => import('@/features/admin/pages/AdminVariationTypesPage').then(m => ({ default: m.AdminVariationTypesPage })));
 const AdminHeroBannersPage = lazy(() => import('@/features/admin/pages/AdminHeroBannersPage').then(m => ({ default: m.AdminHeroBannersPage })));
+const AdminSiteSettingsPage = lazy(() => import('@/features/admin/pages/AdminSiteSettingsPage').then(m => ({ default: m.AdminSiteSettingsPage })));
 
 export const router = createBrowserRouter([
   {
@@ -141,6 +144,10 @@ export const router = createBrowserRouter([
         path: '/mentions-legales',
         element: <Suspense fallback={<PageLoader />}><MentionsLegalesPage /></Suspense>,
       },
+      {
+        path: '/pages/:slug',
+        element: <Suspense fallback={<PageLoader />}><DynamicPage /></Suspense>,
+      },
       // Protected routes — require authentication
       {
         element: <ProtectedRoute />,
@@ -175,6 +182,7 @@ export const router = createBrowserRouter([
           { path: '/admin/orders', element: <Suspense fallback={<PageLoader />}><AdminOrdersPage /></Suspense> },
           { path: '/admin/orders/:id', element: <Suspense fallback={<PageLoader />}><AdminOrderDetailPage /></Suspense> },
           { path: '/admin/pages', element: <Suspense fallback={<PageLoader />}><AdminPagesPage /></Suspense> },
+          { path: '/admin/site-settings', element: <Suspense fallback={<PageLoader />}><AdminSiteSettingsPage /></Suspense> },
           { path: '/admin/variation-types', element: <Suspense fallback={<PageLoader />}><AdminVariationTypesPage /></Suspense> },
           { path: '/admin/hero-banners', element: <Suspense fallback={<PageLoader />}><AdminHeroBannersPage /></Suspense> },
         ],

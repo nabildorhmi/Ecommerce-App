@@ -1,8 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import Dialog from '@mui/material/Dialog';
@@ -11,6 +10,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
@@ -20,17 +20,17 @@ import Switch from '@mui/material/Switch';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import InputAdornment from '@mui/material/InputAdornment';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
 import Divider from '@mui/material/Divider';
+import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import StarIcon from '@mui/icons-material/Star';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import {
   useVariationTypes,
   useProductVariants,
@@ -45,7 +45,7 @@ import type { ProductVariant, VariationType } from '../types';
 // ---------------------------------------------------------------------------
 //  Constants
 // ---------------------------------------------------------------------------
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 8;
 
 // ---------------------------------------------------------------------------
 //  Types
@@ -57,17 +57,16 @@ interface ProductVariantsSectionProps {
 
 interface VariantFormData {
   sku: string;
-  priceOverrideMad: string; // in MAD for display
-  promoPriceMad: string;    // in MAD for display
+  priceOverrideMad: string;
+  promoPriceMad: string;
   stockQuantity: string;
   isActive: boolean;
-  selectedValues: Record<number, number>; // attribute_id -> attribute_value_id
+  selectedValues: Record<number, number>;
 }
 
 // ---------------------------------------------------------------------------
 //  VariantDialog — create / edit a single variant
 // ---------------------------------------------------------------------------
-
 interface VariantDialogProps {
   open: boolean;
   editTarget: ProductVariant | null;
@@ -90,7 +89,6 @@ function VariantDialog({
 }: VariantDialogProps) {
   const isDefault = editTarget?.is_default === true;
 
-  // Initialize form data
   const initialSelectedValues: Record<number, number> = {};
   if (editTarget) {
     editTarget.attribute_values.forEach((val) => {
@@ -98,69 +96,96 @@ function VariantDialog({
     });
   }
 
+  const typesWithValues = variationTypes.filter((t) => t.values.length > 0);
+  const initialSelectedAttributeIds = typesWithValues
+    .filter((type) => Boolean(initialSelectedValues[type.id]))
+    .map((type) => type.id);
+
+  const [selectedAttributeIds, setSelectedAttributeIds] = useState<number[]>(initialSelectedAttributeIds);
+
   const [formData, setFormData] = useState<VariantFormData>({
     sku: editTarget?.sku ?? '',
-    priceOverrideMad: editTarget?.price
-      ? (editTarget.price / 100).toFixed(2)
-      : '',
-    promoPriceMad: editTarget?.promo_price
-      ? (editTarget.promo_price / 100).toFixed(2)
-      : '',
+    priceOverrideMad: editTarget?.price ? (editTarget.price / 100).toFixed(2) : '',
+    promoPriceMad: editTarget?.promo_price ? (editTarget.promo_price / 100).toFixed(2) : '',
     stockQuantity: editTarget?.stock.toString() ?? '0',
     isActive: editTarget?.is_active ?? true,
     selectedValues: initialSelectedValues,
   });
 
-  const handleSubmit = async () => {
-    await onSubmit(formData);
-  };
-
-  const typesWithValues = variationTypes.filter((t) => t.values.length > 0);
+  const selectedTypes = typesWithValues.filter((type) => selectedAttributeIds.includes(type.id));
+  const hasAllRequiredSelections =
+    isDefault ||
+    (selectedTypes.length > 0 && selectedTypes.every((type) => Boolean(formData.selectedValues[type.id])));
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth
+      PaperProps={{ sx: { background: 'rgba(14,14,22,0.97)', border: '1px solid rgba(0,194,255,0.12)', borderRadius: '16px' } }}
+    >
+      <DialogTitle sx={{ fontWeight: 700, color: 'var(--mirai-white)', fontSize: '1rem' }}>
         {isDefault
-          ? 'Modifier la variante par défaut / Edit default variant'
+          ? 'Modifier la variante par défaut'
           : editTarget
-            ? 'Modifier la variante / Edit variant'
-            : 'Ajouter une variante / Add variant'}
+            ? 'Modifier la variante'
+            : 'Ajouter une variante'}
       </DialogTitle>
       <DialogContent>
-        <Box pt={1}>
-          {/* Hide attribute selectors for default variant */}
+        <Box pt={1} display="flex" flexDirection="column" gap={2}>
+          {/* Attribute selectors — hidden for default variant */}
           {!isDefault && (
             <>
               {typesWithValues.length === 0 && (
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                  Aucun type de variation disponible. Créez d'abord des types avec des valeurs / No variation types available. Create types with values first.
+                <Alert severity="warning">
+                  Aucun type de variation disponible.{' '}
+                  <a href="/admin/variation-types" style={{ color: '#00C2FF' }}>
+                    Créez des attributs d'abord →
+                  </a>
                 </Alert>
               )}
+              <Autocomplete
+                multiple
+                size="small"
+                options={typesWithValues}
+                getOptionLabel={(option) => option.name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                value={typesWithValues.filter((type) => selectedAttributeIds.includes(type.id))}
+                noOptionsText="Aucun attribut"
+                onChange={(_, newSelected) => {
+                  const nextIds = newSelected.map((type) => type.id);
+                  setSelectedAttributeIds(nextIds);
+                  setFormData((prev) => {
+                    const nextValues: Record<number, number> = {};
+                    for (const attrId of nextIds) {
+                      const picked = prev.selectedValues[attrId];
+                      if (picked) nextValues[attrId] = picked;
+                    }
+                    return { ...prev, selectedValues: nextValues };
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Attributs a utiliser"
+                    placeholder="Rechercher puis selectionner des attributs..."
+                  />
+                )}
+              />
 
-              {typesWithValues.map((type) => (
-                <FormControl key={type.id} fullWidth margin="normal">
+              {selectedTypes.map((type) => (
+                <FormControl key={type.id} fullWidth size="small">
                   <InputLabel>{type.name}</InputLabel>
                   <Select
                     value={formData.selectedValues[type.id] ?? ''}
                     onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        selectedValues: {
-                          ...formData.selectedValues,
-                          [type.id]: Number(e.target.value),
-                        },
-                      })
+                      setFormData((prev) => ({
+                        ...prev,
+                        selectedValues: { ...prev.selectedValues, [type.id]: Number(e.target.value) },
+                      }))
                     }
                     label={type.name}
-                    required
                   >
-                    <MenuItem value="">
-                      <em>Sélectionner / Select</em>
-                    </MenuItem>
+                    <MenuItem value=""><em>Selectionner...</em></MenuItem>
                     {type.values.map((val) => (
-                      <MenuItem key={val.id} value={val.id}>
-                        {val.value}
-                      </MenuItem>
+                      <MenuItem key={val.id} value={val.id}>{val.value}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -168,85 +193,83 @@ function VariantDialog({
             </>
           )}
 
-          <TextField
-            label="SKU (optionnel / optional)"
-            value={formData.sku}
-            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-            fullWidth
-            margin="normal"
-          />
-
-          <TextField
-            label="Prix (MAD) - optionnel, laissez vide pour prix de base / Price (MAD) - optional"
-            type="number"
-            value={formData.priceOverrideMad}
-            onChange={(e) =>
-              setFormData({ ...formData, priceOverrideMad: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-            inputProps={{ step: '0.01', min: '0' }}
-            helperText="Laissez vide pour utiliser le prix de base du produit / Leave empty to use base product price"
-          />
-
-          <TextField
-            label="Prix promo (MAD) - optionnel / Promo price (MAD) - optional"
-            type="number"
-            value={formData.promoPriceMad}
-            onChange={(e) =>
-              setFormData({ ...formData, promoPriceMad: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-            inputProps={{ step: '0.01', min: '0' }}
-            helperText="Laissez vide pour aucune promotion / Leave empty for no promotion"
-          />
-
-          <TextField
-            label="Stock / Stock quantity"
-            type="number"
-            value={formData.stockQuantity}
-            onChange={(e) =>
-              setFormData({ ...formData, stockQuantity: e.target.value })
-            }
-            fullWidth
-            margin="normal"
-            required
-            inputProps={{ min: '0', step: '1' }}
-          />
+          {/* 2-col grid for SKU + stock */}
+          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2}>
+            <TextField
+              label="SKU (optionnel)"
+              value={formData.sku}
+              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+              size="small"
+            />
+            <TextField
+              label="Stock *"
+              type="number"
+              value={formData.stockQuantity}
+              onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+              size="small"
+              required
+              inputProps={{ min: '0', step: '1' }}
+            />
+            <TextField
+              label="Prix spécifique (MAD)"
+              type="number"
+              value={formData.priceOverrideMad}
+              onChange={(e) => setFormData({ ...formData, priceOverrideMad: e.target.value })}
+              size="small"
+              inputProps={{ step: '0.01', min: '0' }}
+              helperText="Laisser vide → prix de base"
+              slotProps={{
+                input: { endAdornment: <InputAdornment position="end">MAD</InputAdornment> },
+              }}
+            />
+            <TextField
+              label="Prix promo (MAD)"
+              type="number"
+              value={formData.promoPriceMad}
+              onChange={(e) => setFormData({ ...formData, promoPriceMad: e.target.value })}
+              size="small"
+              inputProps={{ step: '0.01', min: '0' }}
+              helperText="Laisser vide → pas de promo"
+              slotProps={{
+                input: { endAdornment: <InputAdornment position="end">MAD</InputAdornment> },
+              }}
+            />
+          </Box>
 
           <FormControlLabel
             control={
               <Switch
                 checked={formData.isActive}
-                onChange={(e) =>
-                  setFormData({ ...formData, isActive: e.target.checked })
-                }
+                onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                size="small"
               />
             }
-            label="Active / Active"
-            sx={{ mt: 2 }}
+            label="Variante active"
           />
 
           {submitError && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              {(submitError as { response?: { data?: { message?: string } } })
-                ?.response?.data?.message ?? 'Une erreur est survenue / An error occurred'}
+            <Alert severity="error">
+              {(submitError as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Une erreur est survenue'}
             </Alert>
           )}
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={isSubmitting}>
-          Annuler / Cancel
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} disabled={isSubmitting} sx={{ color: 'var(--mirai-gray)' }}>
+          Annuler
         </Button>
         <Button
           variant="contained"
-          onClick={() => void handleSubmit()}
-          disabled={isSubmitting || (!isDefault && typesWithValues.length === 0)}
-          startIcon={isSubmitting ? <CircularProgress size={16} /> : undefined}
+          onClick={() => void onSubmit(formData)}
+          disabled={isSubmitting || (!isDefault && (typesWithValues.length === 0 || !hasAllRequiredSelections))}
+          startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+          sx={{
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg,#00C2FF,#0099CC)',
+            fontWeight: 700,
+          }}
         >
-          {editTarget ? 'Modifier / Update' : 'Créer / Create'}
+          {editTarget ? 'Mettre à jour' : 'Créer'}
         </Button>
       </DialogActions>
     </Dialog>
@@ -256,7 +279,6 @@ function VariantDialog({
 // ---------------------------------------------------------------------------
 //  DeleteDialog
 // ---------------------------------------------------------------------------
-
 interface DeleteDialogProps {
   variant: ProductVariant | null;
   onClose: () => void;
@@ -265,39 +287,27 @@ interface DeleteDialogProps {
   deleteError: Error | null;
 }
 
-function DeleteDialog({
-  variant,
-  onClose,
-  onConfirm,
-  isDeleting,
-  deleteError,
-}: DeleteDialogProps) {
+function DeleteDialog({ variant, onClose, onConfirm, isDeleting, deleteError }: DeleteDialogProps) {
   return (
-    <Dialog open={Boolean(variant)} onClose={onClose}>
-      <DialogTitle>Supprimer la variante / Delete variant</DialogTitle>
+    <Dialog open={Boolean(variant)} onClose={onClose}
+      PaperProps={{ sx: { background: 'rgba(14,14,22,0.97)', border: '1px solid rgba(255,60,60,0.15)', borderRadius: '14px' } }}
+    >
+      <DialogTitle sx={{ fontWeight: 700, color: 'var(--mirai-white)' }}>Supprimer la variante</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Êtes-vous sûr de vouloir supprimer cette variante ? / Are you sure you want to delete this variant?
-          {variant && (
-            <>
-              <br />
-              <br />
-              <strong>
-                {variant.attribute_values.map((v) => v.value).join(' / ')}
-              </strong>
-            </>
-          )}
+          Êtes-vous sûr de vouloir supprimer{' '}
+          <strong>{variant?.attribute_values.map((v) => v.value).join(' / ') || 'cette variante'}</strong>{' '}?
+          Cette action est irréversible.
         </DialogContentText>
         {deleteError && (
           <Alert severity="error" sx={{ mt: 2 }}>
-            {(deleteError as { response?: { data?: { message?: string } } })
-              ?.response?.data?.message ?? 'Suppression impossible / Deletion failed'}
+            {(deleteError as { response?: { data?: { message?: string } } })?.response?.data?.message ?? 'Suppression impossible'}
           </Alert>
         )}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={isDeleting}>
-          Annuler / Cancel
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} disabled={isDeleting} sx={{ color: 'var(--mirai-gray)' }}>
+          Annuler
         </Button>
         <Button
           color="error"
@@ -305,8 +315,9 @@ function DeleteDialog({
           onClick={() => variant && onConfirm(variant.id)}
           disabled={isDeleting}
           startIcon={isDeleting ? <CircularProgress size={16} /> : undefined}
+          sx={{ borderRadius: '8px', fontWeight: 700 }}
         >
-          Supprimer / Delete
+          Supprimer
         </Button>
       </DialogActions>
     </Dialog>
@@ -314,10 +325,9 @@ function DeleteDialog({
 }
 
 // ---------------------------------------------------------------------------
-//  Variant Card — compact display for one variant
+//  Variant Row — compact table-style display
 // ---------------------------------------------------------------------------
-
-function VariantCard({
+function VariantRow({
   variant,
   onEdit,
   onDelete,
@@ -328,76 +338,111 @@ function VariantCard({
 }) {
   const isDefault = variant.is_default;
   const label = isDefault
-    ? 'Par défaut / Default'
-    : variant.attribute_values.map((v) => v.value).join(' / ') || '—';
+    ? 'Variante par défaut'
+    : variant.attribute_values.map((v) => v.value).join(' · ') || '—';
 
   return (
-    <Card
-      variant="outlined"
+    <Box
       sx={{
-        borderColor: isDefault ? 'primary.main' : undefined,
-        borderWidth: isDefault ? 2 : 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 2,
+        px: 2,
+        py: 1.25,
+        borderRadius: '10px',
+        background: isDefault
+          ? 'rgba(0,194,255,0.06)'
+          : 'rgba(255,255,255,0.03)',
+        border: `1px solid ${isDefault ? 'rgba(0,194,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+        transition: 'background 0.15s',
+        '&:hover': { background: isDefault ? 'rgba(0,194,255,0.1)' : 'rgba(255,255,255,0.055)' },
       }}
     >
-      <CardContent sx={{ pb: '12px !important', pt: 1.5 }}>
-        {/* Header row */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={0.5}>
-          <Box display="flex" alignItems="center" gap={1}>
-            {isDefault && <StarIcon fontSize="small" color="primary" />}
-            <Typography variant="subtitle2" fontWeight="bold">
-              {label}
-            </Typography>
-          </Box>
-          <Box>
-            <IconButton size="small" onClick={onEdit} title="Modifier / Edit">
-              <EditIcon fontSize="small" />
-            </IconButton>
-            {!isDefault && (
-              <IconButton
-                size="small"
-                color="error"
-                onClick={onDelete}
-                title="Supprimer / Delete"
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
+      {/* Default star / active indicator */}
+      {isDefault ? (
+        <Tooltip title="Variante par défaut">
+          <StarIcon sx={{ fontSize: '1rem', color: '#F59E0B', flexShrink: 0 }} />
+        </Tooltip>
+      ) : (
+        <Tooltip title={variant.is_active ? 'Active' : 'Inactive'}>
+          {variant.is_active ? (
+            <CheckCircleIcon sx={{ fontSize: '1rem', color: '#22C55E', flexShrink: 0 }} />
+          ) : (
+            <RadioButtonUncheckedIcon sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />
+          )}
+        </Tooltip>
+      )}
 
-        {/* Info row */}
-        <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
-          {variant.sku && (
-            <Typography variant="body2" color="text.secondary">
-              SKU: {variant.sku}
-            </Typography>
-          )}
-          <Typography variant="body2">
-            Prix / Price: {formatCurrency(variant.effective_price)}
+      {/* Label + attributes */}
+      <Box flex={1} minWidth={0}>
+        <Typography
+          sx={{
+            fontSize: '0.82rem',
+            fontWeight: isDefault ? 700 : 500,
+            color: isDefault ? '#00C2FF' : 'var(--mirai-white)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {label}
+        </Typography>
+        {variant.sku && (
+          <Typography sx={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>
+            {variant.sku}
           </Typography>
-          {variant.is_on_sale && variant.promo_price != null && (
-            <Typography variant="body2" sx={{ color: '#FF6B35', fontWeight: 600 }}>
-              Promo: {formatCurrency(variant.promo_price)}
+        )}
+      </Box>
+
+      {/* Price */}
+      <Box sx={{ textAlign: 'right', minWidth: 80 }}>
+        {variant.is_on_sale && variant.promo_price != null ? (
+          <>
+            <Typography sx={{ fontSize: '0.68rem', color: 'text.disabled', textDecoration: 'line-through' }}>
+              {formatCurrency(variant.effective_price)}
             </Typography>
-          )}
-          <Typography variant="body2" fontWeight="bold">
-            Stock: {variant.stock}
+            <Typography sx={{ fontSize: '0.8rem', color: '#D97A50', fontWeight: 700 }}>
+              {formatCurrency(variant.promo_price)}
+            </Typography>
+          </>
+        ) : (
+          <Typography sx={{ fontSize: '0.82rem', color: 'var(--mirai-white)' }}>
+            {formatCurrency(variant.effective_price)}
           </Typography>
-          <Chip
-            label={variant.is_active ? 'Active' : 'Inactive'}
-            color={variant.is_active ? 'success' : 'default'}
-            size="small"
-          />
-        </Stack>
-      </CardContent>
-    </Card>
+        )}
+      </Box>
+
+      {/* Stock badge */}
+      <Chip
+        label={`${variant.stock} en stock`}
+        size="small"
+        sx={{
+          fontSize: '0.7rem',
+          flexShrink: 0,
+          background: variant.stock > 0 ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+          color: variant.stock > 0 ? '#22C55E' : '#EF4444',
+          border: `1px solid ${variant.stock > 0 ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
+        }}
+      />
+
+      {/* Actions */}
+      <Box display="flex" gap={0.5} flexShrink={0}>
+        <IconButton size="small" onClick={onEdit} title="Modifier" sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#00C2FF' } }}>
+          <EditIcon sx={{ fontSize: '0.9rem' }} />
+        </IconButton>
+        {!isDefault && (
+          <IconButton size="small" onClick={onDelete} title="Supprimer" sx={{ color: 'rgba(255,255,255,0.5)', '&:hover': { color: '#EF4444' } }}>
+            <DeleteIcon sx={{ fontSize: '0.9rem' }} />
+          </IconButton>
+        )}
+      </Box>
+    </Box>
   );
 }
 
 // ---------------------------------------------------------------------------
 //  Main component
 // ---------------------------------------------------------------------------
-
 export function ProductVariantsSection({ productId, productSku }: ProductVariantsSectionProps) {
   const { data: variantsData, isLoading: variantsLoading } = useProductVariants(productId);
   const { data: typesData, isLoading: typesLoading } = useVariationTypes();
@@ -414,53 +459,34 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
   const allVariants: ProductVariant[] = (variantsData as ProductVariant[]) ?? [];
   const types: VariationType[] = (typesData as VariationType[]) ?? [];
 
-  // ----- Separate default variant from attribute-based variants -----
   const defaultVariant = allVariants.find((v) => v.is_default) ?? null;
   const attributeVariants = allVariants.filter((v) => !v.is_default);
 
-  // ----- Filtering -----
   const filteredVariants = useMemo(() => {
     if (!search.trim()) return attributeVariants;
     const q = search.toLowerCase();
     return attributeVariants.filter((v) => {
       const label = v.attribute_values.map((a) => a.value).join(' ');
-      return (
-        label.toLowerCase().includes(q) ||
-        (v.sku ?? '').toLowerCase().includes(q) ||
-        String(v.stock).includes(q)
-      );
+      return label.toLowerCase().includes(q) || (v.sku ?? '').toLowerCase().includes(q) || String(v.stock).includes(q);
     });
   }, [attributeVariants, search]);
 
-  // ----- Pagination -----
   const totalPages = Math.max(1, Math.ceil(filteredVariants.length / PAGE_SIZE));
-  // Clamp page if filter changed
   const safePage = Math.min(page, totalPages - 1);
-  if (safePage !== page) setPage(safePage);
+  const pagedVariants = filteredVariants.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
-  const pagedVariants = filteredVariants.slice(
-    safePage * PAGE_SIZE,
-    safePage * PAGE_SIZE + PAGE_SIZE,
-  );
-
-  // ----- Handlers -----
+  // ── Handlers ──
   const handleCreate = async (data: VariantFormData) => {
     const variationValueIds = Object.values(data.selectedValues).filter((id) => id > 0);
-
-    const priceOverrideCentimes = data.priceOverrideMad.trim()
-      ? Math.round(parseFloat(data.priceOverrideMad) * 100)
-      : null;
-
-    const promoPriceCentimes = data.promoPriceMad.trim()
-      ? Math.round(parseFloat(data.promoPriceMad) * 100)
-      : null;
+    const priceOverride = data.priceOverrideMad.trim() ? Math.round(parseFloat(data.priceOverrideMad) * 100) : null;
+    const promoPrice = data.promoPriceMad.trim() ? Math.round(parseFloat(data.promoPriceMad) * 100) : null;
 
     await createMutation.mutateAsync({
       productId,
       data: {
         sku: data.sku.trim() || null,
-        price: priceOverrideCentimes,
-        promo_price: promoPriceCentimes,
+        price: priceOverride,
+        promo_price: promoPrice,
         stock: parseInt(data.stockQuantity, 10),
         is_active: data.isActive,
         attribute_value_ids: variationValueIds,
@@ -471,32 +497,19 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
 
   const handleUpdate = async (data: VariantFormData) => {
     if (!editTarget) return;
-
     const isDefault = editTarget.is_default;
-    const variationValueIds = isDefault
-      ? []
-      : Object.values(data.selectedValues).filter((id) => id > 0);
-
-    const priceOverrideCentimes = data.priceOverrideMad.trim()
-      ? Math.round(parseFloat(data.priceOverrideMad) * 100)
-      : null;
-
-    const promoPriceCentimes = data.promoPriceMad.trim()
-      ? Math.round(parseFloat(data.promoPriceMad) * 100)
-      : null;
+    const variationValueIds = isDefault ? [] : Object.values(data.selectedValues).filter((id) => id > 0);
+    const priceOverride = data.priceOverrideMad.trim() ? Math.round(parseFloat(data.priceOverrideMad) * 100) : null;
+    const promoPrice = data.promoPriceMad.trim() ? Math.round(parseFloat(data.promoPriceMad) * 100) : null;
 
     const payload: Record<string, unknown> = {
       sku: data.sku.trim() || null,
-      price: priceOverrideCentimes,
-      promo_price: promoPriceCentimes,
+      price: priceOverride,
+      promo_price: promoPrice,
       stock: parseInt(data.stockQuantity, 10),
       is_active: data.isActive,
     };
-
-    // Only send attribute_value_ids for non-default variants
-    if (!isDefault) {
-      payload.attribute_value_ids = variationValueIds;
-    }
+    if (!isDefault) payload.attribute_value_ids = variationValueIds;
 
     await updateMutation.mutateAsync({
       productId,
@@ -513,130 +526,142 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
     setDeleteTarget(null);
   };
 
-  const openCreate = () => {
-    setEditTarget(null);
-    setDialogOpen(true);
-  };
-
-  const openEdit = (variant: ProductVariant) => {
-    setEditTarget(variant);
-    setDialogOpen(true);
-  };
-
   if (variantsLoading || typesLoading) {
     return (
-      <Box display="flex" justifyContent="center" py={3}>
+      <Box display="flex" justifyContent="center" py={4}>
         <CircularProgress size={24} />
       </Box>
     );
   }
 
   return (
-    <Box mt={4}>
-      {/* Auto-generator: select attribute values → generate all combos in one click */}
+    <Box>
+      {/* Auto-generator */}
       <VariantGenerator productId={productId} productSku={productSku ?? ''} />
 
-      {/* ——— Default variant card ——— */}
+      {/* ── Default variant ── */}
       {defaultVariant && (
         <Box mb={3}>
-          <Typography variant="subtitle2" color="text.secondary" mb={1}>
-            Variante par défaut / Default Variant
+          <Typography sx={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', mb: 1 }}>
+            Variante de base
           </Typography>
-          <VariantCard
+          <VariantRow
             variant={defaultVariant}
-            onEdit={() => openEdit(defaultVariant)}
-            onDelete={() => {}} // Cannot delete default — button hidden anyway
+            onEdit={() => { setEditTarget(defaultVariant); setDialogOpen(true); }}
+            onDelete={() => {}}
           />
         </Box>
       )}
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mb: 2.5 }} />
 
-      {/* ——— Header + search + add ——— */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} gap={2} flexWrap="wrap">
-        <Typography variant="h6" fontWeight="bold" sx={{ whiteSpace: 'nowrap' }}>
-          Variantes / Variants ({attributeVariants.length})
-        </Typography>
+      {/* ── Attribute variants header ── */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5} flexWrap="wrap" gap={1}>
+        <Box display="flex" alignItems="center" gap={1.5}>
+          <Typography sx={{ fontWeight: 700, color: 'var(--mirai-white)', fontSize: '0.9rem' }}>
+            Variantes ({attributeVariants.length})
+          </Typography>
+          {attributeVariants.length > 0 && (
+            <Chip
+              label={`${attributeVariants.filter((v) => v.is_active).length} actives`}
+              size="small"
+              sx={{ fontSize: '0.68rem', background: 'rgba(34,197,94,0.1)', color: '#22C55E' }}
+            />
+          )}
+        </Box>
 
-        <Box display="flex" alignItems="center" gap={1} flexGrow={1} justifyContent="flex-end">
-          <TextField
-            size="small"
-            placeholder="Rechercher / Search…"
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(0);
-            }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ maxWidth: 260 }}
-          />
+        <Box display="flex" gap={1} alignItems="center">
+          {attributeVariants.length > 3 && (
+            <TextField
+              size="small"
+              placeholder="Rechercher…"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+              sx={{ maxWidth: 200 }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: '0.9rem', color: 'text.disabled' }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          )}
           <Button
             variant="outlined"
             startIcon={<AddIcon />}
-            onClick={openCreate}
+            onClick={() => { setEditTarget(null); setDialogOpen(true); }}
             size="small"
+            sx={{
+              borderRadius: '8px',
+              borderColor: 'rgba(0,194,255,0.4)',
+              color: '#00C2FF',
+              fontWeight: 600,
+              '&:hover': { borderColor: '#00C2FF', background: 'rgba(0,194,255,0.08)' },
+            }}
           >
-            + Manuelle
+            Ajouter manuellement
           </Button>
         </Box>
       </Box>
 
-      {/* ——— Variant cards (paginated) ——— */}
+      {/* ── Variants list ── */}
       {filteredVariants.length === 0 ? (
-        <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography color="text.secondary">
-            {search.trim()
-              ? 'Aucun résultat / No results'
-              : "Aucune variante d'attribut / No attribute variants"}
+        <Box
+          sx={{
+            py: 5,
+            textAlign: 'center',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px dashed rgba(255,255,255,0.08)',
+            borderRadius: '12px',
+          }}
+        >
+          <StarBorderIcon sx={{ fontSize: '2rem', color: 'rgba(255,255,255,0.15)', mb: 1 }} />
+          <Typography color="text.secondary" sx={{ fontSize: '0.85rem' }}>
+            {search.trim() ? 'Aucun résultat' : 'Utilisez le générateur ci-dessus pour créer des variantes automatiquement.'}
           </Typography>
-        </Paper>
+        </Box>
       ) : (
-        <>
-          <Stack spacing={1.5}>
-            {pagedVariants.map((variant) => (
-              <VariantCard
-                key={variant.id}
-                variant={variant}
-                onEdit={() => openEdit(variant)}
-                onDelete={() => setDeleteTarget(variant)}
-              />
-            ))}
-          </Stack>
-
-          {/* ——— Pagination arrows ——— */}
-          {totalPages > 1 && (
-            <Box display="flex" justifyContent="center" alignItems="center" mt={2} gap={2}>
-              <IconButton
-                onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={safePage === 0}
-                size="small"
-              >
-                <ArrowBackIosNewIcon fontSize="small" />
-              </IconButton>
-              <Typography variant="body2" color="text.secondary">
-                {safePage + 1} / {totalPages}
-              </Typography>
-              <IconButton
-                onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-                disabled={safePage >= totalPages - 1}
-                size="small"
-              >
-                <ArrowForwardIosIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          )}
-        </>
+        <Stack spacing={0.75}>
+          {pagedVariants.map((variant) => (
+            <VariantRow
+              key={variant.id}
+              variant={variant}
+              onEdit={() => { setEditTarget(variant); setDialogOpen(true); }}
+              onDelete={() => setDeleteTarget(variant)}
+            />
+          ))}
+        </Stack>
       )}
 
-      {/* Create / Edit Dialog — key forces full remount so useState re-initializes */}
+      {/* ── Pagination (only if needed) ── */}
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" alignItems="center" mt={2} gap={2}>
+          <Button
+            size="small"
+            disabled={safePage === 0}
+            onClick={() => setPage((p) => p - 1)}
+            sx={{ color: 'var(--mirai-gray)', minWidth: 36 }}
+          >
+            ←
+          </Button>
+          <Typography sx={{ fontSize: '0.78rem', color: 'var(--mirai-gray)' }}>
+            {safePage + 1} / {totalPages}
+          </Typography>
+          <Button
+            size="small"
+            disabled={safePage >= totalPages - 1}
+            onClick={() => setPage((p) => p + 1)}
+            sx={{ color: 'var(--mirai-gray)', minWidth: 36 }}
+          >
+            →
+          </Button>
+        </Box>
+      )}
+
+      {/* Dialogs */}
       <VariantDialog
         key={editTarget ? `edit-${editTarget.id}` : 'create'}
         open={dialogOpen}
@@ -654,13 +679,9 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
         submitError={createMutation.error || updateMutation.error}
       />
 
-      {/* Delete Confirmation Dialog */}
       <DeleteDialog
         variant={deleteTarget}
-        onClose={() => {
-          setDeleteTarget(null);
-          deleteMutation.reset();
-        }}
+        onClose={() => { setDeleteTarget(null); deleteMutation.reset(); }}
         onConfirm={(id) => void handleDelete(id)}
         isDeleting={deleteMutation.isPending}
         deleteError={deleteMutation.error}

@@ -19,12 +19,15 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import Pagination from '@mui/material/Pagination';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchIcon from '@mui/icons-material/Search';
 import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser, useCreateUser } from '../api/users';
 import { useAuthStore } from '../../auth/store';
 import type { AdminUser } from '../types';
@@ -58,7 +61,7 @@ function DeactivateDialog({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={isDeactivating}>
-          Annuler / Cancel
+          Annuler
         </Button>
         <Button
           color="error"
@@ -79,11 +82,20 @@ export function AdminUsersPage() {
   const currentUser = useAuthStore((s) => s.user);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'' | 'admin' | 'customer' | 'global_admin'>('');
+  const [activeFilter, setActiveFilter] = useState<'' | '1' | '0'>('');
   const [deactivateTarget, setDeactivateTarget] = useState<AdminUser | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ name: '', email: '', phone: '', password: '', role: 'customer' });
+  const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const { data, isLoading, error } = useAdminUsers(page, perPage);
+  const params: Record<string, string | number> = { page, per_page: perPage };
+  if (search.trim()) params['filter[search]'] = search.trim();
+  if (roleFilter) params['filter[role]'] = roleFilter;
+  if (activeFilter) params['filter[is_active]'] = activeFilter;
+
+  const { data, isLoading, error } = useAdminUsers(params);
   const deactivateMutation = useDeactivateUser();
   const updateRoleMutation = useUpdateUserRole();
   const activateMutation = useActivateUser();
@@ -93,22 +105,42 @@ export function AdminUsersPage() {
   const totalPages = data?.meta?.last_page ?? 1;
 
   const handleDeactivate = async (id: number) => {
-    await deactivateMutation.mutateAsync(id);
-    setDeactivateTarget(null);
+    try {
+      await deactivateMutation.mutateAsync(id);
+      setDeactivateTarget(null);
+      setFeedback({ type: 'success', message: 'Utilisateur desactive.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de la desactivation.' });
+    }
   };
 
   const handleRoleChange = async (userId: number, newRole: string) => {
-    await updateRoleMutation.mutateAsync({ id: userId, role: newRole });
+    try {
+      await updateRoleMutation.mutateAsync({ id: userId, role: newRole });
+      setFeedback({ type: 'success', message: 'Role mis a jour.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de la mise a jour du role.' });
+    }
   };
 
   const handleActivate = async (id: number) => {
-    await activateMutation.mutateAsync(id);
+    try {
+      await activateMutation.mutateAsync(id);
+      setFeedback({ type: 'success', message: 'Utilisateur active.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de l activation.' });
+    }
   };
 
   const handleCreateUser = async () => {
-    await createMutation.mutateAsync(createForm);
-    setCreateOpen(false);
-    setCreateForm({ name: '', email: '', phone: '', password: '', role: 'customer' });
+    try {
+      await createMutation.mutateAsync(createForm);
+      setCreateOpen(false);
+      setCreateForm({ name: '', email: '', phone: '', password: '', role: 'customer' });
+      setFeedback({ type: 'success', message: 'Utilisateur cree.' });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec de la creation utilisateur.' });
+    }
   };
 
   if (isLoading) {
@@ -122,7 +154,7 @@ export function AdminUsersPage() {
   if (error) {
     return (
       <Alert severity="error">
-        Impossible de charger les utilisateurs / Failed to load users
+        Impossible de charger les utilisateurs
       </Alert>
     );
   }
@@ -140,6 +172,82 @@ export function AdminUsersPage() {
         )}
       </Box>
 
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
+          Gestion des comptes
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Filtrez par role ou statut pour administrer rapidement les comptes, puis ouvrez une fiche detail pour plus d actions.
+        </Typography>
+      </Paper>
+
+      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+        <Box display="flex" gap={1.5} flexWrap="wrap" alignItems="center">
+          <TextField
+            size="small"
+            placeholder="Rechercher (nom, email, telephone)"
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+            sx={{ minWidth: 260 }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Role</InputLabel>
+            <Select
+              label="Role"
+              value={roleFilter}
+              onChange={(e) => { setRoleFilter(e.target.value as '' | 'admin' | 'customer' | 'global_admin'); setPage(1); }}
+            >
+              <MenuItem value="">Tous</MenuItem>
+              <MenuItem value="global_admin">Super admin</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="customer">Client</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ minWidth: 130 }}>
+            <InputLabel>Statut</InputLabel>
+            <Select
+              label="Statut"
+              value={activeFilter}
+              onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+            >
+              <MenuItem value="">Tous</MenuItem>
+              <MenuItem value="1">Actifs</MenuItem>
+              <MenuItem value="0">Inactifs</MenuItem>
+            </Select>
+          </FormControl>
+
+          {(search || roleFilter || activeFilter) && (
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => {
+                setSearch('');
+                setRoleFilter('');
+                setActiveFilter('');
+                setPage(1);
+              }}
+            >
+              Effacer
+            </Button>
+          )}
+
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
+            {data?.meta?.total ?? 0} utilisateur(s)
+          </Typography>
+        </Box>
+      </Paper>
+
       <TableContainer component={Paper}>
         <Table size="small">
           <TableHead>
@@ -156,7 +264,7 @@ export function AdminUsersPage() {
             {users.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  Aucun utilisateur / No users found
+                  Aucun utilisateur trouve
                 </TableCell>
               </TableRow>
             ) : (
@@ -178,12 +286,18 @@ export function AdminUsersPage() {
                           onChange={(e) => void handleRoleChange(user.id, e.target.value)}
                           sx={{ fontSize: '0.875rem' }}
                         >
-                          <MenuItem value="admin">admin</MenuItem>
-                          <MenuItem value="customer">customer</MenuItem>
+                          <MenuItem value="admin">Admin</MenuItem>
+                          <MenuItem value="customer">Client</MenuItem>
                         </Select>
                       </FormControl>
                     ) : (
-                      <Typography variant="body2">{user.role}</Typography>
+                      <Typography variant="body2">
+                        {user.role === 'global_admin'
+                          ? 'Super admin'
+                          : user.role === 'admin'
+                            ? 'Admin'
+                            : 'Client'}
+                      </Typography>
                     )}
                   </TableCell>
                   <TableCell>
@@ -274,7 +388,7 @@ export function AdminUsersPage() {
           <FormControl size="small" fullWidth>
             <InputLabel>Role</InputLabel>
             <Select label="Role" value={createForm.role} onChange={(e) => setCreateForm((f) => ({ ...f, role: e.target.value }))}>
-              <MenuItem value="customer">Customer</MenuItem>
+              <MenuItem value="customer">Client</MenuItem>
               <MenuItem value="admin">Admin</MenuItem>
             </Select>
           </FormControl>
@@ -286,6 +400,21 @@ export function AdminUsersPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={Boolean(feedback)}
+        autoHideDuration={3000}
+        onClose={() => setFeedback(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setFeedback(null)}
+          severity={feedback?.type ?? 'success'}
+          sx={{ width: '100%' }}
+        >
+          {feedback?.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
