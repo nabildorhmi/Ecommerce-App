@@ -2,11 +2,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
 
 /* ── Types ────────────────────────────────────────────── */
-export interface HeroBannerImage {
+export interface HeroBannerImageVariant {
   id: number;
   url: string;
   thumbnail: string;
   hero: string;
+}
+
+export interface HeroBannerImage {
+  desktop: HeroBannerImageVariant | null;
+  mobile: HeroBannerImageVariant | null;
 }
 
 export interface HeroBanner {
@@ -18,6 +23,8 @@ export interface HeroBanner {
   is_active: boolean;
   object_position: string;
   image: HeroBannerImage | null;
+  has_desktop: boolean;
+  has_mobile: boolean;
   created_at: string;
   updated_at: string;
 }
