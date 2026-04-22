@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { AnimatePresence, motion, useMotionValue, animate } from 'framer-motion';
@@ -9,6 +10,11 @@ import { useHeroBanners } from '../../admin/api/heroBanners';
 
 const CYAN = '#00C2FF';
 const PINK = '#FF2D78';
+
+export const HERO_BANNER_ASPECT = {
+  mobile: '9/16',
+  desktop: '16/9',
+} as const;
 
 /* ─── Segmented progress bar ─────────────────────────────────────────── */
 function ProgressBar({ duration, resetKey, current, total }: {
@@ -48,8 +54,8 @@ function ProgressBar({ duration, resetKey, current, total }: {
 }
 
 /* ─── Ken-Burns zoom on active image ─────────────────────────────────── */
-function SlideImage({ src, alt, duration, objectPosition }: {
-  src: string; alt: string; duration: number; objectPosition?: string;
+function SlideImage({ src, alt, duration, objectPosition, isMobile }: {
+  src: string; alt: string; duration: number; objectPosition?: string; isMobile?: boolean;
 }) {
   return (
     <motion.div
@@ -62,7 +68,13 @@ function SlideImage({ src, alt, duration, objectPosition }: {
         component="img"
         src={src}
         alt={alt}
-        sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: objectPosition ?? 'center center', display: 'block' }}
+        sx={{
+          width: '100%',
+          height: '100%',
+          objectFit: isMobile ? 'contain' : 'cover',
+          objectPosition: objectPosition ?? 'center center',
+          display: 'block'
+        }}
       />
     </motion.div>
   );
@@ -87,15 +99,22 @@ function NeonBorderOverlay() {
  * Hero image carousel — crossfade + directional slide transitions,
  * Ken-Burns zoom, segmented progress bar, cyberpunk overlays.
  */
-export function HeroCarousel() {
+export function HeroCarousel({ fullBleed = false }: { fullBleed?: boolean }) {
   const { data } = useHeroBanners();
-  const banners = (data?.data ?? []).filter((b) => b.image);
+  const isMobileViewport = useMediaQuery('(max-width:899.95px)');
+  const banners = (data?.data ?? []).filter((b) => {
+    if (isMobileViewport) {
+      return Boolean(b.image?.mobile?.hero);
+    }
+    return Boolean(b.image?.desktop?.hero);
+  });
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [resetKey, setResetKey] = useState(0);
   const DURATION = 6000;
 
   const count = banners.length;
+  const safeIndex = count > 0 ? index % count : 0;
 
   // Auto-advance
   useEffect(() => {
@@ -120,27 +139,28 @@ export function HeroCarousel() {
 
   const goTo = useCallback(
     (i: number) => {
-      if (i === index) return;
+      if (i === safeIndex) return;
       setResetKey((k) => k + 1);
-      setDirection(i > index ? 1 : -1);
+      setDirection(i > safeIndex ? 1 : -1);
       setIndex(i);
     },
-    [index],
+    [safeIndex],
   );
 
   if (count === 0) {
     return (
       <Box
         sx={{
-          width: { xs: '100%', md: 'min(100%, calc(44vh * (21 / 9)))' },
+          width: fullBleed ? '100%' : { xs: '100%', md: 'min(100%, calc(34vh * (21 / 9)))' },
           mx: 'auto',
-          aspectRatio: { xs: '16/9', md: '21/9' },
-          borderRadius: 3,
-          bgcolor: '#0B0B0E',
+          height: fullBleed ? '100%' : undefined,
+          aspectRatio: fullBleed ? undefined : { xs: HERO_BANNER_ASPECT.mobile, md: HERO_BANNER_ASPECT.desktop },
+          borderRadius: fullBleed ? 0 : 3,
+          bgcolor: '#0c0c14',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          border: '1px solid rgba(0,194,255,0.08)',
+          border: fullBleed ? 'none' : '1px solid rgba(0,194,255,0.08)',
         }}
       >
         <Typography sx={{ color: 'rgba(0,194,255,0.2)', fontSize: '0.75rem', letterSpacing: '0.2em' }}>
@@ -150,7 +170,10 @@ export function HeroCarousel() {
     );
   }
 
-  const current = banners[index];
+  const current = banners[safeIndex];
+  const currentImageSrc = isMobileViewport
+    ? (current.image?.mobile?.hero ?? '')
+    : (current.image?.desktop?.hero ?? '');
 
   /* Crossfade + directional slide + scale */
   const variants = {
@@ -178,13 +201,15 @@ export function HeroCarousel() {
     <Box
       sx={{
         position: 'relative',
-        width: { xs: '100%', md: 'min(100%, calc(44vh * (21 / 9)))' },
+        width: fullBleed ? '100%' : { xs: '100%', md: 'min(100%, calc(34vh * (21 / 9)))' },
         mx: 'auto',
-        aspectRatio: { xs: '16/9', md: '21/9' },
-        borderRadius: 3,
+        height: fullBleed ? '100%' : undefined,
+        aspectRatio: fullBleed ? undefined : { xs: HERO_BANNER_ASPECT.mobile, md: HERO_BANNER_ASPECT.desktop },
+        borderRadius: fullBleed ? 0 : 3,
         overflow: 'hidden',
-        border: '1px solid rgba(0,194,255,0.06)',
-        boxShadow: '0 0 40px rgba(0,194,255,0.06), 0 4px 30px rgba(0,0,0,0.4)',
+        border: fullBleed ? 'none' : '1px solid rgba(0,194,255,0.06)',
+        boxShadow: fullBleed ? 'none' : '0 0 40px rgba(0,194,255,0.06), 0 4px 30px rgba(0,0,0,0.4)',
+        bgcolor: '#0c0c14',
       }}
     >
       {/* Neon border glow */}
@@ -222,10 +247,11 @@ export function HeroCarousel() {
           >
             {/* Ken-Burns zoom on the image while it's active */}
             <SlideImage
-              src={current.image!.hero}
+              src={currentImageSrc}
               alt={current.title ?? 'Banner'}
               duration={DURATION}
               objectPosition={current.object_position}
+              isMobile={isMobileViewport}
             />
 
             {/* Dark cinematic gradient */}
@@ -234,8 +260,8 @@ export function HeroCarousel() {
                 position: 'absolute',
                 inset: 0,
                 background: `
-                  linear-gradient(to top, rgba(11,11,14,0.88) 0%, rgba(11,11,14,0.25) 45%, transparent 100%),
-                  linear-gradient(to right, rgba(11,11,14,0.3) 0%, transparent 20%, transparent 80%, rgba(11,11,14,0.3) 100%)
+                  linear-gradient(to top, rgba(12,12,20,0.88) 0%, rgba(12,12,20,0.25) 45%, transparent 100%),
+                  linear-gradient(to right, rgba(12,12,20,0.3) 0%, transparent 20%, transparent 80%, rgba(12,12,20,0.3) 100%)
                 `,
                 zIndex: 1,
               }}
@@ -257,7 +283,7 @@ export function HeroCarousel() {
               sx={{
                 position: 'absolute',
                 inset: 0,
-                background: 'radial-gradient(ellipse at center, transparent 50%, rgba(11,11,14,0.35) 100%)',
+                background: 'radial-gradient(ellipse at center, transparent 50%, rgba(12,12,20,0.35) 100%)',
                 pointerEvents: 'none',
                 zIndex: 2,
               }}
@@ -276,7 +302,7 @@ export function HeroCarousel() {
                       sx={{
                         fontSize: { xs: '0.92rem', md: '1.2rem' },
                         fontWeight: 800,
-                        color: '#F5F7FA',
+                        color: '#E8ECF2',
                         letterSpacing: '0.05em',
                         textShadow: `0 2px 12px rgba(0,0,0,0.8), 0 0 20px rgba(0,194,255,0.15)`,
                         mb: 0.5,
@@ -320,7 +346,7 @@ export function HeroCarousel() {
 
       {/* Segmented progress bar */}
       {count > 1 && (
-        <ProgressBar duration={DURATION} resetKey={resetKey} current={index} total={count} />
+        <ProgressBar duration={DURATION} resetKey={resetKey} current={safeIndex} total={count} />
       )}
 
       {/* Navigation */}
@@ -357,18 +383,18 @@ export function HeroCarousel() {
             <motion.div
               key={i}
               animate={{
-                width: i === index ? 20 : 6,
-                opacity: i === index ? 1 : 0.3,
+                width: i === safeIndex ? 20 : 6,
+                opacity: i === safeIndex ? 1 : 0.3,
               }}
               transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
               onClick={() => goTo(i)}
               style={{
                 height: 6,
                 borderRadius: 3,
-                background: i === index ? `linear-gradient(90deg, ${CYAN}, ${PINK})` : CYAN,
+                background: i === safeIndex ? `linear-gradient(90deg, ${CYAN}, ${PINK})` : CYAN,
                 cursor: 'pointer',
                 flexShrink: 0,
-                boxShadow: i === index ? `0 0 8px ${CYAN}55` : 'none',
+                boxShadow: i === safeIndex ? `0 0 8px ${CYAN}55` : 'none',
               }}
             />
           ))}
@@ -401,7 +427,7 @@ export function HeroCarousel() {
           border: '1px solid rgba(0,194,255,0.1)',
         }}>
           <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: CYAN, fontFamily: 'monospace' }}>
-            {String(index + 1).padStart(2, '0')}
+            {String(safeIndex + 1).padStart(2, '0')}
           </Typography>
           <Box sx={{ width: 8, height: 1, bgcolor: 'rgba(255,255,255,0.2)' }} />
           <Typography sx={{ fontSize: '0.58rem', fontWeight: 700, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>
