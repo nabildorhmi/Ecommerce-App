@@ -286,7 +286,7 @@ export function AdminProductsPage() {
             {data?.meta?.total ?? 0} produit(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
