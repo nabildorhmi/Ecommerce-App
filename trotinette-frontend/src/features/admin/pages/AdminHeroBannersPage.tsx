@@ -33,6 +33,7 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import {
   useAdminHeroBanners,
   useCreateHeroBanner,
@@ -41,6 +42,14 @@ import {
   type HeroBanner,
 } from '../api/heroBanners';
 import { HERO_BANNER_ASPECT } from '../../home/components/HeroCarousel';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 const HERO_UPLOAD_SOFT_LIMIT_BYTES = 1_900_000;
 const HERO_DESKTOP_TARGET_WIDTH = 1920;
@@ -144,24 +153,40 @@ export function AdminHeroBannersPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={700}>
-          Banners hero
-        </Typography>
-        <Button variant="contained" startIcon={<AddPhotoAlternateIcon />} onClick={handleAdd}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Banners hero
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            ビジュアル管理
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddPhotoAlternateIcon />}
+          onClick={handleAdd}
+          sx={{
+            borderRadius: '10px',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+            '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 20px rgba(0,194,255,0.25)' },
+            transition: 'all 0.2s ease',
+          }}
+        >
           Ajouter un visuel
         </Button>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Gestion des visuels d accueil
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Administrez les images du carousel principal et leur ordre d affichage pour la page d accueil.
         </Typography>
-      </Paper>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
           <TextField
             size="small"
@@ -203,7 +228,7 @@ export function AdminHeroBannersPage() {
             {filteredBanners.length} visuel(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
       {isLoading ? (
         <Grid container spacing={3}>
@@ -245,7 +270,17 @@ function BannerCard({ banner, onEdit }: { banner: HeroBanner; onEdit: () => void
   };
 
   return (
-    <Card sx={{ position: 'relative', opacity: banner.is_active ? 1 : 0.5 }}>
+    <Card sx={{
+      position: 'relative',
+      opacity: banner.is_active ? 1 : 0.5,
+      background: 'rgba(12, 12, 20, 0.7)',
+      backdropFilter: 'blur(16px)',
+      border: '1px solid rgba(0,194,255,0.09)',
+      borderRadius: '16px',
+      overflow: 'hidden',
+      transition: 'all 0.3s ease',
+      '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 12px 28px rgba(0,0,0,0.4)', border: '1px solid rgba(0,194,255,0.18)' },
+    }}>
       {(banner.image?.desktop || banner.image?.mobile) ? (
         <Box sx={{ position: 'relative', width: '100%', aspectRatio: HERO_BANNER_ASPECT.desktop, overflow: 'hidden' }}>
           <CardMedia
@@ -620,6 +655,16 @@ function BannerDialog({
       maxWidth="md"
       fullWidth
       TransitionProps={{ onEnter: handleEnter }}
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'rgba(12, 12, 20, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            borderRadius: '16px',
+          },
+        },
+      }}
     >
       <DialogTitle>{isCreate ? 'Ajouter un banner' : 'Modifier le banner'}</DialogTitle>
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '8px !important' }}>

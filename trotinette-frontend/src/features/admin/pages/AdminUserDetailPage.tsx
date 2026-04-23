@@ -18,7 +18,16 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PersonIcon from '@mui/icons-material/Person';
 import { useAdminUser, useDeactivateUser, useActivateUser } from '../api/users';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 export function AdminUserDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -75,42 +84,53 @@ export function AdminUserDetailPage() {
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => void navigate('/admin/users')}
-        sx={{ mb: 3 }}
+        sx={{
+          mb: 3,
+          borderColor: 'rgba(0,194,255,0.3)',
+          color: 'var(--mirai-gray)',
+          borderRadius: '8px',
+          '&:hover': { borderColor: '#00C2FF', color: '#00C2FF' },
+        }}
+        variant="outlined"
       >
         Retour aux utilisateurs
       </Button>
 
-      <Typography variant="h5" fontWeight="bold" mb={3}>
-        Detail utilisateur
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5, mb: 3 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+          Detail utilisateur
+        </Typography>
+        <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+          ユーザー詳細
+        </Typography>
+      </Box>
 
-      <Card variant="outlined" sx={{ mb: 3 }}>
-        <CardContent>
+      <Box sx={{ ...glassSx, mb: 3 }}>
           <Box
             display="grid"
             gridTemplateColumns={{ xs: '1fr', sm: '1fr 1fr' }}
             gap={2}
           >
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Nom
               </Typography>
               <Typography>{user.name}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 E-mail
               </Typography>
               <Typography>{user.email}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Telephone
               </Typography>
               <Typography>{user.phone ?? '—'}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Role
               </Typography>
               <Typography>
@@ -122,19 +142,19 @@ export function AdminUserDetailPage() {
               </Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Ville
               </Typography>
               <Typography>{user.address_city ?? '—'}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Adresse
               </Typography>
               <Typography>{user.address_street ?? '—'}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Statut
               </Typography>
               <Box>
@@ -150,7 +170,7 @@ export function AdminUserDetailPage() {
               </Box>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" sx={{ color: 'rgba(0,194,255,0.5)' }}>
                 Inscrit le
               </Typography>
               <Typography>{new Date(user.created_at).toLocaleDateString('fr-FR')}</Typography>
@@ -183,10 +203,9 @@ export function AdminUserDetailPage() {
               </Button>
             </Box>
           )}
-        </CardContent>
-      </Card>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 3 }}>
+      <Box sx={{ ...glassSx }}>
         <Typography variant="h6" fontWeight="bold" mb={2}>
           Historique des commandes
         </Typography>
@@ -200,9 +219,22 @@ export function AdminUserDetailPage() {
             Aucune commande pour le moment
           </Typography>
         )}
-      </Paper>
+      </Box>
 
-      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+      <Dialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
+      >
         <DialogTitle>Desactiver</DialogTitle>
         <DialogContent>
           <DialogContentText>

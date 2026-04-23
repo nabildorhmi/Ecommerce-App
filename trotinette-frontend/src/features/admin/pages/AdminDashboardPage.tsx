@@ -37,6 +37,14 @@ import type { DashboardFilters } from '../types';
 import CountUp from 'react-countup';
 import { motion } from 'framer-motion';
 
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
+
 const ORDER_STATUSES = [
   { value: 'pending', label: 'En attente' },
   { value: 'confirmed', label: 'Confirmée' },
@@ -118,17 +126,17 @@ export function AdminDashboardPage() {
         </Typography>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Vue de pilotage
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Analysez les performances commerciales par periode, statut de commande et tendances de vente.
         </Typography>
-      </Paper>
+      </Box>
 
       {/* Filters */}
-      <Paper className="mirai-glass" sx={{ p: 2, mb: 3, borderRadius: '12px' }}>
+      <Box sx={{ ...glassSx, mb: 3 }}>
         <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
           Filtres d analyse
         </Typography>
@@ -206,7 +214,7 @@ export function AdminDashboardPage() {
             </Button>
           )}
         </Stack>
-      </Paper>
+      </Box>
 
       {/* KPI Cards */}
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
