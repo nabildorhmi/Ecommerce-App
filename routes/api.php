@@ -75,6 +75,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/products/{product}',                       [AdminProductController::class, 'update']);
         Route::delete('/products/{product}',                      [AdminProductController::class, 'destroy']);
         Route::post('/products/discounts/clear',                  [AdminProductController::class, 'clearDiscounts']);
+        Route::post('/products/featured/clear',                   [AdminProductController::class, 'clearFeatured']);
+        Route::post('/products/new/clear',                        [AdminProductController::class, 'clearNew']);
         Route::delete('/products/{product}/media/{mediaId}',      [AdminProductController::class, 'deleteMedia']);
 
         // Category CRUD

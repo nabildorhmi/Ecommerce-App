@@ -32,6 +32,7 @@ class ProductController extends Controller
                 AllowedFilter::exact('category_id'),
                 AllowedFilter::exact('is_active'),
                 AllowedFilter::exact('is_featured'),
+                AllowedFilter::exact('is_new'),
                 AllowedFilter::callback('search', fn ($query, $value) =>
                     $query->where(fn ($q) =>
                         $q->where('name', 'like', '%' . $value . '%')
@@ -51,6 +52,13 @@ class ProductController extends Controller
                 AllowedFilter::callback('in_stock', fn ($query, $value) =>
                     $query->when((bool) $value, fn ($q) =>
                         $q->whereHas('variants', fn ($vq) => $vq->where('is_active', true)->where('stock', '>', 0))
+                    )
+                ),
+                AllowedFilter::callback('is_on_sale', fn ($query, $value) =>
+                    $query->when($value === '1', fn ($q) =>
+                        $q->whereNotNull('promo_price')->where('promo_price', '>', 0)
+                    )->when($value === '0', fn ($q) =>
+                        $q->whereNull('promo_price')->orWhere('promo_price', '=', 0)
                     )
                 ),
             ])
@@ -120,6 +128,30 @@ class ProductController extends Controller
             'message' => 'Toutes les remises ont ete desactivees.',
             'products_updated' => $productsUpdated,
             'variants_updated' => $variantsUpdated,
+        ]);
+    }
+
+    public function clearFeatured(): JsonResponse
+    {
+        $productsUpdated = Product::query()->where('is_featured', true)->update([
+            'is_featured' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Toutes les vedettes ont ete retirees.',
+            'products_updated' => $productsUpdated,
+        ]);
+    }
+
+    public function clearNew(): JsonResponse
+    {
+        $productsUpdated = Product::query()->where('is_new', true)->update([
+            'is_new' => false,
+        ]);
+
+        return response()->json([
+            'message' => 'Toutes les nouveautes ont ete retirees.',
+            'products_updated' => $productsUpdated,
         ]);
     }
 }
