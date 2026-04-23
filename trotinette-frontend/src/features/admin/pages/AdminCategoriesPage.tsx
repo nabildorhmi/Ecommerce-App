@@ -30,6 +30,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import CategoryIcon from '@mui/icons-material/Category';
 import {
   useAdminCategories,
   useDeleteCategory,
@@ -37,6 +38,14 @@ import {
 } from '../api/categories';
 import { CategoryForm } from '../components/CategoryForm';
 import type { AdminCategory } from '../types';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 interface DeleteDialogProps {
   category: AdminCategory | null;
@@ -57,7 +66,20 @@ function DeleteDialog({
     category?.product_count !== undefined && category.product_count > 0;
 
   return (
-    <Dialog open={Boolean(category)} onClose={onClose}>
+    <Dialog
+      open={Boolean(category)}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'rgba(12, 12, 20, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            borderRadius: '16px',
+          },
+        },
+      }}
+    >
       <DialogTitle>Supprimer la categorie</DialogTitle>
       <DialogContent>
         {hasProducts && (
@@ -169,28 +191,40 @@ export function AdminCategoriesPage() {
         alignItems="center"
         mb={3}
       >
-        <Typography variant="h5" fontWeight="bold">
-          Categories
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Categories
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            カテゴリー管理
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={openCreate}
+          sx={{
+            borderRadius: '10px',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+            '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 20px rgba(0,194,255,0.25)' },
+            transition: 'all 0.2s ease',
+          }}
         >
           Ajouter une categorie
         </Button>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Gestion des categories
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Organisez votre catalogue par famille de produits. Activez ou desactivez rapidement une categorie depuis le tableau.
         </Typography>
-      </Paper>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
           <TextField
             size="small"
@@ -222,16 +256,16 @@ export function AdminCategoriesPage() {
             {filteredCategories.length} categorie(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={0} sx={{ ...glassSx, p: 0, overflow: 'hidden' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Nom</TableCell>
-              <TableCell>Slug</TableCell>
-              <TableCell>Statut</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Nom</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Slug</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Statut</TableCell>
+              <TableCell align="right" sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -243,7 +277,14 @@ export function AdminCategoriesPage() {
               </TableRow>
             ) : (
               paginatedCategories.map((cat) => (
-                <TableRow key={cat.id} hover>
+                <TableRow
+                  key={cat.id}
+                  hover
+                  sx={{
+                    '&:hover': { backgroundColor: 'rgba(0,194,255,0.04)' },
+                    '& td': { borderBottom: '1px solid rgba(255,255,255,0.04)' },
+                  }}
+                >
                   <TableCell>{cat.name ?? '—'}</TableCell>
                   <TableCell>{cat.slug}</TableCell>
                   <TableCell>
@@ -318,6 +359,16 @@ export function AdminCategoriesPage() {
         onClose={() => setFormOpen(false)}
         maxWidth="sm"
         fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
       >
         <DialogTitle>
           {editTarget

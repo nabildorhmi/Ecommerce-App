@@ -27,11 +27,20 @@ import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
 import EditIcon from '@mui/icons-material/Edit';
 import SearchIcon from '@mui/icons-material/Search';
+import ArticleIcon from '@mui/icons-material/Article';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import MDEditor from '@uiw/react-md-editor';
 import { useAdminPages, useUpdatePage } from '../api/pages';
 import type { PageData } from '../api/pages';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 const pageSchema = z.object({
   title: z.string().min(1, 'Le titre est requis'),
@@ -109,21 +118,26 @@ export function AdminPagesPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight="bold">
-          Pages markdown
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Pages markdown
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            ページ管理
+          </Typography>
+        </Box>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Gestion du contenu
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Cette section centralise les pages markdown publiques. Modifiez le titre ou le contenu puis previsualisez avant enregistrement.
         </Typography>
-      </Paper>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
           <TextField
             size="small"
@@ -150,16 +164,16 @@ export function AdminPagesPage() {
             {filteredPages.length} page(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={0} sx={{ ...glassSx, p: 0, overflow: 'hidden' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Titre</TableCell>
-              <TableCell>Slug</TableCell>
-              <TableCell>Derniere modification</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Titre</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Slug</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Derniere modification</TableCell>
+              <TableCell align="right" sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -171,7 +185,14 @@ export function AdminPagesPage() {
               </TableRow>
             ) : (
               filteredPages.map((page) => (
-                <TableRow key={page.id} hover>
+                <TableRow
+                  key={page.id}
+                  hover
+                  sx={{
+                    '&:hover': { backgroundColor: 'rgba(0,194,255,0.04)' },
+                    '& td': { borderBottom: '1px solid rgba(255,255,255,0.04)' },
+                  }}
+                >
                   <TableCell>{page.title}</TableCell>
                   <TableCell>{page.slug}</TableCell>
                   <TableCell>
@@ -198,6 +219,16 @@ export function AdminPagesPage() {
         onClose={closeEdit}
         maxWidth="md"
         fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
       >
         <DialogTitle>Modifier la page</DialogTitle>
         <DialogContent>

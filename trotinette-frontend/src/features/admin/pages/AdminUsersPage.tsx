@@ -28,9 +28,18 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import PeopleIcon from '@mui/icons-material/People';
 import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser, useCreateUser } from '../api/users';
 import { useAuthStore } from '../../auth/store';
 import type { AdminUser } from '../types';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 interface DeactivateDialogProps {
   user: AdminUser | null;
@@ -46,7 +55,20 @@ function DeactivateDialog({
   isDeactivating,
 }: DeactivateDialogProps) {
   return (
-    <Dialog open={Boolean(user)} onClose={onClose}>
+    <Dialog
+      open={Boolean(user)}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'rgba(12, 12, 20, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            borderRadius: '16px',
+          },
+        },
+      }}
+    >
       <DialogTitle>{"Désactiver"}</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -162,26 +184,41 @@ export function AdminUsersPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" fontWeight="bold">
-          Utilisateurs
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Utilisateurs
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            ユーザー管理
+          </Typography>
+        </Box>
         {currentUser?.role === 'global_admin' && (
-          <Button variant="contained" onClick={() => setCreateOpen(true)}>
+          <Button
+            variant="contained"
+            onClick={() => setCreateOpen(true)}
+            sx={{
+              borderRadius: '10px',
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+              '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 20px rgba(0,194,255,0.25)' },
+              transition: 'all 0.2s ease',
+            }}
+          >
             Ajouter un utilisateur
           </Button>
         )}
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Gestion des comptes
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Filtrez par role ou statut pour administrer rapidement les comptes, puis ouvrez une fiche detail pour plus d actions.
         </Typography>
-      </Paper>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Box display="flex" gap={1.5} flexWrap="wrap" alignItems="center">
           <TextField
             size="small"
@@ -246,18 +283,18 @@ export function AdminUsersPage() {
             {data?.meta?.total ?? 0} utilisateur(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={0} sx={{ ...glassSx, p: 0, overflow: 'hidden' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>{"Nom"}</TableCell>
-              <TableCell>{"E-mail"}</TableCell>
-              <TableCell>{"Téléphone"}</TableCell>
-              <TableCell>{"Rôle"}</TableCell>
-              <TableCell>{"Statut"}</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>{"Nom"}</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>{"E-mail"}</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>{"Téléphone"}</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>{"Rôle"}</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>{"Statut"}</TableCell>
+              <TableCell align="right" sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -270,6 +307,10 @@ export function AdminUsersPage() {
             ) : (
               users.map((user) => (
                 <TableRow
+                  sx={{
+                    '&:hover': { backgroundColor: 'rgba(0,194,255,0.04)' },
+                    '& td': { borderBottom: '1px solid rgba(255,255,255,0.04)' },
+                  }}
                   key={user.id}
                   hover
                   sx={{ cursor: 'pointer' }}
@@ -378,7 +419,22 @@ export function AdminUsersPage() {
         isDeactivating={deactivateMutation.isPending}
       />
 
-      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        maxWidth="xs"
+        fullWidth
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
+      >
         <DialogTitle>Ajouter un utilisateur</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '16px !important' }}>
           <TextField label="Nom" value={createForm.name} onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))} fullWidth size="small" required />

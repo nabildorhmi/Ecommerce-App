@@ -31,6 +31,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
+import TuneIcon from '@mui/icons-material/Tune';
 import {
   useVariationTypes,
   useCreateVariationType,
@@ -38,6 +39,14 @@ import {
   useDeleteVariationType,
 } from '../api/variations';
 import type { VariationType } from '../types';
+
+const glassSx = {
+  background: 'rgba(12, 12, 20, 0.7)',
+  backdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0,194,255,0.09)',
+  borderRadius: '18px',
+  p: { xs: 2, md: 3 },
+};
 
 interface FormDialogProps {
   open: boolean;
@@ -81,7 +90,22 @@ function FormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'rgba(12, 12, 20, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            borderRadius: '16px',
+          },
+        },
+      }}
+    >
       <DialogTitle>
         {editTarget
           ? 'Modifier l\'attribut'
@@ -175,7 +199,20 @@ function DeleteDialog({
   deleteError,
 }: DeleteDialogProps) {
   return (
-    <Dialog open={Boolean(type)} onClose={onClose}>
+    <Dialog
+      open={Boolean(type)}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            background: 'rgba(12, 12, 20, 0.95)',
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0,194,255,0.12)',
+            borderRadius: '16px',
+          },
+        },
+      }}
+    >
       <DialogTitle>Supprimer l'attribut</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -294,28 +331,40 @@ export function AdminVariationTypesPage() {
         alignItems="center"
         mb={3}
       >
-        <Typography variant="h5" fontWeight="bold">
-          Attributs
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'var(--mirai-white)' }}>
+            Attributs
+          </Typography>
+          <Typography sx={{ fontFamily: '"Noto Serif JP", serif', fontSize: '0.75rem', color: 'rgba(0,194,255,0.2)', letterSpacing: '0.1em' }}>
+            属性管理
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
           onClick={openCreate}
+          sx={{
+            borderRadius: '10px',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+            '&:hover': { transform: 'translateY(-1px)', boxShadow: '0 8px 20px rgba(0,194,255,0.25)' },
+            transition: 'all 0.2s ease',
+          }}
         >
           Ajouter un attribut
         </Button>
       </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 0.5 }}>
           Gestion des attributs
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Configurez les attributs et leurs valeurs pour generer les variantes produit de facon fiable.
         </Typography>
-      </Paper>
+      </Box>
 
-      <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+      <Box sx={{ ...glassSx, mb: 2 }}>
         <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
           <TextField
             size="small"
@@ -347,15 +396,15 @@ export function AdminVariationTypesPage() {
             {filteredTypes.length} attribut(s)
           </Typography>
         </Box>
-      </Paper>
+      </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={0} sx={{ ...glassSx, p: 0, overflow: 'hidden' }}>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Nom</TableCell>
-              <TableCell>Valeurs</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Nom</TableCell>
+              <TableCell sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Valeurs</TableCell>
+              <TableCell align="right" sx={{ borderBottom: '1px solid rgba(0,194,255,0.08)', color: 'var(--mirai-gray)', fontWeight: 600, fontSize: '0.82rem' }}>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -367,7 +416,14 @@ export function AdminVariationTypesPage() {
               </TableRow>
             ) : (
               paginatedTypes.map((type) => (
-                <TableRow key={type.id} hover>
+                <TableRow
+                  key={type.id}
+                  hover
+                  sx={{
+                    '&:hover': { backgroundColor: 'rgba(0,194,255,0.04)' },
+                    '& td': { borderBottom: '1px solid rgba(255,255,255,0.04)' },
+                  }}
+                >
                   <TableCell>{type.name}</TableCell>
                   <TableCell>
                     <Box display="flex" gap={0.5} flexWrap="wrap">
