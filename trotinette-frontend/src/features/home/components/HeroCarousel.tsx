@@ -252,7 +252,6 @@ export function HeroCarousel({ fullBleed = false }: { fullBleed?: boolean }) {
               alt={current.title ?? 'Banner'}
               duration={DURATION}
               objectPosition={current.object_position}
-              isMobile={isMobileViewport}
             />
 
             {/* Dark cinematic gradient */}
