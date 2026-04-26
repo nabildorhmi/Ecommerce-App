@@ -141,3 +141,51 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/hero-banners/{heroBanner}',             [AdminHeroBannerController::class, 'destroy']);
     });
 });
+
+// TEMPORARY: One-time database setup - DELETE AFTER USE!
+Route::get('/setup-database-temp', function () {
+    try {
+        // Run migrations
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        // Create admin user
+        $user = \App\Models\User::firstOrCreate(
+            ['email' => 'nabil.dorhmi26@gmail.com'],
+            [
+                'name' => 'Nabil Dorhmi',
+                'password' => bcrypt('nabil2001'),
+                'phone' => null,
+                'status' => 'active',
+            ]
+        );
+
+        // Create roles if not exists
+        $globalAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'global_admin', 'guard_name' => 'web']);
+        $adminRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $customerRole = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
+
+        // Assign role
+        if (!$user->hasRole('global_admin')) {
+            $user->assignRole('global_admin');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Database setup complete!',
+            'migrations' => $migrateOutput,
+            'admin' => [
+                'email' => 'nabil.dorhmi26@gmail.com',
+                'password' => 'nabil2001',
+                'role' => 'global_admin'
+            ],
+            'warning' => '⚠️ DELETE THIS ROUTE FROM routes/api.php NOW!'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ], 500);
+    }
+});
