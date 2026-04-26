@@ -28,7 +28,6 @@ import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import PeopleIcon from '@mui/icons-material/People';
 import { useAdminUsers, useDeactivateUser, useUpdateUserRole, useActivateUser, useCreateUser } from '../api/users';
 import { useAuthStore } from '../../auth/store';
 import type { AdminUser } from '../types';
@@ -308,12 +307,12 @@ export function AdminUsersPage() {
               users.map((user) => (
                 <TableRow
                   sx={{
+                    cursor: 'pointer',
                     '&:hover': { backgroundColor: 'rgba(0,194,255,0.04)' },
                     '& td': { borderBottom: '1px solid rgba(255,255,255,0.04)' },
                   }}
                   key={user.id}
                   hover
-                  sx={{ cursor: 'pointer' }}
                   onClick={() => void navigate(`/admin/users/${user.id}`)}
                 >
                   <TableCell>{user.name}</TableCell>
