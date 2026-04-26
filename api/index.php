@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
 // Set CORS headers before Laravel loads
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $allowedOrigins = explode(',', getenv('CORS_ALLOWED_ORIGINS') ?: '*');
@@ -18,5 +21,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Vercel serverless entrypoint for Laravel
-require __DIR__ . '/../public/index.php';
+// Bootstrap Laravel for Vercel serverless
+define('LARAVEL_START', microtime(true));
+
+// Check maintenance mode
+if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Register Composer autoloader
+require __DIR__.'/../vendor/autoload.php';
+
+// Bootstrap Laravel and handle request
+/** @var Application $app */
+$app = require_once __DIR__.'/../bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
