@@ -194,11 +194,12 @@ export function AdminProductEditPage() {
       )}
 
       {/* ── Tab 1: Variants ── */}
-      {!isCreate && activeTab === 1 && productId > 0 && !isLoading && !error && (
+      {!isCreate && activeTab === 1 && productId > 0 && !isLoading && !error && product && (
         <Box sx={glassSx}>
           <ProductVariantsSection
             productId={productId}
-            productSku={product?.sku ?? ''}
+            productSku={product.sku ?? ''}
+            basePrice={product.price}
           />
         </Box>
       )}

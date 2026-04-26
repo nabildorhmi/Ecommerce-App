@@ -24,7 +24,6 @@ import DialogActions from '@mui/material/DialogActions';
 import Skeleton from '@mui/material/Skeleton';
 import Alert from '@mui/material/Alert';
 import Tooltip from '@mui/material/Tooltip';
-import Paper from '@mui/material/Paper';
 import Chip from '@mui/material/Chip';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -33,7 +32,6 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CenterFocusStrongIcon from '@mui/icons-material/CenterFocusStrong';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import {
   useAdminHeroBanners,
   useCreateHeroBanner,

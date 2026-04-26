@@ -30,7 +30,6 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import CategoryIcon from '@mui/icons-material/Category';
 import {
   useAdminCategories,
   useDeleteCategory,

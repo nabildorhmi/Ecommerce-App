@@ -24,8 +24,8 @@ export function WhatsAppFab() {
       rel="noopener noreferrer"
       sx={{
         position: 'fixed',
-        bottom: 24,
-        right: 24,
+        bottom: { xs: 80, md: 24 },
+        right: { xs: 16, md: 24 },
         bgcolor: '#25D366',
         color: '#fff',
         '&:hover': { bgcolor: '#1DA851' },

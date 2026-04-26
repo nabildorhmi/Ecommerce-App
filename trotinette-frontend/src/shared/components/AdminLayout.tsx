@@ -152,10 +152,7 @@ export function AdminLayout() {
         id: 'parametres',
         label: 'Parametres',
         items: [
-          { to: '/admin/site-settings#contact', icon: <SettingsIcon />, label: 'Contact et disponibilite' },
-          { to: '/admin/site-settings#social', icon: <SettingsIcon />, label: 'Reseaux sociaux' },
-          { to: '/admin/site-settings#shipping', icon: <TuneIcon />, label: 'Livraison et tarification' },
-          { to: '/admin/site-settings#short-links', icon: <DescriptionIcon />, label: 'Short links dynamiques' },
+          { to: '/admin/site-settings', icon: <SettingsIcon />, label: 'Parametres du site' },
         ],
       }]
       : []),

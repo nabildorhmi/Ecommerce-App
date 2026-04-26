@@ -31,6 +31,9 @@ import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import StarsIcon from '@mui/icons-material/Stars';
 import {
   useVariationTypes,
   useProductVariants,
@@ -38,6 +41,7 @@ import {
   useUpdateProductVariant,
   useDeleteProductVariant,
 } from '../api/variations';
+import { useAdminProduct, useUpdateProduct } from '../api/products';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { VariantGenerator } from './VariantGenerator';
 import type { ProductVariant, VariationType } from '../types';
@@ -53,12 +57,13 @@ const PAGE_SIZE = 8;
 interface ProductVariantsSectionProps {
   productId: number;
   productSku?: string;
+  basePrice: number;
 }
 
 interface VariantFormData {
   sku: string;
   priceOverrideMad: string;
-  promoPriceMad: string;
+  discountPercentage: string;
   stockQuantity: string;
   isActive: boolean;
   selectedValues: Record<number, number>;
@@ -103,10 +108,16 @@ function VariantDialog({
 
   const [selectedAttributeIds, setSelectedAttributeIds] = useState<number[]>(initialSelectedAttributeIds);
 
+  const calculateDiscountPercentage = (price: number, promoPrice: number | null): string => {
+    if (!promoPrice || price <= 0) return '';
+    const discount = Math.round(((price - promoPrice) / price) * 100);
+    return discount > 0 ? discount.toString() : '';
+  };
+
   const [formData, setFormData] = useState<VariantFormData>({
     sku: editTarget?.sku ?? '',
     priceOverrideMad: editTarget?.price ? (editTarget.price / 100).toFixed(2) : '',
-    promoPriceMad: editTarget?.promo_price ? (editTarget.promo_price / 100).toFixed(2) : '',
+    discountPercentage: editTarget ? calculateDiscountPercentage(editTarget.effective_price, editTarget.promo_price) : '',
     stockQuantity: editTarget?.stock.toString() ?? '0',
     isActive: editTarget?.is_active ?? true,
     selectedValues: initialSelectedValues,
@@ -223,15 +234,15 @@ function VariantDialog({
               }}
             />
             <TextField
-              label="Prix promo (MAD)"
+              label="Remise (%)"
               type="number"
-              value={formData.promoPriceMad}
-              onChange={(e) => setFormData({ ...formData, promoPriceMad: e.target.value })}
+              value={formData.discountPercentage}
+              onChange={(e) => setFormData({ ...formData, discountPercentage: e.target.value })}
               size="small"
-              inputProps={{ step: '0.01', min: '0' }}
-              helperText="Laisser vide → pas de promo"
+              inputProps={{ step: '1', min: '0', max: '100' }}
+              helperText="ex: 30 pour −30%"
               slotProps={{
-                input: { endAdornment: <InputAdornment position="end">MAD</InputAdornment> },
+                input: { endAdornment: <InputAdornment position="end">%</InputAdornment> },
               }}
             />
           </Box>
@@ -443,12 +454,14 @@ function VariantRow({
 // ---------------------------------------------------------------------------
 //  Main component
 // ---------------------------------------------------------------------------
-export function ProductVariantsSection({ productId, productSku }: ProductVariantsSectionProps) {
+export function ProductVariantsSection({ productId, productSku, basePrice }: ProductVariantsSectionProps) {
   const { data: variantsData, isLoading: variantsLoading } = useProductVariants(productId);
   const { data: typesData, isLoading: typesLoading } = useVariationTypes();
+  const { data: productData } = useAdminProduct(productId);
   const createMutation = useCreateProductVariant();
   const updateMutation = useUpdateProductVariant();
   const deleteMutation = useDeleteProductVariant();
+  const updateProductMutation = useUpdateProduct();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<ProductVariant | null>(null);
@@ -479,7 +492,11 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
   const handleCreate = async (data: VariantFormData) => {
     const variationValueIds = Object.values(data.selectedValues).filter((id) => id > 0);
     const priceOverride = data.priceOverrideMad.trim() ? Math.round(parseFloat(data.priceOverrideMad) * 100) : null;
-    const promoPrice = data.promoPriceMad.trim() ? Math.round(parseFloat(data.promoPriceMad) * 100) : null;
+
+    // Calculate promo price from discount percentage
+    const effectivePrice = priceOverride ?? basePrice;
+    const discountPct = data.discountPercentage.trim() ? parseInt(data.discountPercentage, 10) : 0;
+    const promoPrice = discountPct > 0 ? Math.round(effectivePrice * (1 - discountPct / 100)) : null;
 
     await createMutation.mutateAsync({
       productId,
@@ -500,7 +517,11 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
     const isDefault = editTarget.is_default;
     const variationValueIds = isDefault ? [] : Object.values(data.selectedValues).filter((id) => id > 0);
     const priceOverride = data.priceOverrideMad.trim() ? Math.round(parseFloat(data.priceOverrideMad) * 100) : null;
-    const promoPrice = data.promoPriceMad.trim() ? Math.round(parseFloat(data.promoPriceMad) * 100) : null;
+
+    // Calculate promo price from discount percentage
+    const effectivePrice = priceOverride ?? editTarget.effective_price;
+    const discountPct = data.discountPercentage.trim() ? parseInt(data.discountPercentage, 10) : 0;
+    const promoPrice = discountPct > 0 ? Math.round(effectivePrice * (1 - discountPct / 100)) : null;
 
     const payload: Record<string, unknown> = {
       sku: data.sku.trim() || null,
@@ -524,6 +545,51 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
   const handleDelete = async (id: number) => {
     await deleteMutation.mutateAsync({ productId, variantId: id });
     setDeleteTarget(null);
+  };
+
+  const handleBulkRemoveDiscounts = async () => {
+    const variantsWithDiscount = allVariants.filter((v) => v.promo_price != null);
+    if (variantsWithDiscount.length === 0) return;
+
+    if (!confirm(`Désactiver les remises pour ${variantsWithDiscount.length} variante(s) ?`)) return;
+
+    for (const variant of variantsWithDiscount) {
+      const payload: Record<string, unknown> = {
+        sku: variant.sku,
+        price: variant.price,
+        promo_price: null,
+        stock: variant.stock,
+        is_active: variant.is_active,
+      };
+      if (!variant.is_default) {
+        payload.attribute_value_ids = variant.attribute_values.map((v) => v.id);
+      }
+
+      await updateMutation.mutateAsync({
+        productId,
+        variantId: variant.id,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data: payload as any,
+      });
+    }
+  };
+
+  const handleToggleFeatured = async () => {
+    const product = productData?.data;
+    if (!product) return;
+    await updateProductMutation.mutateAsync({
+      id: productId,
+      is_featured: !product.is_featured,
+    });
+  };
+
+  const handleToggleNew = async () => {
+    const product = productData?.data;
+    if (!product) return;
+    await updateProductMutation.mutateAsync({
+      id: productId,
+      is_new: !product.is_new,
+    });
   };
 
   if (variantsLoading || typesLoading) {
@@ -570,7 +636,7 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
           )}
         </Box>
 
-        <Box display="flex" gap={1} alignItems="center">
+        <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
           {attributeVariants.length > 3 && (
             <TextField
               size="small"
@@ -588,6 +654,75 @@ export function ProductVariantsSection({ productId, productSku }: ProductVariant
                 },
               }}
             />
+          )}
+          {allVariants.some((v) => v.promo_price != null) && (
+            <Tooltip title="Supprimer toutes les remises des variantes">
+              <Button
+                variant="outlined"
+                startIcon={<LocalOfferIcon />}
+                onClick={() => void handleBulkRemoveDiscounts()}
+                size="small"
+                disabled={updateMutation.isPending}
+                sx={{
+                  borderRadius: '8px',
+                  borderColor: 'rgba(217,122,80,0.4)',
+                  color: '#D97A50',
+                  fontWeight: 600,
+                  fontSize: '0.75rem',
+                  '&:hover': { borderColor: '#D97A50', background: 'rgba(217,122,80,0.08)' },
+                }}
+              >
+                Désactiver remises
+              </Button>
+            </Tooltip>
+          )}
+          {productData?.data && (
+            <>
+              <Tooltip title={productData.data.is_featured ? "Retirer du vedette" : "Marquer comme vedette"}>
+                <Button
+                  variant="outlined"
+                  startIcon={<StarsIcon />}
+                  onClick={() => void handleToggleFeatured()}
+                  size="small"
+                  disabled={updateProductMutation.isPending}
+                  sx={{
+                    borderRadius: '8px',
+                    borderColor: productData.data.is_featured ? 'rgba(212,164,58,0.4)' : 'rgba(255,255,255,0.2)',
+                    color: productData.data.is_featured ? '#D4A43A' : 'rgba(255,255,255,0.5)',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    '&:hover': {
+                      borderColor: productData.data.is_featured ? '#D4A43A' : 'rgba(255,255,255,0.4)',
+                      background: productData.data.is_featured ? 'rgba(212,164,58,0.08)' : 'rgba(255,255,255,0.05)'
+                    },
+                  }}
+                >
+                  {productData.data.is_featured ? '★' : '☆'} Vedette
+                </Button>
+              </Tooltip>
+              <Tooltip title={productData.data.is_new ? "Retirer du nouveau" : "Marquer comme nouveau"}>
+                <Button
+                  variant="outlined"
+                  startIcon={<NewReleasesIcon />}
+                  onClick={() => void handleToggleNew()}
+                  size="small"
+                  disabled={updateProductMutation.isPending}
+                  sx={{
+                    borderRadius: '8px',
+                    borderColor: productData.data.is_new ? 'rgba(46,173,95,0.4)' : 'rgba(255,255,255,0.2)',
+                    color: productData.data.is_new ? '#2EAD5F' : 'rgba(255,255,255,0.5)',
+                    fontWeight: 600,
+                    fontSize: '0.75rem',
+                    '&:hover': {
+                      borderColor: productData.data.is_new ? '#2EAD5F' : 'rgba(255,255,255,0.4)',
+                      background: productData.data.is_new ? 'rgba(46,173,95,0.08)' : 'rgba(255,255,255,0.05)'
+                    },
+                  }}
+                >
+                  Nouveau
+                </Button>
+              </Tooltip>
+            </>
           )}
           <Button
             variant="outlined"

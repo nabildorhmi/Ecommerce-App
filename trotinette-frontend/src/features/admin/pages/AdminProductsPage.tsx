@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
+import Drawer from '@mui/material/Drawer';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
@@ -37,7 +38,13 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases';
 import NewReleasesOutlinedIcon from '@mui/icons-material/NewReleasesOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { useAdminProducts, useDeleteProduct, useUpdateProduct, useClearAllProductDiscounts } from '../api/products';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
+import Badge from '@mui/material/Badge';
+import Menu from '@mui/material/Menu';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useAdminProducts, useDeleteProduct, useUpdateProduct, useClearAllProductDiscounts, useClearAllProductFeatured, useClearAllProductNew } from '../api/products';
 import { useCategories } from '../../catalog/api/categories';
 import type { AdminProduct } from '../types';
 
@@ -114,6 +121,10 @@ export function AdminProductsPage() {
   const [search, setSearch] = useState('');
   const [categoryId, setCategoryId] = useState<number | ''>('');
   const [activeFilter, setActiveFilter] = useState<'' | '1' | '0'>('');
+  const [featuredFilter, setFeaturedFilter] = useState<'' | '1' | '0'>('');
+  const [newFilter, setNewFilter] = useState<'' | '1' | '0'>('');
+  const [onSaleFilter, setOnSaleFilter] = useState<'' | '1' | '0'>('');
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   const deferredSearch = useDeferredValue(search);
 
@@ -121,6 +132,9 @@ export function AdminProductsPage() {
   if (deferredSearch) params['filter[search]'] = deferredSearch;
   if (categoryId !== '') params['filter[category_id]'] = categoryId;
   if (activeFilter !== '') params['filter[is_active]'] = activeFilter;
+  if (featuredFilter !== '') params['filter[is_featured]'] = featuredFilter;
+  if (newFilter !== '') params['filter[is_new]'] = newFilter;
+  if (onSaleFilter !== '') params['filter[is_on_sale]'] = onSaleFilter;
 
   const { data, isLoading, isFetching, error } = useAdminProducts(params);
   const { data: categoriesData } = useCategories();
@@ -128,10 +142,15 @@ export function AdminProductsPage() {
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
   const clearDiscountsMutation = useClearAllProductDiscounts();
+  const clearFeaturedMutation = useClearAllProductFeatured();
+  const clearNewMutation = useClearAllProductNew();
 
   const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null);
   const [clearDiscountsDialogOpen, setClearDiscountsDialogOpen] = useState(false);
+  const [clearFeaturedDialogOpen, setClearFeaturedDialogOpen] = useState(false);
+  const [clearNewDialogOpen, setClearNewDialogOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [bulkMenuAnchor, setBulkMenuAnchor] = useState<null | HTMLElement>(null);
 
   const products: AdminProduct[] = (data?.data as AdminProduct[]) ?? [];
   const totalPages = data?.meta?.last_page ?? 1;
@@ -178,6 +197,32 @@ export function AdminProductsPage() {
     }
   };
 
+  const handleClearAllFeatured = async () => {
+    try {
+      const result = await clearFeaturedMutation.mutateAsync() as { products_updated?: number };
+      setClearFeaturedDialogOpen(false);
+      setFeedback({
+        type: 'success',
+        message: `Vedettes retirées (${result.products_updated ?? 0} produits).`,
+      });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec du retrait global des vedettes.' });
+    }
+  };
+
+  const handleClearAllNew = async () => {
+    try {
+      const result = await clearNewMutation.mutateAsync() as { products_updated?: number };
+      setClearNewDialogOpen(false);
+      setFeedback({
+        type: 'success',
+        message: `Nouveautés retirées (${result.products_updated ?? 0} produits).`,
+      });
+    } catch {
+      setFeedback({ type: 'error', message: 'Echec du retrait global des nouveautés.' });
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box
@@ -221,72 +266,213 @@ export function AdminProductsPage() {
       </Box>
 
       <Box sx={{ ...glassSx, mb: 2 }}>
-        <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1.5 }}>
-          Filtres et actions rapides
-        </Typography>
-        <Box display="flex" gap={1.5} flexWrap="wrap" alignItems="center">
-          <TextField
-            size="small"
-            placeholder="Rechercher (nom, SKU...)"
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            sx={{ minWidth: 220 }}
-            slotProps={{
-              input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel sx={{ fontSize: '0.82rem' }}>Categorie</InputLabel>
-            <Select
-              label="Categorie"
-              value={categoryId}
-              onChange={(e) => { setCategoryId(e.target.value as number | ''); setPage(1); }}
-              startAdornment={<FilterListIcon fontSize="small" sx={{ mr: 0.5, color: 'text.disabled' }} />}
+        <Box display="flex" gap={2} flexWrap="wrap" alignItems="center" justifyContent="space-between">
+          <Box display="flex" gap={1.5} alignItems="center" flex={1}>
+            <TextField
+              size="small"
+              placeholder="Rechercher (nom, SKU...)"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+              sx={{ minWidth: 240, flex: '1 1 auto', maxWidth: 400 }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" sx={{ color: 'text.disabled' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: search && (
+                    <InputAdornment position="end">
+                      <IconButton size="small" onClick={() => { setSearch(''); setPage(1); }} edge="end">
+                        <ClearIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+            <Badge
+              badgeContent={
+                (categoryId !== '' ? 1 : 0) +
+                (activeFilter !== '' ? 1 : 0) +
+                (featuredFilter !== '' ? 1 : 0) +
+                (newFilter !== '' ? 1 : 0) +
+                (onSaleFilter !== '' ? 1 : 0)
+              }
+              color="primary"
             >
-              <MenuItem value="">Toutes</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 130 }}>
-            <InputLabel sx={{ fontSize: '0.82rem' }}>Statut</InputLabel>
-            <Select
-              label="Statut"
-              value={activeFilter}
-              onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<FilterListIcon />}
+                onClick={() => setFilterDrawerOpen(true)}
+                sx={{
+                  borderColor: 'rgba(0,194,255,0.4)',
+                  color: '#00C2FF',
+                  '&:hover': { borderColor: '#00C2FF', background: 'rgba(0,194,255,0.08)' },
+                }}
+              >
+                Filtres
+              </Button>
+            </Badge>
+            {(categoryId !== '' || activeFilter !== '' || featuredFilter !== '' || newFilter !== '' || onSaleFilter !== '' || search !== '') && (
+              <Button
+                size="small"
+                variant="text"
+                startIcon={<ClearIcon fontSize="small" />}
+                onClick={() => {
+                  setCategoryId('');
+                  setActiveFilter('');
+                  setFeaturedFilter('');
+                  setNewFilter('');
+                  setOnSaleFilter('');
+                  setSearch('');
+                  setPage(1);
+                }}
+                sx={{ color: 'text.secondary', fontSize: '0.75rem' }}
+              >
+                Tout effacer
+              </Button>
+            )}
+          </Box>
+          <Box display="flex" gap={1.5} alignItems="center">
+            <Typography variant="body2" color="text.secondary">
+              {data?.meta?.total ?? 0} produit(s)
+            </Typography>
+            <Button
+              size="small"
+              variant="outlined"
+              endIcon={<MoreVertIcon fontSize="small" />}
+              onClick={(e) => setBulkMenuAnchor(e.currentTarget)}
+              sx={{
+                borderColor: 'rgba(255,255,255,0.12)',
+                color: 'text.secondary',
+                fontSize: '0.75rem',
+                '&:hover': { borderColor: 'rgba(255,255,255,0.2)' },
+              }}
             >
-              <MenuItem value="">Tous</MenuItem>
-              <MenuItem value="1">Actifs</MenuItem>
-              <MenuItem value="0">Inactifs</MenuItem>
-            </Select>
-          </FormControl>
-          {(search || categoryId !== '' || activeFilter !== '') && (
-            <Button size="small" variant="outlined" color="inherit" onClick={() => { setSearch(''); setCategoryId(''); setActiveFilter(''); setPage(1); }}>
-              Effacer
+              Actions groupées
             </Button>
-          )}
-          <Button
-            size="small"
-            variant="outlined"
-            color="error"
-            onClick={() => setClearDiscountsDialogOpen(true)}
-            disabled={clearDiscountsMutation.isPending}
-            startIcon={clearDiscountsMutation.isPending ? <CircularProgress size={14} /> : undefined}
-          >
-            Desactiver toutes remises
-          </Button>
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
-            {data?.meta?.total ?? 0} produit(s)
-          </Typography>
+          </Box>
         </Box>
       </Box>
+
+      <Menu
+        anchorEl={bulkMenuAnchor}
+        open={Boolean(bulkMenuAnchor)}
+        onClose={() => setBulkMenuAnchor(null)}
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(20, 20, 28, 0.98)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.08)',
+              borderRadius: '12px',
+              mt: 0.5,
+            },
+          },
+        }}
+      >
+        <MenuItem
+          onClick={() => {
+            setClearDiscountsDialogOpen(true);
+            setBulkMenuAnchor(null);
+          }}
+          disabled={clearDiscountsMutation.isPending}
+          sx={{ fontSize: '0.85rem', py: 1.2, px: 2 }}
+        >
+          Désactiver toutes les remises
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setClearFeaturedDialogOpen(true);
+            setBulkMenuAnchor(null);
+          }}
+          disabled={clearFeaturedMutation.isPending}
+          sx={{ fontSize: '0.85rem', py: 1.2, px: 2 }}
+        >
+          Désactiver toutes les vedettes
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setClearNewDialogOpen(true);
+            setBulkMenuAnchor(null);
+          }}
+          disabled={clearNewMutation.isPending}
+          sx={{ fontSize: '0.85rem', py: 1.2, px: 2 }}
+        >
+          Désactiver toutes les nouveautés
+        </MenuItem>
+      </Menu>
+
+      {/* Active filter chips */}
+      {(categoryId !== '' || activeFilter !== '' || featuredFilter !== '' || newFilter !== '' || onSaleFilter !== '') && (
+        <Box sx={{ ...glassSx, mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, mr: 0.5 }}>
+            Filtres actifs:
+          </Typography>
+          {categoryId !== '' && (
+            <Chip
+              label={`Catégorie: ${categories.find(c => c.id === categoryId)?.name ?? categoryId}`}
+              size="small"
+              onDelete={() => { setCategoryId(''); setPage(1); }}
+              sx={{
+                bgcolor: 'rgba(0,194,255,0.12)',
+                color: '#00C2FF',
+                '& .MuiChip-deleteIcon': { color: '#00C2FF', '&:hover': { color: '#00E5FF' } },
+              }}
+            />
+          )}
+          {activeFilter !== '' && (
+            <Chip
+              label={`Statut: ${activeFilter === '1' ? 'Actif' : 'Inactif'}`}
+              size="small"
+              onDelete={() => { setActiveFilter(''); setPage(1); }}
+              sx={{
+                bgcolor: 'rgba(0,194,255,0.12)',
+                color: '#00C2FF',
+                '& .MuiChip-deleteIcon': { color: '#00C2FF', '&:hover': { color: '#00E5FF' } },
+              }}
+            />
+          )}
+          {featuredFilter !== '' && (
+            <Chip
+              label={`Vedette: ${featuredFilter === '1' ? 'Oui' : 'Non'}`}
+              size="small"
+              onDelete={() => { setFeaturedFilter(''); setPage(1); }}
+              sx={{
+                bgcolor: 'rgba(0,194,255,0.12)',
+                color: '#00C2FF',
+                '& .MuiChip-deleteIcon': { color: '#00C2FF', '&:hover': { color: '#00E5FF' } },
+              }}
+            />
+          )}
+          {newFilter !== '' && (
+            <Chip
+              label={`Nouveauté: ${newFilter === '1' ? 'Oui' : 'Non'}`}
+              size="small"
+              onDelete={() => { setNewFilter(''); setPage(1); }}
+              sx={{
+                bgcolor: 'rgba(0,194,255,0.12)',
+                color: '#00C2FF',
+                '& .MuiChip-deleteIcon': { color: '#00C2FF', '&:hover': { color: '#00E5FF' } },
+              }}
+            />
+          )}
+          {onSaleFilter !== '' && (
+            <Chip
+              label={`Promotion: ${onSaleFilter === '1' ? 'Oui' : 'Non'}`}
+              size="small"
+              onDelete={() => { setOnSaleFilter(''); setPage(1); }}
+              sx={{
+                bgcolor: 'rgba(0,194,255,0.12)',
+                color: '#00C2FF',
+                '& .MuiChip-deleteIcon': { color: '#00C2FF', '&:hover': { color: '#00E5FF' } },
+              }}
+            />
+          )}
+        </Box>
+      )}
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -294,11 +480,29 @@ export function AdminProductsPage() {
         </Alert>
       )}
 
-      <TableContainer component={Paper} elevation={0} className="mirai-glass" sx={{ borderRadius: '16px', position: 'relative' }}>
-        {/* Loading overlay — shown during refetches without hiding filters */}
-        {isFetching && (
-          <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(12,12,20,0.55)', zIndex: 10, borderRadius: 1, backdropFilter: 'blur(2px)' }}>
-            <CircularProgress size={32} />
+      <TableContainer component={Paper} elevation={0} className="mirai-glass" sx={{ borderRadius: '16px', position: 'relative', minHeight: 400 }}>
+        {/* Loading overlay — shown during refetches without hiding table */}
+        {isFetching && !isLoading && (
+          <Box sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'rgba(0,194,255,0.08)',
+            backdropFilter: 'blur(1px)',
+            zIndex: 10,
+            borderTopLeftRadius: '16px',
+            borderTopRightRadius: '16px',
+            py: 1,
+            gap: 1.5,
+          }}>
+            <CircularProgress size={16} sx={{ color: '#00C2FF' }} />
+            <Typography variant="body2" sx={{ color: '#00C2FF', fontSize: '0.75rem', fontWeight: 600 }}>
+              Actualisation...
+            </Typography>
           </Box>
         )}
         <Table size="small" sx={{ borderCollapse: 'separate', borderSpacing: '0 8px' }}>
@@ -329,8 +533,32 @@ export function AdminProductsPage() {
               ))
             ) : products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} align="center" sx={{ py: 6, color: 'text.secondary' }}>
-                  Aucun produit trouvé
+                <TableCell colSpan={10} align="center" sx={{ py: 8 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                    <SearchIcon sx={{ fontSize: 48, color: 'rgba(0,194,255,0.2)' }} />
+                    <Typography variant="body1" color="text.secondary" fontWeight={600}>
+                      Aucun produit trouvé
+                    </Typography>
+                    {(search || categoryId !== '' || activeFilter !== '' || featuredFilter !== '' || newFilter !== '' || onSaleFilter !== '') && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<ClearIcon fontSize="small" />}
+                        onClick={() => {
+                          setCategoryId('');
+                          setActiveFilter('');
+                          setFeaturedFilter('');
+                          setNewFilter('');
+                          setOnSaleFilter('');
+                          setSearch('');
+                          setPage(1);
+                        }}
+                        sx={{ mt: 1 }}
+                      >
+                        Effacer les filtres
+                      </Button>
+                    )}
+                  </Box>
                 </TableCell>
               </TableRow>
             ) : (
@@ -497,31 +725,131 @@ export function AdminProductsPage() {
         </DialogActions>
       </Dialog>
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mt={3} flexWrap="wrap" gap={2}>
-        <Box display="flex" alignItems="center" gap={1}>
-          <FormControl size="small" sx={{ minWidth: 130 }}>
-            <InputLabel sx={{ fontSize: '0.8rem' }}>Lignes / page</InputLabel>
+      <Dialog
+        open={clearFeaturedDialogOpen}
+        onClose={() => setClearFeaturedDialogOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
+      >
+        <DialogTitle>Retirer la vedette de tous les produits</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Cette action va retirer l&apos;attribut vedette de tous les produits. Vous pourrez ensuite mettre en vedette de nouveaux produits.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setClearFeaturedDialogOpen(false)}
+            disabled={clearFeaturedMutation.isPending}
+          >
+            Annuler
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => void handleClearAllFeatured()}
+            disabled={clearFeaturedMutation.isPending}
+            startIcon={clearFeaturedMutation.isPending ? <CircularProgress size={16} /> : undefined}
+          >
+            Desactiver toutes vedettes
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={clearNewDialogOpen}
+        onClose={() => setClearNewDialogOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              background: 'rgba(12, 12, 20, 0.95)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(0,194,255,0.12)',
+              borderRadius: '16px',
+            },
+          },
+        }}
+      >
+        <DialogTitle>Retirer la nouveauté de tous les produits</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Cette action va retirer l&apos;attribut nouveauté de tous les produits.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setClearNewDialogOpen(false)}
+            disabled={clearNewMutation.isPending}
+          >
+            Annuler
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => void handleClearAllNew()}
+            disabled={clearNewMutation.isPending}
+            startIcon={clearNewMutation.isPending ? <CircularProgress size={16} /> : undefined}
+          >
+            Desactiver tous nouveaux
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {products.length > 0 && (
+        <Box
+          sx={{
+            ...glassSx,
+            mt: 2,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 2,
+          }}
+        >
+          <FormControl size="small" sx={{ minWidth: 140 }}>
+            <InputLabel sx={{ fontSize: '0.82rem' }}>Lignes / page</InputLabel>
             <Select
               label="Lignes / page"
               value={perPage}
               onChange={(e) => { setPerPage(Number(e.target.value)); setPage(1); }}
-              sx={{ fontSize: '0.82rem' }}
+              sx={{
+                fontSize: '0.85rem',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,194,255,0.2)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(0,194,255,0.4)' },
+              }}
             >
-              <MenuItem value={10}>10 / page</MenuItem>
-              <MenuItem value={20}>20 / page</MenuItem>
-              <MenuItem value={50}>50 / page</MenuItem>
+              <MenuItem value={10}>10 produits</MenuItem>
+              <MenuItem value={20}>20 produits</MenuItem>
+              <MenuItem value={50}>50 produits</MenuItem>
             </Select>
           </FormControl>
+          {totalPages > 1 && (
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={(_e, p) => setPage(p)}
+              color="primary"
+              showFirstButton
+              showLastButton
+              sx={{
+                '& .MuiPaginationItem-root': {
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                },
+              }}
+            />
+          )}
         </Box>
-        {totalPages > 1 && (
-          <Pagination
-            count={totalPages}
-            page={page}
-            onChange={(_e, p) => setPage(p)}
-            color="primary"
-          />
-        )}
-      </Box>
+      )}
 
       <Snackbar
         open={Boolean(feedback)}
@@ -537,6 +865,185 @@ export function AdminProductsPage() {
           {feedback?.message}
         </Alert>
       </Snackbar>
+
+      {/* Filter Drawer */}
+      <Drawer
+        anchor="right"
+        open={filterDrawerOpen}
+        onClose={() => setFilterDrawerOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              width: { xs: '100%', sm: 400 },
+              background: 'rgba(12, 12, 20, 0.98)',
+              backdropFilter: 'blur(20px)',
+              border: 'none',
+              borderLeft: '1px solid rgba(0,194,255,0.12)',
+            },
+          },
+        }}
+      >
+        <Box sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 800 }}>
+              Filtres produits
+            </Typography>
+            <IconButton size="small" onClick={() => setFilterDrawerOpen(false)} sx={{ color: 'text.secondary' }}>
+              <ClearIcon />
+            </IconButton>
+          </Box>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontSize: '0.85rem' }}>
+            Affinez la liste des produits en sélectionnant un ou plusieurs critères ci-dessous.
+          </Typography>
+          <Stack spacing={2.5}>
+            <Box>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary', textTransform: 'uppercase', mb: 1 }}>
+                Catégorie
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={categoryId}
+                  onChange={(e) => { setCategoryId(e.target.value as number | ''); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                >
+                  <MenuItem value="">Toutes les catégories</MenuItem>
+                  {categories.map((cat) => (
+                    <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
+
+            <Box>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary', textTransform: 'uppercase', mb: 1 }}>
+                Statut
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={activeFilter}
+                  onChange={(e) => { setActiveFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                >
+                  <MenuItem value="">Tous les statuts</MenuItem>
+                  <MenuItem value="1">Actifs</MenuItem>
+                  <MenuItem value="0">Inactifs</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
+
+            <Box>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary', textTransform: 'uppercase', mb: 1 }}>
+                Vedette
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={featuredFilter}
+                  onChange={(e) => { setFeaturedFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                >
+                  <MenuItem value="">Tous</MenuItem>
+                  <MenuItem value="1">En vedette</MenuItem>
+                  <MenuItem value="0">Pas en vedette</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
+
+            <Box>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary', textTransform: 'uppercase', mb: 1 }}>
+                Nouveauté
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={newFilter}
+                  onChange={(e) => { setNewFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                >
+                  <MenuItem value="">Tous</MenuItem>
+                  <MenuItem value="1">Nouveaux</MenuItem>
+                  <MenuItem value="0">Pas nouveaux</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Divider sx={{ borderColor: 'rgba(0,194,255,0.08)' }} />
+
+            <Box>
+              <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.1em', color: 'text.secondary', textTransform: 'uppercase', mb: 1 }}>
+                Promotion
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  value={onSaleFilter}
+                  onChange={(e) => { setOnSaleFilter(e.target.value as '' | '1' | '0'); setPage(1); }}
+                  displayEmpty
+                  sx={{
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.05)' },
+                  }}
+                >
+                  <MenuItem value="">Tous</MenuItem>
+                  <MenuItem value="1">En promotion</MenuItem>
+                  <MenuItem value="0">Sans promotion</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+          </Stack>
+
+          <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+            <Button
+              fullWidth
+              variant="outlined"
+              color="error"
+              startIcon={<ClearIcon />}
+              onClick={() => {
+                setCategoryId('');
+                setActiveFilter('');
+                setFeaturedFilter('');
+                setNewFilter('');
+                setOnSaleFilter('');
+                setPage(1);
+              }}
+              sx={{ borderRadius: '10px' }}
+            >
+              Réinitialiser
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setFilterDrawerOpen(false)}
+              sx={{
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #00C2FF, #0099CC)',
+                fontWeight: 700,
+              }}
+            >
+              Appliquer
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
     </Container>
   );
 }

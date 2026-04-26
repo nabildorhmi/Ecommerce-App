@@ -201,13 +201,13 @@ export function ProductDetailPage() {
       {/* Futuristic side decorations */}
       <PageDecor variant="productDetail" />
 
-      <Container maxWidth="xl" sx={{ py: { xs: 3, md: 5 }, position: 'relative', zIndex: 1 }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 2, md: 5 }, position: 'relative', zIndex: 1 }}>
         {/* Breadcrumb */}
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: { xs: 2, md: 3 } }}>
           <CategoryBreadcrumb category={product.category} />
         </Box>
 
-        <Grid container spacing={{ xs: 3, md: 6 }}>
+        <Grid container spacing={{ xs: 2, md: 6 }}>
           {/* Gallery */}
           <Grid size={{ xs: 12, md: 7 }} sx={{ order: { xs: 1, md: 1 } }}>
             <motion.div variants={fadeInLeft} initial="hidden" animate="visible">
@@ -222,13 +222,13 @@ export function ProductDetailPage() {
               <Box>
                 <Typography
                   sx={{
-                    fontSize: '0.8rem',
+                    fontSize: { xs: '0.75rem', md: '0.8rem' },
                     fontWeight: 800,
                     letterSpacing: '0.15em',
                     color: '#00C2FF',
                     textTransform: 'uppercase',
                     fontFamily: '"Orbitron", sans-serif',
-                    mb: 2,
+                    mb: { xs: 1.25, md: 2 },
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1,
@@ -243,16 +243,16 @@ export function ProductDetailPage() {
 
             {/* Description */}
             {product.description && (
-              <Box sx={{ mt: 4 }}>
+              <Box sx={{ mt: { xs: 3, md: 4 } }}>
                 <Typography
                   sx={{
-                    fontSize: '0.8rem',
+                    fontSize: { xs: '0.75rem', md: '0.8rem' },
                     fontWeight: 800,
                     letterSpacing: '0.15em',
                     color: '#00C2FF',
                     textTransform: 'uppercase',
                     fontFamily: '"Orbitron", sans-serif',
-                    mb: 2,
+                    mb: { xs: 1.25, md: 2 },
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1,
@@ -265,15 +265,15 @@ export function ProductDetailPage() {
                   <Box
                     ref={descRef}
                     sx={{
-                      fontSize: '0.92rem',
+                      fontSize: { xs: '0.85rem', md: '0.92rem' },
                       color: 'text.secondary',
-                      lineHeight: 1.8,
-                      ...(!descExpanded && { maxHeight: 135, overflow: 'hidden' }),
-                      '& h1, & h2, & h3': { color: 'text.primary', mt: 2, mb: 1 },
-                      '& ul': { pl: 3, listStyleType: 'disc' },
-                      '& ol': { pl: 3, listStyleType: 'decimal' },
+                      lineHeight: { xs: 1.6, md: 1.8 },
+                      ...(!descExpanded && { maxHeight: { xs: 120, md: 135 }, overflow: 'hidden' }),
+                      '& h1, & h2, & h3': { color: 'text.primary', mt: { xs: 1.5, md: 2 }, mb: { xs: 0.75, md: 1 } },
+                      '& ul': { pl: { xs: 2.5, md: 3 }, listStyleType: 'disc' },
+                      '& ol': { pl: { xs: 2.5, md: 3 }, listStyleType: 'decimal' },
                       '& li': { mb: 0.5, display: 'list-item' },
-                      '& p': { mb: 1.5 },
+                      '& p': { mb: { xs: 1.2, md: 1.5 } },
                       '& p:last-child': { mb: 0 },
                       '& a': { color: '#00C2FF' },
                       '& strong': { color: 'text.primary', fontWeight: 700 },
@@ -329,8 +329,8 @@ export function ProductDetailPage() {
             <Box
               className="mirai-glass"
               sx={{
-                borderRadius: { xs: '14px', md: '20px' },
-                p: { xs: 1.75, md: 3.5 },
+                borderRadius: { xs: '12px', md: '20px' },
+                p: { xs: 1.25, md: 3.5 },
                 position: 'relative',
                 overflow: 'hidden',
                 '&::before': {
@@ -344,7 +344,7 @@ export function ProductDetailPage() {
                 },
               }}
             >
-              <Stack spacing={{ xs: 1.25, md: 2.5 }}>
+              <Stack spacing={{ xs: 0.9, md: 2.5 }}>
                 {/* Category chip + NEW badge */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                   {product.category && (
@@ -382,7 +382,7 @@ export function ProductDetailPage() {
                 <Typography
                   component="h1"
                   sx={{
-                    fontSize: { xs: '1.3rem', md: '2.4rem' },
+                    fontSize: { xs: '1.15rem', md: '2.4rem' },
                     fontWeight: 900,
                     lineHeight: 1.1,
                     color: 'text.primary',
@@ -426,7 +426,7 @@ export function ProductDetailPage() {
                       <BoltIcon sx={{ fontSize: '1.2rem', color: '#D97A50', mb: '-2px' }} />
                       <Typography
                         sx={{
-                          fontSize: { xs: '1.5rem', md: '2rem' },
+                          fontSize: { xs: '1.3rem', md: '2rem' },
                           fontWeight: 800,
                           color: '#D97A50',
                           lineHeight: 1,
@@ -442,7 +442,7 @@ export function ProductDetailPage() {
                     <BoltIcon sx={{ fontSize: '1.2rem', color: '#00C2FF', mb: '-2px' }} />
                     <Typography
                       sx={{
-                        fontSize: { xs: '1.5rem', md: '2rem' },
+                        fontSize: { xs: '1.3rem', md: '2rem' },
                         fontWeight: 800,
                         color: '#00C2FF',
                         lineHeight: 1,
@@ -539,19 +539,10 @@ export function ProductDetailPage() {
                   <Typography sx={{ fontSize: { xs: '0.62rem', md: '0.72rem' }, color: 'text.secondary' }}>(500+ avis)</Typography>
                 </Box>
 
-                <Divider />
-
-                <Box sx={{ p: 1.25, borderRadius: '10px', border: '1px solid rgba(0,194,255,0.18)', backgroundColor: 'rgba(0,194,255,0.04)' }}>
-                  <Typography sx={{ fontSize: '0.72rem', fontWeight: 700, color: '#00C2FF', mb: 0.25, letterSpacing: '0.06em' }}>
-                    COMMENT ACHETER
-                  </Typography>
-                  <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', lineHeight: 1.5 }}>
-                    1. Choisissez vos options. 2. Ajoutez au panier ou achetez maintenant. 3. Confirmez avec paiement a la livraison.
-                  </Typography>
-                </Box>
+                <Divider sx={{ display: { xs: 'none', md: 'block' } }} />
 
                 {/* CTA Actions */}
-                <Stack spacing={1} sx={{ pt: 0.25 }}>
+                <Stack spacing={{ xs: 0.75, md: 1 }} sx={{ pt: 0.25, display: { xs: 'none', md: 'flex' } }}>
                   <Button
                     variant="contained"
                     size="large"
@@ -560,12 +551,12 @@ export function ProductDetailPage() {
                     onClick={handleAddToCart}
                     startIcon={<ShoppingCartIcon />}
                     sx={{
-                      py: { xs: 1.25, md: 1.75 },
-                      fontSize: { xs: '0.78rem', md: '0.88rem' },
+                      py: { xs: 1, md: 1.75 },
+                      fontSize: { xs: '0.75rem', md: '0.88rem' },
                       fontWeight: 700,
                       letterSpacing: '0.06em',
                       textTransform: 'uppercase',
-                      borderRadius: { xs: '10px', md: '12px' },
+                      borderRadius: { xs: '8px', md: '12px' },
                       bgcolor: isAddDisabled ? undefined : '#00C2FF',
                       boxShadow: isAddDisabled
                         ? 'none'
@@ -588,12 +579,12 @@ export function ProductDetailPage() {
                       disabled={isAddDisabled}
                       onClick={handleBuyNow}
                       sx={{
-                        py: { xs: 1.1, md: 1.4 },
-                        fontSize: { xs: '0.76rem', md: '0.84rem' },
+                        py: { xs: 0.9, md: 1.4 },
+                        fontSize: { xs: '0.73rem', md: '0.84rem' },
                         fontWeight: 700,
                         letterSpacing: '0.05em',
                         textTransform: 'uppercase',
-                        borderRadius: { xs: '10px', md: '12px' },
+                        borderRadius: { xs: '8px', md: '12px' },
                         borderColor: 'rgba(0,194,255,0.45)',
                         color: '#00C2FF',
                       }}
@@ -602,15 +593,15 @@ export function ProductDetailPage() {
                     </Button>
 
                   {/* Reassurance micro-copy */}
-                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 1, md: 2.5 }, flexWrap: 'wrap', pt: 0.25 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 0.75, md: 2.5 }, flexWrap: 'wrap', pt: { xs: 0, md: 0.25 } }}>
                     {[
-                      { icon: <LocalShippingOutlinedIcon sx={{ fontSize: '0.8rem' }} />, label: 'Livraison 2-5j' },
-                      { icon: <UndoIcon sx={{ fontSize: '0.8rem' }} />, label: 'Retour 30j' },
-                      { icon: <LockOutlinedIcon sx={{ fontSize: '0.8rem' }} />, label: 'Paiement sécurisé' },
+                      { icon: <LocalShippingOutlinedIcon sx={{ fontSize: { xs: '0.7rem', md: '0.8rem' } }} />, label: 'Livraison 2-5j' },
+                      { icon: <UndoIcon sx={{ fontSize: { xs: '0.7rem', md: '0.8rem' } }} />, label: 'Retour 30j' },
+                      { icon: <LockOutlinedIcon sx={{ fontSize: { xs: '0.7rem', md: '0.8rem' } }} />, label: 'Paiement sécurisé' },
                     ].map(({ icon, label }) => (
                       <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'text.disabled' }}>
                         {icon}
-                        <Typography sx={{ fontSize: '0.62rem', fontWeight: 500 }}>{label}</Typography>
+                        <Typography sx={{ fontSize: { xs: '0.58rem', md: '0.62rem' }, fontWeight: 500 }}>{label}</Typography>
                       </Box>
                     ))}
                   </Box>
@@ -632,13 +623,13 @@ export function ProductDetailPage() {
       <Box sx={{
         display: { xs: 'flex', md: 'none' },
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10,
-        bgcolor: 'rgba(12,12,20,0.95)', backdropFilter: 'blur(16px)',
+        bgcolor: 'rgba(12,12,20,0.96)', backdropFilter: 'blur(16px)',
         borderTop: '1px solid rgba(0,194,255,0.15)',
-        p: 1.5, gap: 2, alignItems: 'center',
+        p: 1.2, gap: 1.5, alignItems: 'center',
         justifyContent: 'space-between',
       }}>
         <Box>
-          <Typography sx={{ fontWeight: 800, color: displayIsOnSale ? '#D97A50' : '#00C2FF', fontSize: '1.1rem' }}>
+          <Typography sx={{ fontWeight: 800, color: displayIsOnSale ? '#D97A50' : '#00C2FF', fontSize: '1rem' }}>
             {formatCurrency(displayIsOnSale && displayPromoPrice ? displayPromoPrice : displayPrice)}
           </Typography>
         </Box>
@@ -646,10 +637,11 @@ export function ProductDetailPage() {
           variant="contained"
           disabled={isAddDisabled}
           onClick={handleAddToCart}
-          startIcon={<ShoppingCartIcon />}
+          startIcon={<ShoppingCartIcon sx={{ fontSize: '1rem' }} />}
           sx={{
-            flex: 1, maxWidth: 220, py: 1.2, fontSize: '0.8rem',
+            flex: 1, maxWidth: 190, py: 1, fontSize: '0.75rem',
             bgcolor: isAddDisabled ? undefined : '#00C2FF',
+            fontWeight: 700,
           }}
         >
           Ajouter
@@ -659,11 +651,11 @@ export function ProductDetailPage() {
           disabled={isAddDisabled}
           onClick={handleBuyNow}
           sx={{
-            py: 1.2,
-            minWidth: 120,
+            py: 1,
+            minWidth: 100,
             borderColor: 'rgba(0,194,255,0.45)',
             color: '#00C2FF',
-            fontSize: '0.72rem',
+            fontSize: '0.7rem',
             fontWeight: 700,
             whiteSpace: 'nowrap',
           }}

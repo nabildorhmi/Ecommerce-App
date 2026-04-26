@@ -68,10 +68,11 @@ function SlideImage({ src, alt, duration, objectPosition, isMobile }: {
         component="img"
         src={src}
         alt={alt}
+        loading="lazy"
         sx={{
           width: '100%',
           height: '100%',
-          objectFit: isMobile ? 'contain' : 'cover',
+          objectFit: 'cover',
           objectPosition: objectPosition ?? 'center center',
           display: 'block'
         }}
@@ -104,9 +105,9 @@ export function HeroCarousel({ fullBleed = false }: { fullBleed?: boolean }) {
   const isMobileViewport = useMediaQuery('(max-width:899.95px)');
   const banners = (data?.data ?? []).filter((b) => {
     if (isMobileViewport) {
-      return Boolean(b.image?.mobile?.hero);
+      return b.has_mobile;
     }
-    return Boolean(b.image?.desktop?.hero);
+    return b.has_desktop;
   });
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);

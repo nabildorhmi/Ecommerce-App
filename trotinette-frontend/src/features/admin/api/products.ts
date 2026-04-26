@@ -228,3 +228,34 @@ export function useClearAllProductDiscounts() {
     },
   });
 }
+
+export function useClearAllProductFeatured() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post('/admin/products/featured/clear');
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      void queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+
+export function useClearAllProductNew() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post('/admin/products/new/clear');
+      return res.data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'products'] });
+      void queryClient.invalidateQueries({ queryKey: ['products'] });
+    },
+  });
+}
+

@@ -22,6 +22,7 @@ import ClickAwayListener from '@mui/material/ClickAwayListener';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import Avatar from '@mui/material/Avatar';
+import Badge from '@mui/material/Badge';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -88,6 +89,19 @@ export function Navbar() {
 
   const { data: categoriesData } = useCategories();
   const categories = categoriesData?.data ?? [];
+
+  // Pending orders count for notification badge
+  const { data: pendingData } = useQuery({
+    queryKey: ['admin', 'orders', 'pending-count'],
+    queryFn: async () => {
+      const res = await apiClient.get('/admin/orders', { params: { 'filter[status]': 'pending', per_page: 1 } });
+      return res.data.meta?.total ?? 0;
+    },
+    enabled: user?.role === 'admin' || user?.role === 'global_admin',
+    refetchInterval: 30_000,
+    staleTime: 15_000,
+  });
+  const pendingCount = (pendingData as number) ?? 0;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -413,7 +427,9 @@ export function Navbar() {
                         '&:hover': { color: '#00C2FF', backgroundColor: 'rgba(0,194,255,0.06)' },
                       }}
                     >
-                      <AdminPanelSettingsIcon sx={{ fontSize: '1.1rem' }} />
+                      <Badge badgeContent={pendingCount} color="error" max={99}>
+                        <AdminPanelSettingsIcon sx={{ fontSize: '1.1rem' }} />
+                      </Badge>
                     </IconButton>
                   )}
 
