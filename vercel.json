@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "bash build.sh && composer install --optimize-autoloader --no-dev",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.1",
