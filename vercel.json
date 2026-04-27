@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "bash build.sh && composer install --optimize-autoloader --no-dev",
   "functions": {
     "api/index.php": {
       "runtime": "vercel-php@0.7.1",
@@ -12,6 +13,12 @@
       "dest": "/api/index.php"
     }
   ],
+  "env": {
+    "VIEW_COMPILED_PATH": "/tmp/views",
+    "CACHE_STORE": "array",
+    "SESSION_DRIVER": "database",
+    "LOG_CHANNEL": "stderr"
+  },
   "github": {
     "silent": true
   }

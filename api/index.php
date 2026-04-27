@@ -24,6 +24,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Bootstrap Laravel for Vercel serverless
 define('LARAVEL_START', microtime(true));
 
+// Ensure writable directories exist in /tmp for serverless
+$tmpDirs = [
+    '/tmp/views',
+    '/tmp/cache',
+    '/tmp/sessions',
+    '/tmp/logs',
+];
+
+foreach ($tmpDirs as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0755, true);
+    }
+}
+
 // Check maintenance mode
 if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
     require $maintenance;
@@ -39,4 +53,12 @@ $app = require_once __DIR__.'/../bootstrap/app.php';
 // Force JSON responses by setting Accept header
 $_SERVER['HTTP_ACCEPT'] = 'application/json';
 
-$app->handleRequest(Request::capture());
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
