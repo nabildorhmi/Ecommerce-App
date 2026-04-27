@@ -13,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Force JSON responses for Vercel API deployment
-        $middleware->prepend(function ($request, $next) {
+        $middleware->use(function ($request, $next) {
             $request->headers->set('Accept', 'application/json');
             return $next($request);
         });
