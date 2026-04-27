@@ -12,6 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Force JSON responses for Vercel API deployment
+        $middleware->prepend(function ($request, $next) {
+            $request->headers->set('Accept', 'application/json');
+            return $next($request);
+        });
+
         $middleware->alias([
             'role'               => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission'         => \Spatie\Permission\Middleware\PermissionMiddleware::class,
