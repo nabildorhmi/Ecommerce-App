@@ -36,4 +36,7 @@ require __DIR__.'/../vendor/autoload.php';
 /** @var Application $app */
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+// Force JSON responses by setting Accept header
+$_SERVER['HTTP_ACCEPT'] = 'application/json';
+
 $app->handleRequest(Request::capture());
